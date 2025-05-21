@@ -1,0 +1,171 @@
+body {
+    padding: 0;
+    margin: 0;
+    font-family: 'Century Gothic', sans-serif;
+    color: #000;
+    background-image: url(../Image/fondo.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    text-decoration: none;
+    text-align: center;
+    position: relative;
+}
+
+/* Capa de transparencia */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 200%;
+    background-color:#fc6998;  /* Color blanco con opacidad del 50% */
+    opacity: 0.2;
+    z-index: -1; /* Se coloca detrás del contenido del body */
+}
+/* Asegura que todo el contenido del body esté sobre el overlay */
+main, header, footer, .content {
+    position: relative;
+    z-index: 1;
+}
+
+
+
+main {
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Ajusta según tus necesidades */
+    padding: 10px;
+}
+
+main input{
+    padding: 5px;
+    width: 80%;
+    padding-right:5px ;
+    border-radius: 20px 20px;
+    border: none;
+    background-color: #f3f0f0;
+    position: relative;
+    width: 150%;
+    top: -3px;
+}
+main button{
+    position: absolute;
+    left:52%; /* Ajusta la posición desde el lado izquierdo */
+    top:18px;
+    box-decoration-break: clone;
+}
+main input#searchInput {
+    background-color: rgb(223, 220, 220);
+}
+
+
+main h4{
+    margin: 0;
+    margin-bottom: 10px; /* Espacio debajo del h5 */
+    /* Para mover el h5 hacia la izquierda pero no completamente */
+    margin-left: 55px; /* Ajusta este valor según tus necesidades */
+}
+
+main .icons {
+    margin: 0;
+    margin-bottom: 10px; /* Espacio debajo del h5 */
+    /* Para mover el h5 hacia la izquierda pero no completamente */
+    margin-right: 100px; /* Ajusta este valor según tus necesidades */
+}
+main .icons a {
+color: #000;
+text-decoration: none;
+}
+
+/*--------------------------------*/
+
+.search-form {
+    display: flex;
+    align-items: center;
+}
+
+.search-form input /*icono de lupa*/ {
+    margin-right: 5px; /* Espacio entre el input y el botón */
+
+}
+
+.icons {
+    display: flex;
+    align-items: center;
+}
+
+
+.icons i {
+    margin: 0 10px; /* Espacio entre los íconos */
+}
+
+.icons p {
+    margin: 0;
+}
+
+
+.table-responsive{
+
+    display: flex;
+    align-content: center;
+    width: 50%;
+    height: 50%;
+    margin-top: 100px; /* Mueve la tabla hacia abajo */
+    margin-left: 10%; /* Centra horizontalmente */
+    margin-right: auto; /* Centra horizontalmente */
+border-radius: 40px;
+    background-color: #fff;
+    border-color: #fc6998;
+
+
+}
+.agregar{
+    display: flex;
+    align-content: center;
+    width: 30%;
+    height: 10%;
+    margin-top: 150px; /* Mueve la tabla hacia abajo */
+    margin-left: 5%; /* Centra horizontalmente */
+    margin-right: auto; /* Centra horizontalmente */
+border-radius: 40px;
+    background-color: #fff;
+    border-color: #fc6998;
+}
+.container.mt-4 {
+    flex-direction: column; /* Asegura que los elementos dentro se alineen en columna */
+    width: 70%;
+    border-radius: 15px;
+    padding: 20px; /* Añade espacio interno */
+}
+
+
+/* Media Queries para pantallas pequeñas */
+@media (max-width: 768px) {
+    main {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .vent_semanal, .vent_mensual {
+        width: 90%;
+        height: auto;
+    }
+
+    .Graph1, .Graph2 {
+        width: 90%;
+    }
+
+    nav {
+        width: 100%;
+        max-width: none;
+    }
+
+    nav.sidenav {
+        left: 0;
+        width: 100%;
+        height: auto;
+    }
+}

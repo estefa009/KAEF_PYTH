@@ -1,0 +1,236 @@
+/*________________________ADMIN________________________*/
+    /* ESTILOS DEL BOTÓN (SIEMPRE VISIBLE) */
+.menu-toggle {
+    position: fixed;
+    top: 8px;
+    left: 10px;
+    z-index: 1001; /* Por encima de todo */
+    background: #ff6699;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+/* MENÚ LATERAL (OCULTO INICIALMENTE) */
+.sidenav {
+    position: fixed;
+    top: 0;
+    left: -250px; /* Oculta el menú */
+    width: 250px;
+    height: 100vh;
+    background: #ff6699;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+/* CLASE QUE MUESTRA EL MENÚ */
+.sidenav.active {
+    left: 0; /* Muestra el menú */
+}
+
+/* CONTENIDO DEL MENÚ */
+.sidenav-content {
+    padding: 80px 20px 20px;
+}
+
+.sidenav .logo {
+    width: 80%;
+    display: block;
+    margin: 0 auto 30px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    color: white;
+    padding: 12px 20px;
+    margin: 8px 0;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.2s;
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-link i {
+    margin-right: 10px;
+}
+
+.sidebar {
+    width: 0; /* O alguna otra forma de ocultarlo */
+    overflow-x: hidden;
+    transition: 0.3s;
+}
+
+.sidebar.open {
+    width: 250px; /* O el ancho deseado */
+}
+
+.menu-toggle {
+    cursor: pointer;
+    /* Otros estilos */
+}
+
+/*________________________CLIENTE________________________*/
+
+
+.carrito {
+    width: 10%;
+    height: 30px;
+    display: flex;
+    background-color: #fc6998;
+    border: 2px solid #4e4032;
+    border-radius: 50px;
+    position: absolute;
+    margin-left: 43%;
+    margin-top: 10px;
+    z-index: 1001;
+    cursor: pointer;
+
+}
+.carrito h1 {
+    font-family: "Dunkin";
+    font-size: 13px; /* Ajuste del tamaño para que no sea muy grande */
+    color: #4e4032;
+    margin-left: 15px;
+    margin-top: 4px;
+
+}
+.carrito img {
+    width: auto;
+    height: 100%;
+    margin-top: 2px;
+    margin-left: 30px;
+    transition: transform 0.3s ease; /* Añadir transición si es necesario */
+}
+.carrito:hover {
+    transform: scale(1.05); /* Efecto de hover */
+}
+.count-products {
+    position: absolute;
+    top: 43px; /* Ajusta según sea necesario */
+    right: 104px; /* Ajusta según sea necesario */
+    background-color: #4e4032;
+    color: #ffc0cb;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    z-index: 1001;
+}
+.container-cart-products {
+    position: absolute;
+    top: 50px; /* Ajusta según sea necesario */
+    right: 50px; /* Ajusta según sea necesario */
+    background-color: #fff;
+    border: 7px solid #ffc0cb; /* Añade un borde */
+    border-radius: 50px; /* Esquinas redondeadas */
+    width: 450px; /* Ancho del contenedor */
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    color: #4e4032;
+}
+.titulo-producto-carrito{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-top: 20px;
+    font-size: 19px;
+}
+.total-pagar{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    margin-right: 12px;
+    text-decoration: none;
+    border: none;
+}
+
+.cart-product {
+    display: flex;
+    padding: 20px; /* Espaciado interno */
+    border-bottom: 2px solid #eee; /* Separador entre productos */
+}
+
+.info-cart-product {
+    display: flex;
+    justify-content: space-between;
+    flex: 1; /* Permite que ocupe el espacio disponible */
+    align-items: center; /* Alinear verticalmente */
+}
+
+.cart-total {
+    padding: 10px;
+    text-align: right; /* Alinear texto a la derecha */
+    margin-right: 20px;
+}
+
+.icon-close {
+    cursor: pointer; /* Cambia el cursor al pasar sobre el icono */
+    width: 25px;
+    height: 25px;
+    stroke: #4e4032;
+    margin-top: 10px;
+    stroke-width: 2;
+    cursor: pointer;
+}
+.icon-close :hover{
+    stroke: #ffc0cb;
+    transform: scale(1.0);
+}
+.precio-producto-carrito{
+    font-size: 22px;
+    margin-top: 10px;
+}
+.hidden-cart{
+    display: none;
+}
+/*________________________INDEX________________________*/
+.Profile{
+    width: auto;
+    height: 30px;
+    padding-left: 0px;
+}
+
+.navbar-nav .nav-item .nav-link {
+    margin-right: 15px;
+    color: #4e4032;
+    padding: 10px;
+    margin: 0 10px;
+}
+.navbar-nav .nav-item .nav-link:hover{
+    color: #93877e;
+    transform: scale(1.05);
+}
+.navbar-nav .nav-item .nav-link:last-child {
+    margin-right: 0;
+}
+@font-face {
+    font-family: 'Dunkin';
+    src: url('../font/Dunkin.otf') format('truetype');
+}
+
+.navbar-collapse {
+    padding-right: 300px;
+    font-family: "Dunkin";
+    background-color: #ffc0cb;;
+    border-radius: 100px;
+}
+
+.navbar-brand {
+    padding-left: 200px;
+}
+.navbar-brand img{
+    height: 100%;
+    width: 100%;
+}

@@ -1,0 +1,171 @@
+body {
+    padding: 0;
+    margin: 0;
+    font-family: 'Century Gothic', sans-serif;
+    color: #000;
+    background-image: url(../Image/fondo.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    text-decoration: none;
+    text-align: center;
+    position: relative;
+}
+
+/* Capa de transparencia */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 200%;
+    background-color:#fc6998;  /* Color blanco con opacidad del 50% */
+    opacity: 0.2;
+    z-index: -1; /* Se coloca detrás del contenido del body */
+}
+/* Asegura que todo el contenido del body esté sobre el overlay */
+main, header, footer, .content {
+    position: relative;
+    z-index: 1;
+}
+
+
+
+
+main {
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Ajusta según tus necesidades */
+    padding: 10px;
+}
+
+main input{
+    padding: 5px;
+    border-radius: 20px 20px;
+    border: none;
+    background-color: #f3f0f0;
+    position: relative;
+    width: 180%;
+    top: -3px;
+}
+main button{
+    position: absolute;
+    left:60%; /* Ajusta la posición desde el lado izquierdo */
+    top:18px;
+    box-decoration-break: clone;
+}
+main input#searchInput {
+    background-color: rgb(223, 220, 220);
+}
+main h4{
+    margin: 10px;
+    margin-bottom: 10px; /* Espacio debajo del h5 */
+    /* Para mover la izquierda pero no completamente */
+    margin-left: 100px; /* Ajusta este valor según tus necesidades */
+}
+
+main h1{
+    margin-top: 10px;
+}
+
+main h5{
+    margin: 0;
+    margin-bottom: 10px; /* Espacio debajo del h5 */
+    /* Para mover el h5 hacia la izquierda pero no completamente */
+    margin-left: 100px; /* Ajusta este valor según tus necesidades */
+}
+
+main .icons {
+    margin: 0;
+    margin-bottom: 20px; /* Espacio debajo del h5 */
+    /* Para mover el h5 hacia la izquierda pero no completamente */
+    margin-left:100px; /* Ajusta este valor según tus necesidades */
+}
+main .icons a {
+    color: #000;
+    text-decoration: none;
+}
+/*--------------------------------*/
+
+.search-form {
+    display: flex;
+    align-items: center;
+}
+
+
+
+.icons {
+    display: flex;
+    align-items: center;
+}
+
+
+.icons i {
+    margin: 0 10px; /* Espacio entre los íconos */
+}
+
+.icons p {
+    margin:0;
+}
+
+
+/* Contenedores de ventas */
+
+.vent_semanal, .vent_mensual {
+    align-items: center;
+    color: #e3f634;
+    border-radius: 25px;
+    padding: 20px;
+    margin: 10px auto;
+
+}
+
+.vent_mensual {
+    color: #d694a3;
+}
+
+.tablaa {
+    background-color: #f3f0f0;
+    border-radius: 25px;
+    padding: 20px;
+    margin: 20px auto;
+}
+.table-pink { background-color: #f06292; color: white; }
+.btn-rosa { background-color: #ec407a; color: white; }
+.btn-rosa:hover { background-color: #d81b60; }
+.btn-pink-outline {
+    border: 1px solid #ec407a;
+    color: #ec407a;
+    background-color: transparent;
+}
+.btn-pink-outline:hover {
+    background-color: #f8bbd0;
+    color: #880e4f;
+}
+
+/* Estilos específicos de gráficos */
+h3 {
+    margin-bottom: 20px;
+}
+
+button {
+    margin: 5px;
+    border-radius: 20px;
+}
+
+/* Media Queries para pantallas pequeñas */
+@media (max-width: 768px) {
+    main {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .vent_semanal, .vent_mensual {
+        width: 90%;
+        height: auto;
+    }
+
+
+}

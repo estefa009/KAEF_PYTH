@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
+    <link rel="stylesheet" href="{% static 'css/menu.css' %}">
+    <link rel="icon" href="{% static 'icon/2.ico' %}" sizes="128x128" type="image/x-icon">
+</head>
+<body>
+{% include 'includes/navbar_auth.html' %}
+
+<div class="LaVida">
+    <h1>¡La vida sabe mejor con una <span class="DNUT">DNUT!</span></h1>
+</div>
+<div class="ProductoCombos shadow">
+    <div class="title">
+        <div class="Combos shadow"><h1>Combos</h1></div>
+    </div>
+    <div class="seleccion">
+        <div class="Cajas1 shadow">
+            <div class="descripcionCombo">
+                <h1>Talla S</h1>
+                <h2>Bolsa de 6 donas.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                <br>
+                <div class="precio">$10.000</div>
+                <button class="boton shadow" id="btnInfoS">Más info.</button>
+            </div>
+            <div class="imagenCombo">
+                <img src="{% static 'Image/imagenCaja1.jpg' %}" alt="Imagen Combo Talla S">
+            </div>
+        </div>
+
+        <div id="modalS" class="modal hidden">
+            <div class="modal-content">
+                <div class="imagenModal">
+                    <img id="modal-imageS" src="{% static 'Image/imagenModal1.jpg' %}" alt="Imagen Modal Talla S">
+                </div>
+                <div class="info">
+                    <span class="closeS close">&times;</span>
+                    <div class="infoCaja">
+                        <h2 id="modal-titleS">Combo<br><span class="tallas">Talla S.</span></h2>
+                        <p id="modal-descriptionS">Bolsa de 6 donas, en donde puedes escoger un solo sabor de masa, una sola cobertura y un solo topping para todas las donas. ¡Elige tus sabores favoritos!</p>
+                        <hr class="linea">
+                        <p>Descripción detallada del producto</p>
+                    </div>
+                    <button id="btnCerrarModalS">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="Cajas2 shadow">
+            <div class="descripcionCombo">
+                <h1>Talla M</h1>
+                <h2>Bolsa/caja de 12 donas.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                <br>
+                <div class="precio">$20.000</div>
+                <button class="boton shadow" id="btnInfoM">Más info.</button>
+            </div>
+            <div class="imagenCombo">
+                <img src="{% static 'Image/caja.png' %}" alt="Imagen Combo Talla M">
+            </div>
+        </div>
+
+        <div id="modalM" class="modal hidden">
+            <div class="modal-content">
+                <div class="imagenModal">
+                    <img id="modal-imageM" src="{% static 'Image/imagenModal1.jpg' %}" alt="Imagen Modal Talla M">
+                </div>
+                <div class="info">
+                    <span class="closeM close">&times;</span>
+                    <div class="infoCaja">
+                        <h2 id="modal-titleM">Combo<br><span class="tallas">Talla M.</span></h2>
+                        <p id="modal-descriptionM">Bolsa/caja de 12 donas, en donde puedes escoger varios sabores de masa, coberturas y toppings. ¡Elige tus sabores favoritos!</p>
+                        <hr class="linea">
+                        <p>Descripción detallada del producto</p>
+                    </div>
+                    <button id="btnCerrarModalM">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="Cajas3 shadow">
+            <div class="descripcionCombo">
+                <h1>Talla L</h1>
+                <h2>Caja de 18 dnts.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                <br>
+                <div class="precio">$30.000</div>
+                <button class="boton shadow" id="btnInfoL">Más info.</button>
+            </div>
+            <div class="imagenCombo"><img src="{% static 'Image/imagenCaja3.jpg' %}" alt="Imagen Combo Talla XL"></div>
+        </div>
+
+        <div id="modalL" class="modal hidden">
+            <div class="modal-content">
+                <div class="imagenModal">
+                    <img id="modal-imageL" src="{% static 'Image/imagenModal1.jpg' %}" alt="Imagen Modal Talla L">
+                </div>
+                <div class="info">
+                    <span class="closeL close">&times;</span>
+                    <div class="infoCaja">
+                        <h2 id="modal-titleL">Combo<br><span class="tallas">Talla L.</span></h2>
+                        <p id="modal-descriptionL">Caja de 12 donas, en donde puedes escoger varios sabores de masa, coberturas y toppings. ¡Elige tus sabores favoritos!</p>
+                        <hr class="linea">
+                        <p>Descripción detallada del producto</p>
+                    </div>
+                    <button id="btnCerrarModalL">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="Cajas4 shadow">
+            <div class="descripcionCombo">
+                <h1>Talla XL</h1>
+                <h2>Caja de 24 dnts.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                <br>
+                <div class="precio">$40.000</div>
+                <button class="boton shadow" id="btnInfoXL">Más info.</button>
+            </div>
+            <div class="imagenCombo"><img src="{% static 'Image/imagenCaja4.jpg' %}" alt="Imagen Caja 4"></div>
+        </div>
+        <div class="Cajas5 shadow" href="#"><img src="{% static 'Image/mas.png' %}" alt="Imagen de más"></div>
+
+        <div id="modalXL" class="modal hidden">
+            <div class="modal-content">
+                <div class="imagenModal">
+                    <img id="modal-imageXL" src="{% static 'Image/imagenModal1.jpg' %}" alt="Imagen Modal Talla XL">
+                </div>
+                <div class="info">
+                    <span class="closeXL close">&times;</span>
+                    <div class="infoCaja">
+                        <h2 id="modal-titleXL">Combo<br><span class="tallas">Talla XL.</span></h2>
+                        <p id="modal-descriptionXL">Caja de 24 donas, en donde puedes escoger varios sabores de masa, coberturas y toppings. ¡Elige tus sabores favoritos!</p>
+                        <hr class="linea">
+                        <p>Descripción detallada del producto</p>
+                    </div>
+                    <button id="btnCerrarModalXL">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="campo"></div>
+    <div class="cajones" id="ProductMasas"></div>
+</div>
+<div class="ProductoMasas shadow">
+    <div class="title">
+        <div class="Masas shadow"><h1>Masa</h1></div>
+    </div>
+    <div class="seleccion">
+        <!-- Masa 1 - Vainilla -->
+        <div class="Masa1 shadow">
+            <div class="descripcionMasa">
+                <h1>Vainilla</h1>
+                <h2>Masa con sabor a vainilla.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                <br>
+                <div class="precio">$0.00</div>
+                <button class="boton shadow" id="btnInfoV">Más información</button>
+            </div>
+            <div class="imagenMasita">
+                <img src="{% static 'Image/Masa1.png' %}" alt="Imagen Masa 1">
+            </div>
+        </div>
+
+        <!-- Modal Vainilla -->
+        <div id="modalV" class="modal hidden">
+            <div class="modal-content">
+                <div class="imagenModal">
+                    <img id="modal-imageV" src="{% static 'Image/Masa1.png' %}" alt="Imagen Modal V">
+                </div>
+                <div class="info">
+                    <span class="closeV close">&times;</span>
+                    <div class="infoCaja">
+                        <h2 id="modal-titleV">Masa<br><span class="tallas">Vainilla</span></h2>
+                        <p id="modal-descriptionV">Masa con sabor a vainilla. ¡Elige tus sabores favoritos!</p>
+                        <hr class="linea">
+                        <p>Descripción detallada del producto</p>
+                    </div>
+                    <button id="btnCerrarModalV">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Masa 2 - Chocolate -->
+        <div class="Masa2 shadow">
+            <div class="descripcionMasa">
+                <h1>Chocolate</h1>
+                <h2>Masa con sabor a chocolate.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                <br>
+                <div class="precio">$0.00</div>
+                <button class="boton shadow" id="btnInfoC">Más información</button>
+            </div>
+            <div class="imagenMasita">
+                <img src="{% static 'Image/Masa2.png' %}" alt="Imagen Masa 2">
+            </div>
+        </div>
+
+        <!-- Modal Chocolate -->
+        <div id="modalC" class="modal hidden">
+            <div class="modal-content">
+                <div class="imagenModal">
+                    <img id="modal-imageC" src="{% static 'Image/Masa2.png' %}" alt="Imagen Modal C">
+                </div>
+                <div class="info">
+                    <span class="closeC close">&times;</span>
+                    <div class="infoCaja">
+                        <h2 id="modal-titleC">Masa<br><span class="tallas">Chocolate</span></h2>
+                        <p id="modal-descriptionC">Masa con sabor a chocolate. ¡Elige tus sabores favoritos!</p>
+                        <hr class="linea">
+                        <p>Descripción detallada del producto</p>
+                    </div>
+                    <button id="btnCerrarModalC">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Masa 3 - Red Velvet -->
+        <div class="Masa3 shadow">
+            <div class="descripcionMasa">
+                <h1>Red Velvet</h1>
+                <h2>Masa con sabor a red velvet.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                <br>
+                <div class="precio">$0.00</div>
+                <button class="boton shadow" id="btnInfoR">Más información</button>
+            </div>
+            <div class="imagenMasita">
+                <img src="{% static 'Image/Masa3.png' %}" alt="Imagen Masa 3">
+            </div>
+        </div>
+
+        <!-- Modal Red Velvet -->
+        <div id="modalR" class="modal hidden">
+            <div class="modal-content">
+                <div class="imagenModal">
+                    <img id="modal-imageR" src="{% static 'Image/Masa3.png' %}" alt="Imagen Modal R">
+                </div>
+                <div class="info">
+                    <span class="closeR close">&times;</span>
+                    <div class="infoCaja">
+                        <h2 id="modal-titleR">Masa<br><span class="tallas">Red Velvet</span></h2>
+                        <p id="modal-descriptionR">Masa con sabor a red velvet. ¡Elige tus sabores favoritos!</p>
+                        <hr class="linea">
+                        <p>Descripción detallada del producto</p>
+                    </div>
+                    <button id="btnCerrarModalR">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="campo"></div>
+    <div class="cajones" id="ProductCobertura"></div>
+</div>
+
+<div class="ProductoCobert shadow">
+    <div class="title">
+        <div class="Cobertura shadow"><h1>Cobertura</h1></div>
+    </div>
+    <div class="seleccion">
+        <!-- Cobertura 1 - Chocolate Blanco -->
+        <div class="Cober1 shadow">
+            <div class="descripcionCober">
+                <h1>Chocolate Blanco</h1>
+                <h2>Elige el color que quieras.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                <div class="precio">$0.00</div>
+                <button class="boton shadow" id="btnInfoB">Más información</button>
+            </div>
+            <div class="imagenCober">
+                <img src="{% static 'Image/cober1.png' %}" alt="Cobertura 1">
+            </div>
+        </div>
+
+        <!-- Modal Chocolate Blanco -->
+        <div id="modalB" class="modal hidden">
+            <div class="modal-content">
+                <div class="imagenModal">
+                    <img id="modal-imageB" src="{% static 'Image/cober1.png' %}" alt="Imagen Modal B">
+                </div>
+                <div class="info">
+                    <span class="closeB close">&times;</span>
+                    <div class="infoCaja">
+                        <h2 id="modal-titleB">Cobertura<br><span class="tallas">Chocolate blanco</span></h2>
+                        <p id="modal-descriptionB">Elige el color que quieras. ¡Elige tus sabores favoritos!</p>
+                        <hr class="linea">
+                        <p>Descripción detallada del producto</p>
+                    </div>
+                    <button id="btnCerrarModalB">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cobertura 2 - Chocolate Oscuro -->
+        <div class="Cober2 shadow">
+            <div class="descripcionCober">
+                <h1>Chocolate Oscuro</h1>
+                <h2>Bañado de chocolate negro.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                <div class="precio">$0.00</div>
+                <button class="boton shadow" id="btnInfoOS">Más información</button>
+            </div>
+            <div class="imagenCober">
+                <img src="{% static 'Image/cober2.png' %}" alt="Cobertura 2">
+            </div>
+        </div>
+
+        <!-- Modal Chocolate Oscuro -->
+        <div id="modalOS" class="modal hidden">
+            <div class="modal-content">
+                <div class="imagenModal">
+                    <img id="modal-imageOS" src="{% static 'Image/cober2.png' %}" alt="Imagen Modal OS">
+                </div>
+                <div class="info">
+                    <span class="closeOS close">&times;</span>
+                    <div class="infoCaja">
+                        <h2 id="modal-titleOS">Cobertura<br><span class="tallas">Chocolate oscuro</span></h2>
+                        <p id="modal-descriptionOS">Bañado de chocolate negro. ¡Elige tus sabores favoritos!</p>
+                        <hr class="linea">
+                        <p>Descripción detallada del producto</p>
+                    </div>
+                    <button id="btnCerrarModalOS">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cobertura 3 - Arequipe -->
+        <div class="Cober3 shadow">
+            <div class="descripcionCober">
+                <h1>Arequipe</h1>
+                <h2>Bañado de dulce de leche.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                <br>
+                <div class="precio">$0.00</div>
+                <button class="boton shadow" id="btnInfoA">Más información</button>
+            </div>
+            <div class="imagenCober">
+                <img src="{% static 'Image/cober3.png' %}" alt="Cobertura 3">
+            </div>
+        </div>
+
+        <!-- Modal Arequipe -->
+        <div id="modalA" class="modal hidden">
+            <div class="modal-content">
+                <div class="imagenModal">
+                    <img id="modal-imageA" src="{% static 'Image/cober3.png' %}" alt="Imagen Modal A">
+                </div>
+                <div class="info">
+                    <span class="closeA close">&times;</span>
+                    <div class="infoCaja">
+                        <h2 id="modal-titleA">Cobertura<br><span class="tallas">Arequipe</span></h2>
+                        <p id="modal-descriptionA">Bañado de dulce de leche. ¡Elige tus sabores favoritos!</p>
+                        <hr class="linea">
+                        <p>Descripción detallada del producto</p>
+                    </div>
+                    <button id="btnCerrarModalA">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="campo"></div>
+    <div class="cajones" id="ProductToppings"></div>
+</div>
+<div class="ProductoToppings shadow">
+    <div class="title">
+        <div class="Toppings shadow"><h1>Toppings</h1></div>
+    </div>
+    <div class="seleccion">
+        <div class="Topp1 shadow">
+            <div class="descripcionTopp">
+                <h1>Chispas</h1>
+                <h2>Chispas de colores.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                <br>
+                <br>
+                <div class="precio">$0.00</div>
+                <button class="boton shadow" id="btnInfoT1">Más info.</button>
+            </div>
+            <div class="imagenTopp">
+                <img src="{% static 'Image/pepitas.png' %}" alt="Topping Pepitas">
+            </div>
+        </div>
+        <div id="modalT1" class="modal hidden">
+            <div class="modal-content">
+                <div class="imagenModal">
+                    <img id="modal-imageT1" src="{% static 'Image/pepitas.png' %}" alt="Imagen Modal T1">
+                </div>
+                <div class="info">
+                    <span class="closeT1 close">&times;</span>
+                    <div class="infoCaja">
+                        <h2 id="modal-titleT1">Topping<br><span class="tallas">Chispas</span></h2>
+                        <p id="modal-descriptionT1">Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam pariatur error enim. Optio nobis vero voluptas repellendus ducimus consequatur impedit, laudantium possimus aspernatur, perspiciatis iure eius magnam cumque! Iure, voluptate.</p>
+                        <hr class="linea">
+                        <p>Descripción detallada del producto</p>
+                    </div>
+                    <button id="btnCerrarModalT1">Cerrar</button>
+                </div>
+            </div>
+        </div>
+        <div class="Topp2 shadow">
+            <div class="descripcionTopp">
+                <h1>Oreo</h1>
+                <h2>Trozos de galleta oreo.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                <br>
+                <br>
+                <div class="precio">$0.00</div>
+                <button class="boton shadow" id="btnInfoT2">Más info.</button>
+            </div>
+            <div class="imagenTopp"> <img src="{% static 'Image/oreo.png' %}" alt="Topping Oreo"></div>
+        </div>
+        <div id="modalT2" class="modal hidden">
+            <div class="modal-content">
+                <div class="imagenModal">
+                    <img id="modal-imageT2" src="{% static 'Image/oreo.png' %}" alt="Imagen Modal T2">
+                </div>
+                <div class="info">
+                    <span class="closeT2 close">&times;</span>
+                    <div class="infoCaja">
+                        <h2 id="modal-titleT2">Topping<br><span class="tallas">Oreo</span></h2>
+                        <p id="modal-descriptionT2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam pariatur error enim. Optio nobis vero voluptas repellendus ducimus consequatur impedit, laudantium possimus aspernatur, perspiciatis iure eius magnam cumque! Iure, voluptate.</p>
+                        <hr class="linea">
+                        <p>Descripción detallada del producto</p>
+                    </div>
+                    <button id="btnCerrarModalT2">Cerrar</button>
+                </div>
+            </div>
+        </div>
+        <div class="Topp3 shadow">
+            <div class="descripcionTopp">
+                <h1>M&M</h1>
+                <h2>Chocolates M&M's.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                <br>
+                <br>
+                <div class="precio">$0.00</div>
+                <button class="boton shadow" id="btnInfoT3">Más info.</button>
+            </div>
+            <div class="imagenTopp">        <img src="{% static 'Image/mym.png' %}" alt="Topping M&M">
+            </div>
+        </div>
+        <div id="modalT3" class="modal hidden">
+            <div class="modal-content">
+                <div class="imagenModal">
+                    <img id="modal-imageT3" src="{% static 'Image/mym.png' %}" alt="Imagen Modal T3">
+                </div>
+                <div class="info">
+                    <span class="closeT3 close">&times;</span>
+                    <div class="infoCaja">
+                        <h2 id="modal-titleT3">Topping<br><span class="tallas">M&M's</span></h2>
+                        <p id="modal-descriptionT3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam pariatur error enim. Optio nobis vero voluptas repellendus ducimus consequatur impedit, laudantium possimus aspernatur, perspiciatis iure eius magnam cumque! Iure, voluptate.</p>
+                        <hr class="linea">
+                        <p>Descripción detallada del producto</p>
+                    </div>
+                    <button id="btnCerrarModalT3">Cerrar</button>
+                </div>
+            </div>
+        </div>
+        <div class="Topp4 shadow">
+            <div class="descripcionTopp">
+                <h1>Chips</h1>
+                <h2>Chips de chocolate blanco, oscuro o de colores.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                <br>
+                <div class="precio">$0.00</div>
+                <button class="boton shadow" id="btnInfoT4">Más info.</button>
+            </div>
+            <div class="imagenTopp">        <img src="{% static 'Image/chips.png' %}" alt="Topping Chips">
+            </div>
+        </div>
+        <div id="modalT4" class="modal hidden">
+            <div class="modal-content">
+                <div class="imagenModal">
+                    <img id="modal-imageT4" src="{% static 'Image/chips.png' %}" alt="Imagen Modal T4">
+                </div>
+                <div class="info">
+                    <span class="closeT4 close">&times;</span>
+                    <div class="infoCaja">
+                        <h2 id="modal-titleT4">Topping<br><span class="tallas">Chips</span></h2>
+                        <p id="modal-descriptionT4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam pariatur error enim. Optio nobis vero voluptas repellendus ducimus consequatur impedit, laudantium possimus aspernatur, perspiciatis iure eius magnam cumque! Iure, voluptate.</p>
+                        <hr class="linea">
+                        <p>Descripción detallada del producto</p>
+                    </div>
+                    <button id="btnCerrarModalT4">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="campo"></div>
+    <div class="cajones" id="Product"></div>
+</div>
+<div class="InformacionFinal">
+    <ul class="navbarFinal">
+        <li><a href="{% url 'index' %}">Inicio</a></li>
+        <li><a href="{% url 'catalogo' %}">Catálogo</a></li>
+        <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
+        <li><a href="{% url 'contactanos' %}">Contáctanos</a></li>
+    </ul>
+    <div class="Direccion">
+        <br><hr><br>
+        <p>Cra 13 # 6510, Bogotá, Colombia <br>
+            © {% now "Y" %} Stefa´s Donuts.</p>
+    </div>
+</div>
+
+<script src="{% static 'js/LPCatalogo.js' %}" defer></script>
+
+<script>
+    function mostrarModal(modalId) {
+        document.getElementById(modalId).classList.remove('hidden');
+    }
+
+    function cerrarModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
+
+    // Cerrar modal al hacer clic fuera del contenido
+    window.onclick = function(event) {
+        document.querySelectorAll('.modal').forEach(modal => {
+            if (event.target == modal) {
+                modal.classList.add('hidden');
+            }
+        });
+    };
+</script>
+</body>
+</html>

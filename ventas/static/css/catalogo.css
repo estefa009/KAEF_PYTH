@@ -1,0 +1,599 @@
+*{
+    box-sizing: border-box;
+}
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fc6998;
+
+}
+.Profile{
+    width: auto;
+    height: 30px;
+    padding-left: 5px;
+}
+.InformacionFinal {
+    width: 100%;
+    height: 300px;
+    background-color: #695450;
+
+}
+.navbarFinal {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Dunkin";
+    padding-top: 50px;
+}
+
+.navbarFinal li {
+    margin: 0 30px;
+}
+
+.navbarFinal li::after {
+    content: '|';
+    margin-left: 30px;
+    color: #93877e;
+}
+
+.navbarFinal li:last-child::after {
+    content: '';
+}
+
+.navbarFinal a {
+    text-decoration: none;
+    color: #93877e;
+    transition: transform 0.3s; /* Animación suave */
+    display: inline-block;
+}
+.navbarFinal a:hover {
+    transform: scale(1.05);
+    color: #ecd6c0;
+}
+.Direccion{
+    text-align: center;
+    color: #93877e;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+.LaVida{
+    height: 110px;
+    width: 100%;
+    background-color:#fff9c7;
+}
+.LaVida h1 {
+    font-family: "Dunkin";
+    color: #4e4032;
+    font-size: 50px;
+    text-align: center;
+
+}
+.DNUT {
+    font-size: 70px;
+}
+.ProductoCombos, .ProductoMasas, .ProductoCobert, .ProductoToppings{
+    height: 350px;
+    width: 100%;
+}
+.Combos h1, .Masas h1, .Cobertura h1, .Toppings h1 {
+    font-family: "Dunkin";
+    color: #4e4032;
+    margin-left: 50px;
+    font-size: 30px;
+    padding-top: 8px;
+    position: relative;
+    display: inline-block;
+}
+.Combos h1::before, .Masas h1::before, .Cobertura h1::before, .Toppings h1::before{
+    content: '';
+    position: absolute;
+    left: -40px; /* Ajusta la distancia desde el texto */
+    top: 50%; /* Centrar verticalmente */
+    transform: translateY(-50%);
+    width: 30px; /* Longitud de la línea */
+    height: 8px; /* Grosor de la línea */
+    background-color: #ffc0cb; /* Color de la línea */
+    border-radius: 90px;
+    margin-top: 10px;
+}
+.Combos h1::after {
+    content: '';
+    position: absolute;
+    right: -1254px; /* Línea después del texto */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1245px;
+    height: 8px;
+    background-color: #ffc0cb;
+    border-radius: 90px;
+    margin-top: 10px;
+}
+.Combos, .Masas, .Cobertura, .Toppings{
+    width: 97%;
+    height: 50px;
+    background-color: white;
+    border-radius: 100px;
+    margin-left: 20px;
+    margin-top: 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+.Cajas1, .Cajas2, .Cajas3, .Cajas4{
+    width: 20%;
+    height: 250px;
+    background-color: #f2f2f2;
+    border-radius: 60px;
+    float: right;
+    margin: 15px;
+    transition: transform 0.3s ease;
+}
+.Cajas1:hover, .Cajas2:hover, .Cajas3:hover, .Cajas4:hover{
+    transform: scale(1.05);
+}
+.Cajas5:hover{
+    transform: scale(1.05);
+}
+.seleccion {
+    width: 100%;
+    height: 100px;
+    display: flex;
+    background-color: #ffc0cb;
+}
+
+.Cajas5 {
+    width: 8%;
+    height: 250px;
+    background-color: #f2f2f2;
+    border-radius: 60px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.Cajas5 img {
+    width: 50%;
+    height: 60px;
+}
+.Masas h1::after {
+    content: '';
+    position: absolute;
+    right: -1300px; /* Línea después del texto */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1290px;
+    height: 8px;
+    background-color: #ffc0cb;
+    border-radius: 90px;
+    margin-top: 10px;
+}
+.Cobertura h1::after {
+    content: '';
+    position: absolute;
+    right: -1200px; /* Línea después del texto */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1190px;
+    height: 8px;
+    background-color: #ffc0cb;
+    border-radius: 90px;
+    margin-top: 10px;
+}
+.Toppings h1::after {
+    content: '';
+    position: absolute;
+    right: -1243px; /* Línea después del texto */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1233px;
+    height: 8px;
+    background-color: #ffc0cb;
+    border-radius: 90px;
+    margin-top: 10px;
+}
+.Masa1, .Masa2, .Masa3 {
+    width: 30%;
+    height: 250px;
+    background-color: #f2f2f2;
+    border-radius: 60px;
+    float: right;
+    margin: 15px;
+    transition: transform 0.3s ease;
+}
+.Masa1:hover, .Masa2:hover, .Masa3:hover{
+    transform: scale(1.05);
+}
+
+.Cober1, .Cober2, .Cober3 {
+    width: 30%;
+    height: 250px;
+    background-color: #f2f2f2;
+    border-radius: 60px;
+    float: right;
+    margin: 15px;
+    transition: transform 0.3s ease;
+}
+.Cober1:hover, .Cober2:hover,.Cober3:hover {
+    transform: scale(1.05);
+}
+
+.Topp1, .Topp2, .Topp3, .Topp4 {
+    width: 25%;
+    height: 250px;
+    background-color: #f2f2f2;
+    border-radius: 60px;
+    float: right;
+    margin: 15px;
+    transition: transform 0.3s ease;
+}
+
+.Topp1:hover, .Topp2:hover,.Topp3:hover, .Topp4:hover{
+    transform: scale(1.05);
+}
+
+.imagenCombo, .imagenMasita, .imagenCober, .imagenTopp {
+    width: 40%;
+    height: 250px;
+}
+
+.descripcionCombo, .descripcionMasa, .descripcionCober, .descripcionTopp {
+    width: 60%;
+    height: 250px;
+    float: right;
+}
+
+.descripcionCombo h1, .descripcionCober h1, .descripcionTopp h1 {
+    font-family: "Dunkin";
+    color: #4e4032;
+    margin-top: 20px;
+    font-size: 30px;
+    margin-left: 10px;
+}
+.descripcionCombo h2, .descripcionCober h2, .descripcionTopp h2 {
+    color: #4e4032;
+    font-size: 15px;
+    margin-left: 10px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.precio {
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: #4e4032;
+    font-size: 20px;
+    margin-left: 20px;
+    width: 20%;
+    height: 30px;
+}
+.boton {
+    height: 40px;
+    width: 70%;
+    border-radius: 50px;
+    background-color: #4e4032;
+    color: #ffc0cb;
+    border: 2px solid#4e4032;
+    font-family: "Dunkin";
+    margin-left: 10px;
+    position: relative;
+    z-index: 3;
+
+}
+.boton:hover{
+    background-color: #ffc0cb;
+    border: 2px solid #ffc0cb;
+    color: #695450;
+    transform: scale(1.05);
+    font-family: "Dunkin";
+}
+.descripcionMasa h1, .descripcionCober h1{
+    font-family: "Dunkin";
+    color: #4e4032;
+    margin-top: 20px;
+    font-size: 30px;
+    margin-left: 15px;
+}
+.descripcionMasa h2, .descripcionCober h2{
+    color: #4e4032;
+    font-size: 15px;
+    margin-left: 15px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.Cajas1, .Cajas2, .Cajas3, .Cajas4, .Masa1, .Masa2, .Masa3, .Cober2, .Cober1, .Cober3, .Topp1, .Topp2, .Topp3, .Topp4{
+    overflow: hidden; /* Esconde el contenido que sobresalga */
+}
+.Cajas1 img, .Cajas2 img, .Cajas3 img, .Topp2 img, .Topp1 img{
+    width: 215px;
+    height: 100%;
+    position: relative;
+    padding-right: 80px;
+}
+.Topp1 img{
+    width: 265px;
+    height: 100%;
+    position: relative;
+    padding-right: 80px;
+}
+.Topp4 img{
+    width: 245px;
+    height: 100%;
+    position: relative;
+    padding-right: 80px;
+}
+.Topp2 img{
+    width: 240px;
+    height: 100%;
+    position: relative;
+
+}
+.Topp3 img{
+    width: 238px;
+    height: 100%;
+    position: relative;
+    padding-right: 80px;
+}
+.Cajas3 img{
+    width: 213px;
+    height: 100%;
+    position: relative;
+
+}
+.Cajas4 img{
+    width: 180px;
+    height: 100%;
+    position: relative;
+    padding-right: 60px;
+    padding-left: 20px;
+}
+.Masa1 img, .Masa2 img, .Masa3 img, .Cober3 img{
+    width: 100%;
+    height: 100%;
+    padding-left: 0px;
+}
+.Cober1 img{
+    width: 100%;
+    height: 230px;
+    padding-left: 30px;
+}
+.Cober2 img {
+    width: 140px;
+    height: 90%;
+    padding-left: 20px;
+}
+.cajones{
+    width: 100%;
+    height: 200px;
+}
+.campo{
+    width: 100%;
+    height: 60px;
+}
+.carrito {
+    width: 10%;
+    height: 30px;
+    display: flex;
+    background-color: #fc6998;
+    border: 2px solid #4e4032;
+    border-radius: 50px;
+    position: absolute;
+    margin-left: 43%;
+    margin-top: 10px;
+    z-index: 10;
+    cursor: pointer;
+
+}
+.carrito h1 {
+    font-family: "Dunkin";
+    font-size: 13px; /* Ajuste del tamaño para que no sea muy grande */
+    color: #4e4032;
+    margin-left: 15px;
+    margin-top: 4px;
+}
+.carrito img {
+    width: auto;
+    height: 100%;
+    margin-top: 2px;
+    margin-left: 30px;
+    transition: transform 0.3s ease; /* Añadir transición si es necesario */
+}
+.carrito:hover {
+    transform: scale(1.05); /* Efecto de hover */
+}
+.count-products {
+    position: absolute;
+    top: 43px; /* Ajusta según sea necesario */
+    right: 84px; /* Ajusta según sea necesario */
+    background-color: #4e4032;
+    color: #ffc0cb;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    z-index: 10;
+}
+.container-cart-products {
+    position: absolute;
+    top: 50px; /* Ajusta según sea necesario */
+    right: 50px; /* Ajusta según sea necesario */
+    background-color: #fff;
+    border: 7px solid #ffc0cb; /* Añade un borde */
+    border-radius: 50px; /* Esquinas redondeadas */
+    width: 450px; /* Ancho del contenedor */
+    z-index: 1;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    /*display: none; /* Inicialmente oculto */
+}
+.titulo-producto-carrito{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-top: 20px;
+    font-size: 19px;
+}
+.total-pagar{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    margin-right: 12px;
+}
+
+.cart-product {
+    display: flex;
+    padding: 20px; /* Espaciado interno */
+    border-bottom: 2px solid #eee; /* Separador entre productos */
+}
+
+.info-cart-product {
+    display: flex;
+    justify-content: space-between;
+    flex: 1; /* Permite que ocupe el espacio disponible */
+    align-items: center; /* Alinear verticalmente */
+}
+
+.cart-total {
+    padding: 10px;
+    text-align: right; /* Alinear texto a la derecha */
+    border-top: 1px solid #ccc; /* Línea superior para separación */
+    margin-right: 20px;
+}
+
+.icon-close {
+    cursor: pointer; /* Cambia el cursor al pasar sobre el icono */
+    width: 25px;
+    height: 25px;
+    stroke: #4e4032;
+    margin-top: 10px;
+    stroke-width: 2;
+    cursor: pointer;
+}
+.icon-close :hover{
+    stroke: #ffc0cb;
+    transform: scale(1.0);
+}
+.precio-producto-carrito{
+    font-size: 22px;
+    margin-top: 10px;
+}
+.hidden-cart{
+    display: none;
+}
+/* Estilos para el modal */
+.modal {
+    display: flex; /* Flexbox para centrar */
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1000; /* Asegura que el modal esté encima */
+    width: 100%;
+    height: 100%;
+    background-color: rgba(58, 47, 54, 0.437); /* Fondo oscuro */
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 0; /* Eliminar padding del contenedor */
+    width: 60%; /* Ajusta el ancho del modal */
+    height: 600px;
+    border-radius: 100px;
+    display: flex;
+    flex-direction: row; /* Imagen a la izquierda, info a la derecha */
+    align-items: stretch; /* Asegura que ambos elementos se ajusten a la misma altura */
+    gap: 0; /* Elimina el espacio entre los elementos */
+    overflow: hidden;
+}
+.modal-body {
+    overflow-y: auto; /* Permite el desplazamiento vertical */
+    max-height: 600px; /* Ajusta la altura máxima del contenido */
+}
+.close {
+    color: #4e4032;
+    float: right;
+    font-size: 27px;
+    font-weight: bold;
+    margin-right: 30px;
+    border-radius: 100px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.close:hover,
+.close:focus {
+    color: #ffc0cb;
+    text-decoration: none;
+    cursor: pointer;
+}
+.hidden {
+    display: none; /* Oculta el modal por defecto */
+}
+.info {
+    flex-basis: 60%; /* Ocupará el 60% del espacio */
+    height: auto; /* Se ajusta dinámicamente según el contenido */
+    margin: 0; /* Sin márgenes */
+    padding: 20px; /* Si quieres agregar padding dentro de la info */
+    font-family: "Dunkin";
+}
+.imagenModal {
+    flex-basis: 40%; /* Ocupará el 40% del espacio */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto; /* Se ajusta dinámicamente según el contenido */
+    margin: 0; /* Sin márgenes */
+    padding: 0; /* Sin padding */
+    overflow: hidden;
+}
+
+.imagenModal img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+.infoCaja h2 {
+    font-size: 40px;
+    color: #4e4032;
+}
+.tallas {
+    font-size: 60px;
+}
+.infoCaja p {
+    font-size: 16px;
+    color: #4e4032;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.infoCaja {
+    color: #4e4032;
+}
+.cart-empty{
+    padding: 20px;
+    text-align: center;
+}
+#btnCerrarModalS, #btnCerrarModalM, #btnCerrarModalL, #btnCerrarModalXL, #btnCerrarModalV, #btnCerrarModalC, #btnCerrarModalR, #btnCerrarModalB, #btnCerrarModalOS, #btnCerrarModalA, #btnCerrarModalT1, #btnCerrarModalT2, #btnCerrarModalT3, #btnCerrarModalT4{
+    height: 40px;
+    width: 70%;
+    border-radius: 50px;
+    background-color: #4e4032;
+    color: #ffc0cb;
+    border: 2px solid#4e4032;
+    font-family: "Dunkin";
+    margin-left: 10px;
+    position: relative;
+    z-index: 3;
+}
+#btnCerrarModalS:hover, #btnCerrarModalM:hover, #btnCerrarModalL:hover, #btnCerrarModalXL:hover, #btnCerrarModalV:hover, #btnCerrarModalC:hover, #btnCerrarModalR:hover, #btnCerrarModalB:hover, #btnCerrarModalOS:hover, #btnCerrarModalA:hover, #btnCerrarModalT1:hover, #btnCerrarModalT2:hover, #btnCerrarModalT3:hover, #btnCerrarModalT4:hover{
+    background-color: #ffc0cb;
+    border: 2px solid #ffc0cb;
+    color: #695450;
+    transform: scale(1.05);
+    font-family: "Dunkin";
+}
+
+
+
+
+
+
+
+

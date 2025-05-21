@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stefa's DNUTS</title>
+
+    <!-- Bootstrap & estilos personalizados -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/menu.css' %}">
+    <link rel="icon" href="{% static 'icon/2.ico' %}" sizes="128x128" type="image/x-icon">
+
+    <style>
+        .combos { cursor: pointer; }
+    </style>
+</head>
+
+<body>
+{% include 'includes/navbar_auth.html' %}
+
+<!-- Sección principal -->
+<div class="contenedor1 shadow">
+    <div class="celular">
+        <img src="{% static 'Image/donlog.png' %}" alt="Donut imagen" class="img-fluid">
+    </div>
+    <div class="textoPrincipal">
+        <h1>¡La vida sabe mejor con una <span class="DNUT">DNUT!</span></h1>
+        <p class="mt-3">Haz parte de esta experiencia, ¡Regístrate y<br> ordena AHORA!</p>
+    </div>
+    <div class="botones">
+        <a href="{% url 'registro' %}" class="btn1 btn mx-2 shadow">REGISTRARME</a>
+    </div>
+</div>
+
+<!-- Galería de productos -->
+<div class="contenedor2 shadow">
+    <div class="textoCapa2">
+        <h1>¡Arma y construye tu <span class="palabra">DNUT</span> a tu gusto!</h1>
+    </div>
+    <div class="gallery">
+        <div class="gallery-item shadow">
+            <a href="{% url 'catalogo' %}#ProductMasas">
+                <img src="{% static 'Image/masa.png' %}" alt="masa">
+                <p class="titulo">Masa</p>
+            </a>
+        </div>
+        <div class="gallery-item shadow">
+            <a href="{% url 'catalogo' %}#ProductCobertura">
+                <img src="{% static 'Image/cobertura.png' %}" alt="cobertura">
+                <p class="titulo">Cobertura</p>
+            </a>
+        </div>
+        <div class="gallery-item shadow">
+            <a href="{% url 'catalogo' %}#ProductToppings">
+                <img src="{% static 'Image/toppings.png' %}" alt="topping">
+                <p class="titulo">Toppings</p>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Sección de combos -->
+<div class="contenedor3 shadow">
+    <div class="flecha">
+        <a class="flechita" href="{% url 'catalogo' %}">
+            <img src="{% static 'Image/flecha.png' %}" alt="flecha">
+        </a>
+    </div>
+    <div class="combos" id="combos">
+        <div class="cuadro shadow">
+            <div class="cantidad">
+                <img src="{% static 'Image/yea.png' %}" alt="cantidadDonas">
+            </div>
+            <div class="letras">
+                <h1>!Elige el <br>combo a tu <span class="ANTOJO">ANTOJO!</span></h1>
+                <p class="descripcion">Elige la cantidad de DNTS que <br>quieras llevar</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script de redirección -->
+<script>
+    document.getElementById("combos").onclick = function () {
+        window.location.href = "{% url 'catalogo' %}";
+    };
+</script>
+
+<!-- Login -->
+<div class="InicioSesion shadow">
+    <h1>¿Ya tienes <span class="cuenta">CUENTA?</span></h1>
+    <h2>Inicia Sesión</h2>
+    <br>
+    <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        {% if error %}
+        <div class="alert alert-danger">
+            <p>{{ error }}</p>
+        </div>
+        {% endif %}
+        <div class="row">
+            <div class="col-5">
+                <input type="text" name="email" class="form-control shadow" placeholder="Correo" required maxlength="50">
+            </div>
+            <div class="col-5">
+                <input type="password" name="password" class="form-control shadow" placeholder="Contraseña" required maxlength="50">
+            </div>
+            <div>
+                <button type="submit" class="btn2 btn form mx-2 shadow">INICIAR SESIÓN</button>
+            </div>
+            <div class="forgot">
+                <button type="button" class="btn-link pr-5">¿Olvidaste tu contraseña?</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Redes sociales -->
+<div class="RedesSociales">
+    <h1>Síguenos en nuestras redes sociales</h1>
+    <h2>¡CONÓCENOS!</h2>
+    <div class="social">
+        <div class="redes">
+            <div class="redes1 shadow">
+                <a href="https://x.com/?lang=es" target="_blank">
+                    <img src="{% static 'Image/twitter.png' %}" alt="Twitter">
+                </a>
+            </div>
+            <div class="redes2 shadow">
+                <a href="https://www.facebook.com/" target="_blank">
+                    <img src="{% static 'Image/facebook.png' %}" alt="Facebook">
+                </a>
+            </div>
+            <div class="redes3 shadow">
+                <a href="https://www.instagram.com/09_tefy_09/" target="_blank">
+                    <img src="{% static 'Image/instagram.png' %}" alt="Instagram">
+                </a>
+            </div>
+            <h1>@Stefa'sdonuts</h1>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="InformacionFinal">
+    <ul class="navbarFinal">
+        <li><a href="{% url 'index' %}">Inicio</a></li>
+        <li><a href="{% url 'catalogo' %}">Catálogo</a></li>
+        <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
+        <li><a href="{% url 'contactanos' %}">Contáctanos</a></li>
+    </ul>
+    <div class="Direccion">
+        <br><hr><br>
+        <p>Cra 13 # 6510, Bogotá, Colombia <br>
+            © {% now "Y" %} Stefa´s Donuts.</p>
+    </div>
+</div>
+
+</body>
+</html>

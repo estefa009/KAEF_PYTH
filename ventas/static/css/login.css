@@ -1,0 +1,102 @@
+body {
+    background-color: #fc6998;
+    width: 100%;
+    height: 100%;
+}
+.contenedorPrincipal {
+    width: 70%;
+    height: 950%;
+    background-color: #ffe5f0;
+    border-radius: 100px;
+    margin-left: 100px;
+}
+input.form-control {
+    border-radius: 100px;
+    background-color: white;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    border: 5px solid #4e4032;
+    width: 100%;
+    height: 60px;
+    margin: 8px;
+}
+input.form-control:hover {
+    background-color: white;
+    border-color: #4e4032;
+}
+.row{
+    margin: auto;
+    width: 80%;
+    height: 600px;
+}
+.btn-link {
+    width: 300px;
+    height: 50px;
+    background-color: transparent;
+    border: none;
+    font-family: "Dunkin";
+    color: #4e4032;
+    font-size: 13px;
+    padding-bottom: 20px;
+    padding-right: 25px;
+}
+.btn-link:hover {
+    color: #93877e;
+    transform: scale(1.05);
+}
+.forgot h1{
+    font-family: "Dunkin";
+    color: #695450;
+    font-size: 16px;
+    padding-left: 45px;
+}
+.forgot h1:hover{
+    transform: scale(1.05);
+    color: #93877e;
+}
+.btn{
+    border-radius: 50px;
+    background-color: #4e4032;
+    color: #ffc0cb;
+    border: 2px solid#695450;
+    font-family: "Dunkin";
+    padding-left: 130px;
+    padding-right: 130px;
+}
+.btn:hover{
+    background-color: #ffc0cb;
+    border: 2px solid #ffc0cb;
+    color: #695450;
+    transform: scale(1.05);
+    font-family: "Dunkin";
+}
+@font-face {
+    font-family: 'Dunkin';
+    src: url('../font/Dunkin.otf') format('truetype');
+}
+.row img{
+    width: 200px;
+    height: 200px;
+    margin: auto;
+}
+.row{
+    padding-top: 50px;
+}
+.forgot img {
+    width: 50px;
+    height: 50px;
+    margin: 15px;
+}
+.donasInicio{
+    width: 50%;
+    height: 50%;
+    float: right;
+}
+.donasInicio img{
+    width: auto;
+    height:75%;
+}
+.formulario{
+    width: 50%;
+    height: 100px;
+    padding-top: 30px;
+}

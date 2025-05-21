@@ -1,0 +1,309 @@
+/* ============ VARIABLES Y ESTILOS BASE ============ */
+:root {
+    --rosa-principal: #fc6998;
+    --rosa-claro: #f8bbd0;
+    --rosa-oscuro: #d81b60;
+    --rosa-pastel: #f06292;
+    --gris-claro: #f3f0f0;
+    --gris-medio: #d3d3d3;
+    --texto-oscuro: #333;
+    --texto-claro: #fff;
+    --borde-redondeado: 25px;
+}
+
+/* ============ ESTILOS GENERALES ============ */
+body {
+    padding: 0;
+    margin: 0;
+    font-family: 'Century Gothic', sans-serif;
+    color: var(--texto-oscuro);
+    background: url(../Image/fondo.jpg) no-repeat center center fixed;
+    background-size: cover;
+    text-align: center;
+    position: relative;
+    min-height: 100vh;
+}
+
+/* Capa de transparencia */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--rosa-principal);
+    opacity: 0.2;
+    z-index: -1;
+}
+
+/* Asegura que todo el contenido esté sobre el overlay */
+main, header, footer, .content {
+    position: relative;
+    z-index: 1;
+}
+
+/* ============ ESTILOS DEL HEADER/MAIN ============ */
+main {
+    background-color: var(--texto-claro);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+main h1, main h4, main h5 {
+    margin: 10px 0;
+    color: var(--rosa-oscuro);
+}
+
+main h4 {
+    margin-left: 100px;
+}
+
+main h5 {
+    margin-left: 100px;
+}
+
+/* ============ BARRA DE BÚSQUEDA ============ */
+.search-form {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+main input {
+    padding: 8px 15px;
+    border-radius: var(--borde-redondeado);
+    border: none;
+    background-color: var(--gris-claro);
+    width: 250px;
+    transition: all 0.3s ease;
+}
+
+main input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--rosa-claro);
+}
+
+main button[type="submit"] {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--rosa-oscuro);
+}
+
+/* ============ ICONOS DE USUARIO ============ */
+.icons {
+    display: flex;
+    align-items: center;
+    margin-left: 100px;
+}
+
+.icons i {
+    margin: 0 15px;
+    color: var(--rosa-oscuro);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.icons i:hover {
+    color: var(--rosa-principal);
+}
+
+.icons p {
+    margin: 0;
+    font-weight: bold;
+}
+
+/* ============ TABLA PRINCIPAL ============ */
+.table {
+    width: 80%;
+    margin: 30px auto;
+    background-color: var(--texto-claro);
+    border-radius: var(--borde-redondeado);
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.table h4.ptable {
+    color: var(--rosa-oscuro);
+    margin-bottom: 20px;
+    text-align: left;
+    padding-left: 20px;
+}
+
+.buscador_tab {
+    padding: 8px 15px;
+    width: 200px;
+    border-radius: var(--borde-redondeado);
+    border: none;
+    background-color: var(--gris-claro);
+    margin-right: 10px;
+}
+
+/* Botones de acción */
+.boton-buscador,
+#downloadPdf,
+#downloadWord,
+#downloadExcel,
+#insumo-more {
+    padding: 8px 15px;
+    border-radius: var(--borde-redondeado);
+    border: none;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.boton-buscador {
+    background-color: transparent;
+    color: var(--rosa-oscuro);
+}
+
+#downloadPdf {
+    background-color: #ff4081;
+    color: white;
+}
+
+#downloadWord {
+    background-color: #4fc3f7;
+    color: white;
+}
+
+#downloadExcel {
+    background-color: #66bb6a;
+    color: white;
+}
+
+#insumo-more {
+    background-color: var(--rosa-principal);
+    color: white;
+}
+
+/* Hover effects */
+#downloadPdf:hover { background-color: #f50057; }
+#downloadWord:hover { background-color: #29b6f6; }
+#downloadExcel:hover { background-color: #4caf50; }
+#insumo-more:hover { background-color: var(--rosa-oscuro); }
+
+/* ============ ESTILOS DE TABLA ============ */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--gris-claro);
+}
+
+th {
+    background-color: var(--rosa-principal);
+    color: white;
+    font-weight: normal;
+}
+
+tr:hover {
+    background-color: rgba(252, 105, 152, 0.1);
+}
+
+/* ============ TARJETAS DE ESTADÍSTICAS ============ */
+.vent_semanal, .vent_mensual {
+    background-color: var(--texto-claro);
+    border-radius: var(--borde-redondeado);
+    padding: 20px;
+    margin: 20px auto;
+    width: 80%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.vent_semanal {
+    border-top: 5px solid #e3f634;
+}
+
+.vent_mensual {
+    border-top: 5px solid var(--rosa-principal);
+}
+
+/* ============ BOTONES ROSA ============ */
+.btn-rosa {
+    background-color: var(--rosa-principal);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--borde-redondeado);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-rosa:hover {
+    background-color: var(--rosa-oscuro);
+}
+
+.btn-pink-outline {
+    border: 1px solid var(--rosa-principal);
+    color: var(--rosa-principal);
+    background-color: transparent;
+    padding: 10px 20px;
+    border-radius: var(--borde-redondeado);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-pink-outline:hover {
+    background-color: var(--rosa-claro);
+    color: var(--rosa-oscuro);
+}
+
+/* ============ RESPONSIVE DESIGN ============ */
+@media (max-width: 768px) {
+    main {
+        flex-direction: column;
+        padding: 15px;
+    }
+
+    main h4, main h5, .icons {
+        margin-left: 0;
+        text-align: center;
+    }
+
+    .table, .vent_semanal, .vent_mensual {
+        width: 95%;
+    }
+
+    .search-form {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    main input {
+        width: 100%;
+    }
+}
+
+/* ============ BOTÓN CERRAR SESIÓN ============ */
+.Cerrar {
+    background-color: transparent;
+    color: var(--rosa-oscuro);
+    border: 1px solid var(--rosa-oscuro);
+    padding: 8px 20px;
+    border-radius: var(--borde-redondeado);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+.Cerrar:hover {
+    background-color: var(--rosa-oscuro);
+    color: white;
+}
