@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stefa's DNUTS</title>
+
+    <!-- Bootstrap y estilos -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/nosotros.css' %}">
+    <link rel="stylesheet" href="{% static 'css/menu.css' %}">
+    <link rel="icon" href="{% static 'icon/2.ico' %}" sizes="128x128" type="image/x-icon">
+
+    <style>
+        .combos {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+{% include 'includes/navbar_auth.html' %}
+
+<div class="LaVida">
+    <h1>¡La vida sabe mejor con una <span class="DNUT">DNUT!</span></h1>
+</div>
+
+<div class="informacionTotal">
+    <div class="julian">
+        <div class="espacio"></div>
+        <div class="B">
+            <h1 class="tituloN">Stefa´s Donuts<br><span class="N">¿Quiénes Somos?</span></h1>
+            <p style="font-weight: bold;">Somos un emprendimiento en Suba, Bogotá D.C., dedicado a la producción de
+                mini donas y mini pescados de harina enchocolatada. Ofrecemos productos frescos, deliciosos y con un toque artesanal.
+            </p>
+            <hr class="linea">
+        </div>
+        <div class="A">
+            <img src="{% static 'Image/nosotros.jpg' %}" alt="Nosotros">
+        </div>
+    </div>
+
+    <div class="julian">
+        <div class="D">
+            <img src="{% static 'Image/clasicas.webp' %}" alt="Donas clásicas">
+        </div>
+        <div class="C">
+            <h1 class="tituloN">Stefa´s Donuts<br><span class="N">Misión</span></h1>
+            <p style="font-weight: bold;">Brindar mini donas y pescados de harina enchocolatada con excelente
+            sabor y calidad, elaborados artesanalmente para satisfacer a nuestros clientes.</p>
+            <hr class="linea">
+        </div>
+        <div class="espacio1"></div>
+    </div>
+    <div class="julian">
+        <div class="espacio"></div>
+        <div class="B">
+            <h1 class="tituloN">Stefa´s Donuts<br><span class="N">Visión</span></h1>
+            <p style="font-weight: bold;">Ser una marca reconocida en Bogotá por la calidad y originalidad de nuestras mini donas y mini pescados</p>
+            <hr class="linea">
+        </div>
+        <div class="A">
+            <img src="{% static 'Image/mandolina.webp' %}" alt="Mandolina">
+        </div>
+    </div>
+</div>
+
+<div class="InformacionFinal">
+    <ul class="navbarFinal">
+        <li><a href="{% url 'index' %}">Inicio</a></li>
+        <li><a href="{% url 'catalogo' %}">Catálogo</a></li>
+        <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
+        <li><a href="{% url 'contactanos' %}">Contáctanos</a></li>
+    </ul>
+    <div class="Direccion">
+        <br><hr><br>
+        <p>Cra 13 # 6510, Bogotá, Colombia <br>
+            © {% now "Y" %} Stefa´s Donuts.</p>
+    </div>
+</div>
+</body>
+</html>

@@ -38,8 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ventas',
-    'produccion_inventario',
-    'usuarios',
+ 
 ]
 
 MIDDLEWARE = [
@@ -78,7 +77,7 @@ WSGI_APPLICATION = 'kaef_final.wsgi.application'
 DATABASES = {
     'default': {
     'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'kaef22',
+        'NAME': 'kaef_Final',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
