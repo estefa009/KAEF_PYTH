@@ -10,24 +10,20 @@ from .models import (
 
 # 1. Configuración personalizada para el Usuario
 class UsuarioAdmin(UserAdmin):
-    list_display = ('email', 'nom_usua', 'apell_usua', 'rol', 'is_active')
-    list_filter = ('rol', 'is_active')
-    search_fields = ('email', 'nom_usua', 'apell_usua')
-    ordering = ('email',)
-    
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Información Personal', {'fields': ('nom_usua', 'apell_usua', 'tele_usua')}),
-        ('Permisos', {'fields': ('rol', 'is_active', 'is_staff', 'is_superuser')}),
-        ('Fechas importantes', {'fields': ('last_login', 'date_joined')}),
+        ('Información personal', {'fields': ('nom_usua', 'apell_usua', 'tele_usua')}),
+        ('Permisos', {'fields': ('is_active', 'is_staff', 'is_superuser', 'rol')}),
     )
-    
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
             'fields': ('email', 'nom_usua', 'apell_usua', 'tele_usua', 'rol', 'password1', 'password2'),
         }),
     )
+    list_display = ('email', 'nom_usua', 'apell_usua', 'is_staff', 'rol')
+    search_fields = ('email', 'nom_usua', 'apell_usua')
+    ordering = ('email',)
 
 admin.site.register(Usuario, UsuarioAdmin)
 
