@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+
+    <!-- Bootstrap y estilos -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/form_registro.css' %}">
+    <link rel="stylesheet" href="{% static 'css/menu.css' %}">
+    <link rel="icon" href="{% static 'icon/2.ico' %}" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Concert+One&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Navbar (reutilizable) -->
+    {% include "includes/nav_index.html" %}
+
+    <!-- Imagen de inicio -->
+    <div class="donasInicio">
+        <img src="{% static 'Image/hola.jpg' %}" alt="donas Inicio">
+    </div>
+
+    <!-- Formulario -->
+    <div class="formulario">
+        <div class="contenedorPrincipal shadow">
+            <div class="row">
+                <img src="{% static 'Image/Profile.png' %}" alt="Profile">
+
+                <form method="post" class="w-100 p-3">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+
+                    <div class="forgot mt-3 text-center">
+                        <input type="submit" value="REGISTRARME" class="btn btn-primary shadow">
+                        <hr>
+                        <h5>
+                            <img src="{% static 'Image/google.png' %}" alt="google" style="width: 20px;">
+                            Ingresar con Google
+                        </h5>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
