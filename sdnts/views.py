@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from .forms import UsuarioForm  # debes crear este formulario
+from .forms import UsuarioForm  # El punto (.) indica que es desde la misma app
 
 def nav_index(request):
     return render(request, 'includes/nav_index.html')

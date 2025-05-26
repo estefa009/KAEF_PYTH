@@ -217,7 +217,7 @@
 }
 @font-face {
     font-family: 'Dunkin';
-    src: url('../font/Dunkin.otf') format('truetype');
+    src: url('font/Dunkin.otf') format('truetype');
 }
 
 .navbar-collapse {
