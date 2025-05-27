@@ -589,8 +589,10 @@ body {
     transform: scale(1.05);
     font-family: "Dunkin";
 }
-
-
+@font-face {
+    font-family: 'Dunkin';
+    src: url('../font/Dunkin.otf') format('truetype');
+}
 
 
 

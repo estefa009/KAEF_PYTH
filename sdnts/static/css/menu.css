@@ -18,7 +18,10 @@
     cursor: pointer;
     transition: all 0.3s;
 }
-
+@font-face {
+    font-family: 'Dunkin';
+    src: url('../font/Dunkin.otf') format('truetype');
+}
 /* MENÚ LATERAL (OCULTO INICIALMENTE) */
 .sidenav {
     position: fixed;
