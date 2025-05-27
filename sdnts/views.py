@@ -1,5 +1,8 @@
 from django.shortcuts import render,redirect
 from .forms import UsuarioForm  # El punto (.) indica que es desde la misma app
+from django.contrib.auth import views as auth_views
+
+from django.urls import reverse_lazy
 
 def nav_index(request):
     return render(request, 'includes/nav_index.html')
@@ -42,3 +45,22 @@ def registro(request):
         form = UsuarioForm()
     
     return render(request, 'auth/registro.html', {'form': form})
+
+
+
+
+class CustomPasswordResetView(auth_views.PasswordResetView):
+    template_name = 'auth/password_reset.html'
+    extra_context = {'etapa': 'formulario'}
+
+class CustomPasswordResetDoneView(auth_views.PasswordResetDoneView):
+    template_name = 'auth/password_reset.html'
+    extra_context = {'etapa': 'correo_enviado'}
+
+class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    template_name = 'auth/password_reset.html'
+    extra_context = {'etapa': 'nueva_contraseña'}
+
+class CustomPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
+    template_name = 'auth/password_reset.html'
+    extra_context = {'etapa': 'completado'}

@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Estilos locales -->
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="{% static 'css/menu.css' %}">
+
+    <!-- Icono -->
+    <link rel="icon" href="{% static 'icon/2.ico' %}" sizes="64x64" type="image/x-icon">
+</head>
+<body>
+  {% include 'includes/nav_register.html' %}
+
+    <div class="donasInicio">
+        <img src="{% static 'Image/hola.jpg' %}" alt="donas Inicio">
+    </div>
+
+    <div class="formulario">
+        <div class="contenedorPrincipal shadow">
+            <!-- Formulario para login -->
+            <form action="{% url 'login' %}" method="post" id="loginForm">
+                {% csrf_token %}
+                <div class="row">
+                    <img src="{% static 'Image/Profile.png' %}" alt="Profile">
+
+                    <input type="email" name="email" id="correo" class="form-control shadow" placeholder="Correo" required maxlength="50">
+                    <input type="password" name="password" id="contraseña" class="form-control shadow" placeholder="Contraseña" required maxlength="50">
+
+                    <!-- Mostrar mensaje de error si existe -->
+                    {% if error %}
+                    <div class="text-danger text-center">
+                        <p>{{ error }}</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="forgot">
+                        <button type="submit" class="btn btn form mx-2 shadow">INICIAR SESIÓN</button>
+                        <br><br>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a>
+                        </div>
+                        <hr>
+                        <h1>
+                            <img src="{% static 'Image/google.png' %}" alt="google">
+                            Ingresar con Google
+                        </h1>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

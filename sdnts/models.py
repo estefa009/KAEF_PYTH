@@ -24,6 +24,9 @@ class UsuarioManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
 class Usuario(AbstractUser):
     """
     Modelo de usuario personalizado que reemplaza al usuario por defecto de Django
@@ -45,10 +48,12 @@ class Usuario(AbstractUser):
     apell_usua = models.CharField('apellido', max_length=20)
     tele_usua = models.CharField('teléfono', max_length=15)
     passw_usua = models.CharField('contraseña', max_length=60)  # Django manejará el hash
-    rol = models.CharField('rol', max_length=7, choices=ROLES)
+
+    # 👇 Valor por defecto en el rol
+    rol = models.CharField('rol', max_length=7, choices=ROLES, default='CLIENTE')
     
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['nom_usua', 'apell_usua', 'tele_usua', 'rol']
+    REQUIRED_FIELDS = ['nom_usua', 'apell_usua', 'tele_usua']  # 🔥 Eliminamos 'rol' porque ahora tiene default
     
     class Meta:
         verbose_name = 'Usuario'

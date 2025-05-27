@@ -16,6 +16,12 @@ Including another URLconf
 """
 from django.urls import path
 from . import views
+from .views import (
+    CustomPasswordResetView,
+    CustomPasswordResetDoneView,
+    CustomPasswordResetConfirmView,
+    CustomPasswordResetCompleteView
+)
 
 urlpatterns = [
  path('', views.index, name='index'),
@@ -27,6 +33,9 @@ urlpatterns = [
     path('nav/index/', views.nav_index, name='nav_index'),
     path('nav/admin/', views.nav_admin, name='nav_admin'),
     path('nav/user/', views.nav_user, name='nav_user'),
-    
+    path('recuperar/', CustomPasswordResetView.as_view(), name='password_reset'),
+    path('recuperar/done/', CustomPasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('recuperar/<uidb64>/<token>/', CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('recuperar/complete/', CustomPasswordResetCompleteView.as_view(), name='password_reset_complete'),
 ]
  
