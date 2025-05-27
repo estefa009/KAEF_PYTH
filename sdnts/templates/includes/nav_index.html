@@ -5,11 +5,11 @@
     <title>Navbar</title>
 </head>
 <body>
+{% load static %}
 <!-- templates/includes/nav_index.html -->
 <nav class="navbar navbar-expand-lg bg-light border-bottom border-body">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Stefa’s DNUTS</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavIndex">
+<a class="navbar-brand" href="{% url 'index' %}"><img src="{% static 'icon/7.ico' %}" width="300"></a>    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavIndex">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavIndex">

@@ -27,5 +27,6 @@ urlpatterns = [
     path('nav/index/', views.nav_index, name='nav_index'),
     path('nav/admin/', views.nav_admin, name='nav_admin'),
     path('nav/user/', views.nav_user, name='nav_user'),
+    
 ]
  

@@ -6,7 +6,14 @@ class UsuarioForm(forms.ModelForm):
     
     class Meta:
         model = Usuario
-        fields = ['email', 'nom_usua', 'apell_usua', 'tele_usua', 'passw_usua', 'rol']
+        fields = ['email', 'nom_usua', 'apell_usua', 'tele_usua', 'passw_usua', 'password2']
+        labels = {
+            'email': 'Correo Electrónico',
+            'nom_usua': 'Nombre',
+            'apell_usua': 'Apellido',
+            'tele_usua': 'Teléfono',
+            'passw_usua': 'Contraseña',
+        }
         widgets = {
             'passw_usua': forms.PasswordInput(),
         }
