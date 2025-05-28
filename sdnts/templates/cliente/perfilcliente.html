@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stefa's DNUTS</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+    <link rel="icon" href="{% static 'icon/2.ico' %}" sizes="128x128" type="image/x-icon">
+    <style>
+        .combos {
+            cursor: pointer; 
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow">
+        <a class="navbar-brand" href="{% url 'vistacliente' %}"><img src="{% static 'icon/7.ico' %}" width="300"></a>
+        <div class="collapse navbar-collapse shadow" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'vistacliente' %}">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'catalogocliente' %}">Catálogo</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'nosotroscliente' %}">Nosotros</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'contactanoscliente' %}">Contáctanos</a></li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'perfilcliente' %}">
+                        Perfil
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="Profile">
+                            <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
+                        </svg>  
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-picture">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="moon">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                </svg> 
+            </div>
+            <div class="nombre">{{ user.username }}</div>
+            <section class="settings-menu">
+                <nav class="settings-tabs">
+                    <a href="#perfil" class="tab active">Carrito</a>
+                    <a href="#comunicacion" class="tab">Mis direcciones</a>
+                    <a href="#direcciones" class="tab">Mis pedidos</a>
+                    <a href="#pago" class="tab">Mi cuenta</a>
+                </nav>
+
+                <div class="settings-content">
+                    <div id="perfil" class="content active">
+                        <h2>Carro de compras</h2>
+                        <p>Aquí podrás ver la información de tu carrito de compras.</p>
+                    </div>
+                    <div id="comunicacion" class="content">
+                        <h2>Dirección</h2>
+                        <p>Aquí podrás agregar tus direcciones.</p>
+                    </div>
+                    <div id="direcciones" class="content">
+                        <h2>Mis pedidos</h2>
+                        <p>Aquí podrás observar tus anteriores pedidos.</p>
+                    </div>
+                    <div id="pago" class="content">
+                        <h2>Cuenta</h2>
+                        <p>Actualiza tu información de cuenta.</p>
+                    </div>
+                </div>
+            </section>
+
+            <script src="{% static 'scripts/Perfil.js' %}"></script>
+        </div>
+    </div>
+
+    <div class="InformacionFinal">
+        <ul class="navbarFinal">
+            <li><a href="{% url 'vistacliente' %}">Inicio</a></li>
+            <li><a href="{% url 'catalogocliente' %}">Catálogo</a></li>
+            <li><a href="{% url 'nosotroscliente' %}">Nosotros</a></li>
+            <li><a href="{% url 'contactanoscliente' %}">Contáctanos</a></li>
+            <li><a href="{% url 'perfilcliente' %}">Perfil</a></li>
+        </ul>
+        <div class="Direccion">
+            <br><hr><br>
+            <p>Cra 13 # 6510, Bogotá, Colombia <br>
+                © 2024 Stefa´s Donuts.</p>
+        </div>
+    </div>
+    <script src="{% static 'js/perfil.js' %}" defer></script>
+</body>
+</html>

@@ -583,3 +583,4 @@ class CombinacionProducto(models.Model):
     
     def __str__(self):
         return f"Combinación #{self.cod_combinacion} - Venta {self.cod_venta_id}"
+    

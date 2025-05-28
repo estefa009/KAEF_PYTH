@@ -1,0 +1,961 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/Catalogo.css' %}">
+    <link rel="stylesheet" href="{% static 'css/C_catalogo.css' %}">
+    <link rel="icon" href="{% static 'icon/2.ico' %}" sizes="128x128" type="image/x-icon">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow">
+        <a class="navbar-brand" href="{% url 'vistacliente' %}"><img src="{% static 'icon/7.ico' %}" width="300"></a>
+        <div class="collapse navbar-collapse shadow" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'vistacliente' %}">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'catalogocliente' %}">Catálogo</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'nosotroscliente' %}">Nosotros</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'contactanoscliente' %}">Contáctanos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'perfilcliente' %}">
+                        Perfil
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="Profile">
+                            <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
+                        </svg>  
+                    </a>
+                </li>
+                <div class="carrito"><h1>CARRITO</h1><img src="{% static 'Image/carrito.png' %}"></div>
+                <div class="count-products">
+                    <span id="contador-productos">0</span>
+                </div>
+                <div class="container-cart-products hidden-cart shadow">
+                    <div class="row-product">
+                        <div class="cart-product">
+                            <div class="info-cart-product">
+                                <span class="cantidad-producto-carrito">1</span>
+                                <p class="titulo-producto-carrito">Combo Talla S</p>
+                                <span class="precio-producto-carrito">$00.000</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-close">
+                                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container-general">
+                        <button class="botonPagar shadow" id="btnPagar">PAGAR</button>
+                        <div id="modalP" class="modal hidden">
+                            <div class="modal-contentP">    
+                                <div class="miacolucci">
+                                    <div class="metodoPago">
+                                        <h1 id="modal-title">Método de Pago:</h1>
+                                        <!-- Primer Contenedor -->
+                                        <div class="nequi-container shadow">
+                                            <div class="formas">
+                                                <h1>N. de referencia:</h1>
+                                                <input type="text" name="txtCorreo" class="nroReferencia shadow" placeholder="Digita el N. de tu pago" required maxlength="10">
+                                                <h2>(Click al logo para info Nequi)</h2>
+                                            </div>
+                                            <div class="logo-nequi" onclick="openModal('modalNequiSpecific')">
+                                                <div class="imagen-nequi">
+                                                    <img src="{% static 'Image/nequi.png' %}" alt="Nequi">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Modal Específico para Nequi -->
+                                        <div id="modalNequiSpecific" class="modal-nequi">
+                                            <div class="modal-nequi-content">
+                                                <span class="close-nequi" onclick="closeModal('modalNequiSpecific')">&times;</span>
+                                                <img src="{% static 'Image/nequi.png' %}" alt="Nequi" class="modal-nequi-img">
+                                                <h2>Método de Pago: Nequi</h2>
+                                                <p>Número de Nequi: +57 3026982043</p>
+                                                <img class="nequiQR" src="{% static 'Image/nequiQR.jpg' %}">
+                                            </div>
+                                        </div>
+                                        <!-- Segundo Contenedor -->
+                                        <div class="davi-container shadow">
+                                            <div class="formas">
+                                                <h1>N. de referencia:</h1>
+                                                <input type="text" name="txtCorreo" class="nroReferencia shadow" placeholder="Digita el N. de tu pago" required maxlength="10">
+                                                <h2>(Click al logo para info Davi)</h2>
+                                            </div>
+                                            <div class="logo-davi" onclick="openModal('modalDaviSpecific')">
+                                                <div class="imagen-davi">
+                                                    <img src="{% static 'Image/davip.webp' %}" alt="Davivienda">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Modal Específico para Davivienda -->
+                                        <div id="modalDaviSpecific" class="modal-davi">
+                                            <div class="modal-davi-content">
+                                                <span class="close-davi" onclick="closeModal('modalDaviSpecific')">&times;</span>
+                                                <img src="{% static 'Image/davip.png' %}" alt="Davivienda" class="modal-davi-img">
+                                                <h2>Método de Pago: DaviPlata</h2>
+                                                <p>Número de DaviPlata: +57 3026982043</p>
+                                                <img class="nequiQR" src="{% static 'Image/nequiQR.jpg' %}">
+                                            </div>
+                                        </div>
+                                    </div>        
+                                    <div class="infoTotalCarrito">
+                                        <div class="infoCarrito">
+                                            <span id="equis" class="closeP close">&times;</span>
+                                            <div class="productosPagar">
+                                                <div class="cajita"></div>
+                                            </div>
+                                            <div class="totalPagar">
+                                                <h1>Total:<br>
+                                                    $0.00
+                                                </h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="botonComprar">
+                                    <button id="btnAgregarProducto" class="cart shadow">COMPRAR</button> 
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cart-total">
+                            <h3>Total:</h3>
+                            <span class="total-pagar">$00.000</span>
+                        </div>
+                    </div>
+                </div>
+            </ul>
+        </div>
+    </nav>
+    <div class="LaVida">
+        <h1>¡La vida sabe mejor con una <span class="DNUT">DNUT!</span></h1>
+    </div>
+    <div class="ProductoCombos shadow">
+        <div class="title">
+            <div class="Combos shadow"><h1>Combos</h1></div>
+        </div>
+        <div class="seleccion">
+            <div class="Cajas1 shadow">
+                <div class="descripcionCombo">
+                    <h1>Talla S</h1>
+                    <h2>Bolsa de 6 dnts.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                    <br>
+                    <span class="precio">$10.000</span>
+                    <button class="boton shadow" id="btnAgregar">Agregar</button>
+                </div>
+                <div class="imagenCombo"><img src="{% static 'Image/imagenCaja1.jpg' %}"></div>
+            </div>
+            <div id="modalS" class="modal hidden">
+                <div class="modal-content">    
+                    <div class="imagenModal">
+                        <img id="modal-imageS" src="{% static 'Image/imagenModal1.jpg' %}" alt="Imagen Modal Talla S">
+                    </div>               
+                    <div class="info">
+                        <span class="closeS close">&times;</span>
+                        <div class="infoCaja1">
+                            <h1 id="modal-title">Combos<br><span class="tallas">Talla S</span></h1>
+                            <p id="modal-descriptionS">Bolsa de 6 donas, en donde puedes escoger un solo sabor de masa, una sola cobertura y un solo topping para todas las donas. ¡Elige tus sabores favoritos!</p>
+                            <hr class="linea">
+                            <p>¡Personaliza tus donas!</p>
+                            <div id="contenidoSelect">
+                                <div class="seleccion-sabores">
+                                    
+                                    <!-- Vista previa de la dona -->
+                                    <div class="dona-preview">
+                                        <div class="dona-base" id="dona-masa"></div>
+                                        <div class="dona-cobertura" id="dona-cobertura"></div>
+                                        <!-- Capa de toppings con imagen de patrón -->
+                                        <div class="dona-topping" id="dona-topping"></div>
+                                    </div>
+                                    
+                                    <style>
+                                    .dona-topping {
+                                        width: 80%;
+                                        height: 80%;
+                                        position: absolute;
+                                        top: 50%;
+                                        left: 50%;
+                                        transform: translate(-50%, -50%);
+                                        z-index: 3;
+                                        background-size: 30% 30%;
+                                        background-repeat: space;
+                                        pointer-events: none;
+                                    }
+                                    </style>
+                                    
+                                    <!-- Selector de sabores con miniaturas -->
+                                    <div class="opcion-seleccion">
+                                        <h4>Masa</h4><p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
+                                        <div class="sabor-options">
+                                            <div class="sabor-option active" data-value="vainilla" data-color="#f5e6c8" data-img="url('dona-vainilla.png')">
+                                                <div class="color-box" style="background-color: #efd091"></div>
+                                                <span>Vainilla</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="chocolate" data-color="#8B4513" data-img="url('dona-chocolate.png')">
+                                                <div class="color-box" style="background-color: #8B4513"></div>
+                                                <span>Chocolate</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="red-velvet" data-color="#C62127" data-img="url('dona-redvelvet.png')">
+                                                <div class="color-box" style="background-color: #952d30"></div>
+                                                <span>Red Velvet</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="linea">
+                                    <div class="opcion-seleccion">
+                                        <h4>Cobertura</h4><p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
+                                        <div class="sabor-options">
+                                            <div class="sabor-option active" data-value="chocolate-blanco" data-color="#f0e0c0" data-img="url('cobertura-blanco.png')">
+                                                <div class="color-box" style="background-color: #f0e0c0"></div>
+                                                <span>Choc. Blanco</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="chocolate-oscuro" data-color="#5C4033" data-img="url('cobertura-oscuro.png')">
+                                                <div class="color-box" style="background-color: #5C4033"></div>
+                                                <span>Choc. Oscuro</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="arequipe" data-color="#D4A76A" data-img="url('cobertura-arequipe.png')">
+                                                <div class="color-box" style="background-color: #D4A76A"></div>
+                                                <span>Arequipe</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="linea">
+                                    <div class="opcion-seleccion">
+                                        <h4>Toppings</h4><p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
+                                        <div class="sabor-options">
+                                            <div class="sabor-option active" data-value="chispas" data-img="url('topping-chispas.png')">
+                                                <div class="img-box" style="background-image: url('{% static 'Image/pepitasPatron.png' %}')"></div>
+                                                <span>Chispas</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="oreo" data-img="url('topping-oreo.png')">
+                                                <div class="img-box" style="background-image: url('{% static 'Image/oreoPatron.png' %}')"></div>
+                                                <span>Oreo</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="mym" data-img="url('topping-mym.png')">
+                                                <div class="img-box" style="background-image: url('{% static 'Image/mymPatron.png' %}')"></div>
+                                                <span>M&M's</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="chips" data-img="url('topping-chips.png')">
+                                                <div class="img-box" style="background-image: url('{% static 'Image/chipsPatron.png' %}')"></div>
+                                                <span>Chips</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="btnCerrarModalS" class="addToCartBtn cart shadow">Agregar al carrito</button> 
+                    </div>
+                </div>
+            </div>
+            <div class="Cajas2 shadow">
+                <div class="descripcionCombo">
+                    <h1>Talla M</h1>
+                    <h2>Bolsa/caja de 12 dnts.<br>¡Elige tus sabores favoritos!</h2>
+                    <br>
+                    <span class="precio">$20.000</span>
+                    <button id="btnAgregarM" class="boton shadow">Agregar</button>
+                </div>
+                <div class="imagenCombo">
+                    <img src="{% static 'Image/caja.png' %}" alt="Caja de Talla M">
+                </div>
+            </div>
+            
+            <div id="modalM" class="modal hidden">
+                <div class="modal-content">    
+                    <div class="imagenModal">
+                        <img id="modal-imageM" src="{% static 'Image/imagenModal1.jpg' %}" alt="Imagen Modal Talla M">
+                    </div>               
+                    <div class="info">
+                        <span class="closeM close">&times;</span>
+                        <div class="infoCaja2">
+                            <h1 id="modal-title">Combos<br><span class="tallas">Talla M</span></h1>
+                            <p id="modal-descriptionM">Bolsa de 12 donas, en donde puedes escoger un solo sabor de masa, una sola cobertura y un solo topping para todas las donas. ¡Elige tus sabores favoritos!</p>
+                            <hr class="linea">
+                            <p>¡Personaliza tus donas!</p>
+                            <div id="contenidoSelect">
+                                <div class="seleccion-sabores">
+                                    
+                                    <!-- Vista previa de la dona -->
+                                    <div class="dona-preview">
+                                        <div class="dona-base" id="dona-masa"></div>
+                                        <div class="dona-cobertura" id="dona-cobertura"></div>
+                                        <!-- Capa de toppings con imagen de patrón -->
+                                        <div class="dona-topping" id="dona-topping"></div>
+                                    </div>
+                                    <!-- Selector de sabores con miniaturas -->
+                                    <div class="opcion-seleccion">
+                                        <h4>Masa</h4><p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
+                                        <div class="sabor-options">
+                                            <div class="sabor-option active" data-value="vainilla" data-color="#f5e6c8" data-img="url('dona-vainilla.png')">
+                                                <div class="color-box" style="background-color: #efd091"></div>
+                                                <span>Vainilla</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="chocolate" data-color="#8B4513" data-img="url('dona-chocolate.png')">
+                                                <div class="color-box" style="background-color: #8B4513"></div>
+                                                <span>Chocolate</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="red-velvet" data-color="#C62127" data-img="url('dona-redvelvet.png')">
+                                                <div class="color-box" style="background-color: #952d30"></div>
+                                                <span>Red Velvet</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="linea">
+                                    <div class="opcion-seleccion">
+                                        <h4>Cobertura</h4><p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
+                                        <div class="sabor-options">
+                                            <div class="sabor-option active" data-value="chocolate-blanco" data-color="#f0e0c0" data-img="url('cobertura-blanco.png')">
+                                                <div class="color-box" style="background-color: #f0e0c0"></div>
+                                                <span>Choc. Blanco</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="chocolate-oscuro" data-color="#5C4033" data-img="url('cobertura-oscuro.png')">
+                                                <div class="color-box" style="background-color: #5C4033"></div>
+                                                <span>Choc. Oscuro</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="arequipe" data-color="#D4A76A" data-img="url('cobertura-arequipe.png')">
+                                                <div class="color-box" style="background-color: #D4A76A"></div>
+                                                <span>Arequipe</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="linea">
+                                    <div class="opcion-seleccion">
+                                        <h4>Toppings</h4><p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
+                                        <div class="sabor-options">
+                                            <div class="sabor-option active" data-value="chispas" data-img="url('topping-chispas.png')">
+                                                <div class="img-box" style="background-image: url('{% static 'Image/pepitasPatron.png' %}')"></div>
+                                                <span>Chispas</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="oreo" data-img="url('topping-oreo.png')">
+                                                <div class="img-box" style="background-image: url('{% static 'Image/oreoPatron.png' %}')"></div>
+                                                <span>Oreo</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="mym" data-img="url('topping-mym.png')">
+                                                <div class="img-box" style="background-image: url('{% static 'Image/mymPatron.png' %}')"></div>
+                                                <span>M&M's</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="chips" data-img="url('topping-chips.png')">
+                                                <div class="img-box" style="background-image: url('{% static 'Image/chipsPatron.png' %}')"></div>
+                                                <span>Chips</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="btnCerrarModalM" class="addToCartBtn cart shadow">Agregar al carrito</button> 
+                    </div>
+                </div>
+            </div>
+            
+            <div class="Cajas3 shadow">
+                <div class="descripcionCombo">
+                    <h1>Talla L</h1>
+                    <h2>Caja de 18 dnts.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                    <br>
+                    <span class="precio">$30.000</span>
+                    <button id="btnAgregarL" class="boton shadow">Agregar</button>
+                </div>
+                <div class="imagenCombo"><img src="{% static 'Image/imagenCaja3.jpg' %}"></div>
+            </div>
+            <div id="modalL" class="modal hidden">
+                <div class="modal-content">    
+                    <div class="imagenModal">
+                        <img id="modal-imageL" src="{% static 'Image/imagenModal1.jpg' %}" alt="Imagen Modal Talla L">
+                    </div>               
+                    <div class="info">
+                        <span class="closeL close">&times;</span>
+                        <div class="infoCaja3">
+                            <h1 id="modal-title">Combos<br><span class="tallas">Talla L</span></h1>
+                            <p id="modal-descriptionL">Bolsa de 18 donas, en donde puedes escoger un solo sabor de masa, una sola cobertura y un solo topping para todas las donas. ¡Elige tus sabores favoritos!</p>
+                            <hr class="linea">
+                            <div id="contenidoSelect">
+                                <p>¡Personaliza tus donas!</p>
+                                <div class="seleccion-sabores">
+                                    
+                                    <!-- Vista previa de la dona -->
+                                    <div class="dona-preview">
+                                        <div class="dona-base" id="dona-masa"></div>
+                                        <div class="dona-cobertura" id="dona-cobertura"></div>
+                                        <!-- Capa de toppings con imagen de patrón -->
+                                        <div class="dona-topping" id="dona-topping"></div>
+                                    </div>
+                                    <!-- Selector de sabores con miniaturas -->
+                                    <div class="opcion-seleccion">
+                                        <h4>Masa</h4><p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
+                                        <div class="sabor-options">
+                                            <div class="sabor-option active" data-value="vainilla" data-color="#f5e6c8" data-img="url('dona-vainilla.png')">
+                                                <div class="color-box" style="background-color: #efd091"></div>
+                                                <span>Vainilla</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="chocolate" data-color="#8B4513" data-img="url('dona-chocolate.png')">
+                                                <div class="color-box" style="background-color: #8B4513"></div>
+                                                <span>Chocolate</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="red-velvet" data-color="#C62127" data-img="url('dona-redvelvet.png')">
+                                                <div class="color-box" style="background-color: #952d30"></div>
+                                                <span>Red Velvet</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="linea">
+                                    <div class="opcion-seleccion">
+                                        <h4>Cobertura</h4><p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
+                                        <div class="sabor-options">
+                                            <div class="sabor-option active" data-value="chocolate-blanco" data-color="#f0e0c0" data-img="url('cobertura-blanco.png')">
+                                                <div class="color-box" style="background-color: #f0e0c0"></div>
+                                                <span>Choc. Blanco</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="chocolate-oscuro" data-color="#5C4033" data-img="url('cobertura-oscuro.png')">
+                                                <div class="color-box" style="background-color: #5C4033"></div>
+                                                <span>Choc. Oscuro</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="arequipe" data-color="#D4A76A" data-img="url('cobertura-arequipe.png')">
+                                                <div class="color-box" style="background-color: #D4A76A"></div>
+                                                <span>Arequipe</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="linea">
+                                    <div class="opcion-seleccion">
+                                        <h4>Toppings</h4><p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
+                                        <div class="sabor-options">
+                                            <div class="sabor-option active" data-value="chispas" data-img="url('topping-chispas.png')">
+                                                <div class="img-box" style="background-image: url('{% static 'Image/pepitasPatron.png' %}')"></div>
+                                                <span>Chispas</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="oreo" data-img="url('topping-oreo.png')">
+                                                <div class="img-box" style="background-image: url('{% static 'Image/oreoPatron.png' %}')"></div>
+                                                <span>Oreo</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="mym" data-img="url('topping-mym.png')">
+                                                <div class="img-box" style="background-image: url('{% static 'Image/mymPatron.png' %}')"></div>
+                                                <span>M&M's</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="chips" data-img="url('topping-chips.png')">
+                                                <div class="img-box" style="background-image: url('{% static 'Image/chipsPatron.png' %}')"></div>
+                                                <span>Chips</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="btnCerrarModalL" class="addToCartBtn cart shadow">Agregar al carrito</button> 
+                    </div>
+                </div>
+            </div>
+            <div class="Cajas4 shadow">
+                <div class="descripcionCombo">
+                    <h1>Talla XL</h1>
+                    <h2>Caja de 24 dnts.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                    <br>
+                    <span class="precio">$40.000</span>
+                    <button id="btnAgregarXL" class="boton shadow">Agregar</button>
+                </div>
+                <div class="imagenCombo"><img src="{% static 'Image/imagenCaja4.jpg' %}"></div>
+            </div>
+            <div id="modalXL" class="modal hidden">
+                <div class="modal-content">    
+                    <div class="imagenModal">
+                        <img id="modal-imagexl" src="{% static 'Image/imagenModal1.jpg' %}" alt="Imagen Modal Talla XL">
+                    </div>               
+                    <div class="info">
+                        <span class="closeXL close">&times;</span>
+                        <div class="infoCaja1">
+                            <h1 id="modal-title">Combos<br><span class="tallas">Talla XL</span></h1>
+                            <p id="modal-descriptionXL">Bolsa de 6 donas, en donde puedes escoger un solo sabor de masa, una sola cobertura y un solo topping para todas las donas. ¡Elige tus sabores favoritos!</p>
+                            <hr class="linea">
+                            <p>¡Personaliza tus donas!</p>
+                            <div id="contenidoSelect">
+                                <div class="seleccion-sabores">
+                                    
+                                    <!-- Vista previa de la dona -->
+                                    <div class="dona-preview">
+                                        <div class="dona-base" id="dona-masa"></div>
+                                        <div class="dona-cobertura" id="dona-cobertura"></div>
+                                        <!-- Capa de toppings con imagen de patrón -->
+                                        <div class="dona-topping" id="dona-topping"></div>
+                                    </div>
+                                    <!-- Selector de sabores con miniaturas -->
+                                    <div class="opcion-seleccion">
+                                        <h4>Masa</h4><p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
+                                        <div class="sabor-options">
+                                            <div class="sabor-option active" data-value="vainilla" data-color="#f5e6c8" data-img="url('dona-vainilla.png')">
+                                                <div class="color-box" style="background-color: #efd091"></div>
+                                                <span>Vainilla</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="chocolate" data-color="#8B4513" data-img="url('dona-chocolate.png')">
+                                                <div class="color-box" style="background-color: #8B4513"></div>
+                                                <span>Chocolate</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="red-velvet" data-color="#C62127" data-img="url('dona-redvelvet.png')">
+                                                <div class="color-box" style="background-color: #952d30"></div>
+                                                <span>Red Velvet</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="linea">
+                                    <div class="opcion-seleccion">
+                                        <h4>Cobertura</h4><p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
+                                        <div class="sabor-options">
+                                            <div class="sabor-option active" data-value="chocolate-blanco" data-color="#f0e0c0" data-img="url('cobertura-blanco.png')">
+                                                <div class="color-box" style="background-color: #f0e0c0"></div>
+                                                <span>Choc. Blanco</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="chocolate-oscuro" data-color="#5C4033" data-img="url('cobertura-oscuro.png')">
+                                                <div class="color-box" style="background-color: #5C4033"></div>
+                                                <span>Choc. Oscuro</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="arequipe" data-color="#D4A76A" data-img="url('cobertura-arequipe.png')">
+                                                <div class="color-box" style="background-color: #D4A76A"></div>
+                                                <span>Arequipe</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="linea">
+                                    <div class="opcion-seleccion">
+                                        <h4>Toppings</h4><p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
+                                        <div class="sabor-options">
+                                            <div class="sabor-option active" data-value="chispas" data-img="url('topping-chispas.png')">
+                                                <div class="img-box" style="background-image: url('{% static 'Image/pepitasPatron.png' %}')"></div>
+                                                <span>Chispas</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="oreo" data-img="url('topping-oreo.png')">
+                                                <div class="img-box" style="background-image: url('{% static 'Image/oreoPatron.png' %}')"></div>
+                                                <span>Oreo</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="mym" data-img="url('topping-mym.png')">
+                                                <div class="img-box" style="background-image: url('{% static 'Image/mymPatron.png' %}')"></div>
+                                                <span>M&M's</span>
+                                            </div>
+                                            <div class="sabor-option" data-value="chips" data-img="url('topping-chips.png')">
+                                                <div class="img-box" style="background-image: url('{% static 'Image/chipsPatron.png' %}')"></div>
+                                                <span>Chips</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="btnCerrarModalXL" class="addToCartBtn cart shadow">Agregar al carrito</button> 
+                    </div>
+                </div>
+            </div>
+            <div class="Cajas5 shadow href="#"><img src="{% static 'Image/mas.png' %}" alt="Imagen de mas"></div>
+        </div>
+        <div class="campo"></div>
+        <div class="cajones" id="ProductMasas"></div>
+    </div>
+    <div class="ProductoMasas shadow">
+        <div class="title">
+            <div class="Masas shadow"><h1>Masa</h1></div>
+        </div>
+        <div class="seleccion">
+            <div class="Masa1 shadow">
+                <div class="descripcionMasa">
+                    <h1>Vainilla</h1>
+                    <h2>Masa con sabor a vainilla.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                    <br>
+                    <br>
+                    <div class="precio">$0.00</div>
+                    <button class="boton shadow" id="btnInfoV">Más información</button>
+                </div>
+                <div class="imagenMasita"><img src="{% static 'Image/Masa1.png' %}"></div>
+            </div>
+            <div id="modalV" class="modal hidden">
+                <div class="modal-content">    
+                    <div class="imagenModal">
+                        <img id="modal-imageV" src="{% static 'Image/Masa1.png' %}" alt="Imagen Modal V">
+                    </div>               
+                    <div class="info">
+                        <span class="closeV close">&times;</span>
+                        <div class="infoCaja">
+                            <h2 id="modal-titleV">Masas<br><span class="tallas">Vainilla</span></h2>
+                            <p id="modal-descriptionV">Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam pariatur error enim. Optio nobis vero voluptas repellendus ducimus consequatur impedit, laudantium possimus aspernatur, perspiciatis iure eius magnam cumque! Iure, voluptate.</p>
+                            <hr class="linea">
+                            <p>Descripción detallada del producto</p>
+                        </div>
+                        <button id="btnCerrarModalV">Cerrar</button> 
+                    </div>
+                </div>
+            </div>
+            <div class="Masa2 shadow">
+                <div class="descripcionMasa">
+                    <h1>Chocolate</h1>
+                    <h2>Masa con sabor a chocolate.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                    <br>
+                    <br>
+                    <div class="precio">$0.00</div>
+                    <button class="boton shadow" id="btnInfoC">Más información</button>
+                </div>
+                <div class="imagenMasita"><img src="{% static 'Image/Masa2.png' %}"></div>
+            </div>
+            <div id="modalC" class="modal hidden">
+                <div class="modal-content">    
+                    <div class="imagenModal">
+                        <img id="modal-imageC" src="{% static 'Image/Masa2.png' %}" alt="Imagen Modal C">
+                    </div>               
+                    <div class="info">
+                        <span class="closeC close">&times;</span>
+                        <div class="infoCaja">
+                            <h2 id="modal-titleC">Masas<br><span class="tallas">Chocolate</span></h2>
+                            <p id="modal-descriptionC">Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam pariatur error enim. Optio nobis vero voluptas repellendus ducimus consequatur impedit, laudantium possimus aspernatur, perspiciatis iure eius magnam cumque! Iure, voluptate.</p>
+                            <hr class="linea">
+                            <p>Descripción detallada del producto</p>
+                        </div>
+                        <button id="btnCerrarModalC">Cerrar</button> 
+                    </div>
+                </div>
+            </div>
+            <div class="Masa3 shadow">
+                <div class="descripcionMasa">
+                    <h1>Red Velvet</h1>
+                    <h2>Masa con sabor a red velvet.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                    <br>
+                    <br>
+                    <div class="precio">$0.00</div>
+                    <button class="boton shadow" id="btnInfoR">Más información</button>
+                </div>
+                <div class="imagenMasita"><img src="{% static 'Image/Masa3.png' %}"></div>
+            </div>
+            <div id="modalR" class="modal hidden">
+                <div class="modal-content">    
+                    <div class="imagenModal">
+                        <img id="modal-imageR" src="{% static 'Image/Masa3.png' %}" alt="Imagen Modal R">
+                    </div>               
+                    <div class="info">
+                        <span class="closeR close">&times;</span>
+                        <div class="infoCaja">
+                            <h2 id="modal-titleR">Masas<br><span class="tallas">Red Velvet</span></h2>
+                            <p id="modal-descriptionR">Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam pariatur error enim. Optio nobis vero voluptas repellendus ducimus consequatur impedit, laudantium possimus aspernatur, perspiciatis iure eius magnam cumque! Iure, voluptate.</p>
+                            <hr class="linea">
+                            <p>Descripción detallada del producto</p>
+                        </div>
+                        <button id="btnCerrarModalR">Cerrar</button> 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="campo"></div>
+        <div class="cajones" id="ProductCobertura"></div>
+    </div>
+    <div class="ProductoCobert shadow">
+        <div class="title">
+            <div class="Cobertura shadow"><h1>Cobertura</h1></div>
+        </div>
+        <div class="seleccion">
+            <div class="Cober1 shadow">
+                <div class="descripcionCober">
+                    <h1>Chocolate Blanco</h1>
+                    <h2>Elige el color que quieras.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                    <div class="precio">$0.00</div>
+                    <button class="boton shadow" id="btnInfoB">Más información</button>
+                </div>
+                <div class="imagenCober"><img src="{% static 'Image/cober1.png' %}"></div>
+            </div>
+            <div id="modalB" class="modal hidden">
+                <div class="modal-content">    
+                    <div class="imagenModal">
+                        <img id="modal-imageB" src="{% static 'Image/cober1.png' %}" alt="Imagen Modal B">
+                    </div>               
+                    <div class="info">
+                        <span class="closeB close">&times;</span>
+                        <div class="infoCaja">
+                            <h2 id="modal-titleB">Coberturas<br><span class="tallas">Chocolate blanco</span></h2>
+                            <p id="modal-descriptionB">Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam pariatur error enim. Optio nobis vero voluptas repellendus ducimus consequatur impedit, laudantium possimus aspernatur, perspiciatis iure eius magnam cumque! Iure, voluptate.</p>
+                            <hr class="linea">
+                            <p>Descripción detallada del producto</p>
+                        </div>
+                        <button id="btnCerrarModalB">Cerrar</button> 
+                    </div>
+                </div>
+            </div>
+            <div class="Cober2 shadow">
+                <div class="descripcionCober">
+                    <h1>Chocolate Oscuro</h1>
+                    <h2>Bañado de chocolate negro.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                    <div class="precio">$0.00</div>
+                    <button class="boton shadow" id="btnInfoOS">Más información</button>
+                </div>
+                <div class="imagenCober"><img src="{% static 'Image/cober2.png' %}"></div>
+            </div>
+            <div id="modalOS" class="modal hidden">
+                <div class="modal-content">    
+                    <div class="imagenModal">
+                        <img id="modal-imageOS" src="{% static 'Image/cober2.png' %}" alt="Imagen Modal OS">
+                    </div>               
+                    <div class="info">
+                        <span class="closeOS close">&times;</span>
+                        <div class="infoCaja">
+                            <h2 id="modal-titleOS">Coberturas<br><span class="tallas">Chocolate oscuro</span></h2>
+                            <p id="modal-descriptionOS">Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam pariatur error enim. Optio nobis vero voluptas repellendus ducimus consequatur impedit, laudantium possimus aspernatur, perspiciatis iure eius magnam cumque! Iure, voluptate.</p>
+                            <hr class="linea">
+                            <p>Descripción detallada del producto</p>
+                        </div>
+                        <button id="btnCerrarModalOS">Cerrar</button> 
+                    </div>
+                </div>
+            </div>
+            <div class="Cober3 shadow">
+                <div class="descripcionCober">
+                    <h1>Arequipe</h1>
+                    <h2>Bañado de dulce de leche.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                    <br>
+                    <br>
+                    <div class="precio">$0.00</div>
+                    <button class="boton shadow" id="btnInfoA">Más información</button>
+                </div>
+                <div class="imagenCober"><img src="{% static 'Image/cober3.png' %}"></div>
+            </div>
+            <div id="modalA" class="modal hidden">
+                <div class="modal-content">    
+                    <div class="imagenModal">
+                        <img id="modal-imageA" src="{% static 'Image/cober3.png' %}" alt="Imagen Modal A">
+                    </div>               
+                    <div class="info">
+                        <span class="closeA close">&times;</span>
+                        <div class="infoCaja">
+                            <h2 id="modal-titleA">Coberturas<br><span class="tallas">Arequipe</span></h2>
+                            <p id="modal-descriptionA">Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam pariatur error enim. Optio nobis vero voluptas repellendus ducimus consequatur impedit, laudantium possimus aspernatur, perspiciatis iure eius magnam cumque! Iure, voluptate.</p>
+                            <hr class="linea">
+                            <p>Descripción detallada del producto</p>
+                        </div>
+                        <button id="btnCerrarModalA">Cerrar</button> 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="campo"></div>
+        <div class="cajones" id="ProductToppings"></div>
+    </div>
+    <div class="ProductoToppings shadow">
+        <div class="title">
+            <div class="Toppings shadow"><h1>Toppings</h1></div>
+        </div>
+        <div class="seleccion">
+            <div class="Topp1 shadow">
+                <div class="descripcionTopp">
+                    <h1>Chispas</h1>
+                    <h2>Chispas de colores.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                    <br>
+                    <br>
+                    <div class="precio">$0.00</div>
+                    <button class="boton shadow" id="btnInfoT1">Más info.</button>
+                </div>
+                <div class="imagenTopp"><img src="{% static 'Image/pepitas.png' %}"></div>
+            </div>
+            <div id="modalT1" class="modal hidden">
+                <div class="modal-content">    
+                    <div class="imagenModal">
+                        <img id="modal-imageT1" src="{% static 'Image/pepitas.png' %}" alt="Imagen Modal T1">
+                    </div>               
+                    <div class="info">
+                        <span class="closeT1 close">&times;</span>
+                        <div class="infoCaja">
+                            <h2 id="modal-titleT1">Toppings<br><span class="tallas">Chispas</span></h2>
+                            <p id="modal-descriptionT1">Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam pariatur error enim. Optio nobis vero voluptas repellendus ducimus consequatur impedit, laudantium possimus aspernatur, perspiciatis iure eius magnam cumque! Iure, voluptate.</p>
+                            <hr class="linea">
+                            <p>Descripción detallada del producto</p>
+                        </div>
+                        <button id="btnCerrarModalT1">Cerrar</button> 
+                    </div>
+                </div>
+            </div>
+            <div class="Topp2 shadow">
+                <div class="descripcionTopp">
+                    <h1>Oreo</h1>
+                    <h2>Trozos de galleta oreo.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                    <br>
+                    <br>
+                    <div class="precio">$0.00</div>
+                    <button class="boton shadow" id="btnInfoT2">Más info.</button>
+                </div>
+                <div class="imagenTopp"><img src="{% static 'Image/oreo.png' %}"></div>
+            </div>
+            <div id="modalT2" class="modal hidden">
+                <div class="modal-content">    
+                    <div class="imagenModal">
+                        <img id="modal-imageT2" src="{% static 'Image/oreo.png' %}" alt="Imagen Modal T2">
+                    </div>               
+                    <div class="info">
+                        <span class="closeT2 close">&times;</span>
+                        <div class="infoCaja">
+                            <h2 id="modal-titleT2">Toppings<br><span class="tallas">Oreo</span></h2>
+                            <p id="modal-descriptionT2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam pariatur error enim. Optio nobis vero voluptas repellendus ducimus consequatur impedit, laudantium possimus aspernatur, perspiciatis iure eius magnam cumque! Iure, voluptate.</p>
+                            <hr class="linea">
+                            <p>Descripción detallada del producto</p>
+                        </div>
+                        <button id="btnCerrarModalT2">Cerrar</button> 
+                    </div>
+                </div>
+            </div>
+            <div class="Topp3 shadow">
+                <div class="descripcionTopp">
+                    <h1>M&M</h1>
+                    <h2>Chocolates M&M's.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                    <br>
+                    <br>
+                    <div class="precio">$0.00</div>
+                    <button class="boton shadow" id="btnInfoT3">Más info.</button>
+                </div>
+                <div class="imagenTopp"><img src="{% static 'Image/mym.png' %}"></div>
+            </div>
+            <div id="modalT3" class="modal hidden">
+                <div class="modal-content">    
+                    <div class="imagenModal">
+                        <img id="modal-imageT3" src="{% static 'Image/mym.png' %}" alt="Imagen Modal T3">
+                    </div>               
+                    <div class="info">
+                        <span class="closeT3 close">&times;</span>
+                        <div class="infoCaja">
+                            <h2 id="modal-titleT3">Toppings<br><span class="tallas">M&M's</span></h2>
+                            <p id="modal-descriptionT3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam pariatur error enim. Optio nobis vero voluptas repellendus ducimus consequatur impedit, laudantium possimus aspernatur, perspiciatis iure eius magnam cumque! Iure, voluptate.</p>
+                            <hr class="linea">
+                            <p>Descripción detallada del producto</p>
+                        </div>
+                        <button id="btnCerrarModalT3">Cerrar</button> 
+                    </div>
+                </div>
+            </div>
+            <div class="Topp4 shadow">
+                <div class="descripcionTopp">
+                    <h1>Chips</h1>
+                    <h2>Chips de chocolate blanco, oscuro o de colores.<br>
+                    ¡Elige tus sabores favoritos!</h2>
+                    <br>
+                    <div class="precio">$0.00</div>
+                    <button class="boton shadow" id="btnInfoT4">Más info.</button>
+                </div>
+                <div class="imagenTopp"><img src="{% static 'Image/chips.png' %}"></div>
+            </div>
+            <div id="modalT4" class="modal hidden">
+                <div class="modal-content">    
+                    <div class="imagenModal">
+                        <img id="modal-imageT4" src="{% static 'Image/chips.png' %}" alt="Imagen Modal T4">
+                    </div>               
+                    <div class="info">
+                        <span class="closeT4 close">&times;</span>
+                        <div class="infoCaja">
+                            <h2 id="modal-titleT4">Toppings<br><span class="tallas">Chips</span></h2>
+                            <p id="modal-descriptionT4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam pariatur error enim. Optio nobis vero voluptas repellendus ducimus consequatur impedit, laudantium possimus aspernatur, perspiciatis iure eius magnam cumque! Iure, voluptate.</p>
+                            <hr class="linea">
+                            <p>Descripción detallada del producto</p>
+                        </div>
+                        <button id="btnCerrarModalT4">Cerrar</button> 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="campo"></div>
+        <div class="cajones" id="Product"></div>
+    </div>
+    <div class="InformacionFinal">
+        <ul class="navbarFinal">
+            <li><a href="{% url 'vistacliente' %}">Inicio</a></li>
+            <li><a href="{% url 'catalogocliente' %}">Catálogo</a></li>
+            <li><a href="{% url 'nosotroscliente' %}">Nosotros</a></li>
+            <li><a href="{% url 'contactanoscliente' %}">Contáctanos</a></li>
+            <li><a href="{% url 'perfilcliente' %}">Perfil</a></li>
+        </ul>
+        <div class="Direccion">
+            <br>
+            <hr>
+            <br>
+            <p>Cra 13 # 6510, Bogotá, Colombia <br>
+                © 2024 Stefa´s Donuts.</p>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mapeo de colores y toppings
+            const colores = {
+                masa: {
+                    'vainilla': '#efd091',
+                    'chocolate': '#8B4513',
+                    'red-velvet': '#952d30'
+                },
+                cobertura: {
+                    'chocolate-blanco': '#f0e0c0',
+                    'chocolate-oscuro': '#5C4033',
+                    'arequipe': '#D4A76A'
+                },
+                toppings: {
+                    'chispas': 'url("{% static 'Image/pepitasPatron.png' %}")',
+                    'oreo': 'url("{% static 'Image/oreoPatron.png' %}")',
+                    'mym': 'url("{% static 'image/mymPatron.png' %}")',
+                    'chips': 'url("{% static 'imageS/chipsPatron.png' %}")',
+                    'ninguno': 'none'
+                }
+            };
+        
+            // Función para actualizar la vista
+            function actualizarDona(tipo, valor) {
+                if (tipo === 'masa') {
+                    document.getElementById('dona-masa').style.backgroundColor = colores.masa[valor];
+                } else if (tipo === 'cobertura') {
+                    document.getElementById('dona-cobertura').style.backgroundColor = colores.cobertura[valor];
+                } else if (tipo === 'toppings') {
+                    const toppingElement = document.getElementById('dona-topping');
+                    toppingElement.style.backgroundImage = colores.toppings[valor];
+                    
+                    // Mostrar/ocultar toppings
+                    if (valor === 'ninguno') {
+                        toppingElement.style.display = 'none';
+                    } else {
+                        toppingElement.style.display = 'block';
+                    }
+                }
+            }
+        
+            // Configurar eventos para todas las opciones
+            document.querySelectorAll('.sabor-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const tipo = this.closest('.opcion-seleccion').querySelector('h4').textContent.toLowerCase();
+                    const valor = this.dataset.value;
+                    
+                    // Actualizar selección visual
+                    this.parentElement.querySelectorAll('.sabor-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Actualizar dona
+                    actualizarDona(tipo, valor);
+                });
+            });
+        
+            // Inicializar con valores por defecto
+            actualizarDona('masa', 'vainilla');
+            actualizarDona('cobertura', 'chocolate-blanco');
+            actualizarDona('toppings', 'chispas');
+            
+            // Marcar opciones por defecto como activas
+            document.querySelector('.sabor-option[data-value="vainilla"]')?.classList.add('active');
+            document.querySelector('.sabor-option[data-value="chocolate-blanco"]')?.classList.add('active');
+            document.querySelector('.sabor-option[data-value="ninguno"]')?.classList.add('active');
+        });
+    </script>
+    <script src="{% static 'js/catalogo.js' %}" defer></script>
+</body>
+</html>

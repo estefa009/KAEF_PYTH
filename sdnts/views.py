@@ -64,3 +64,25 @@ class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
 class CustomPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
     template_name = 'auth/password_reset.html'
     extra_context = {'etapa': 'completado'}
+    
+    
+    
+def vistacliente(request):
+    return render(request, 'cliente/vistacliente.html') 
+
+def catalogocliente(request):
+    return render(request, 'cliente/catalogocliente.html')
+
+def contactanoscliente(request):
+    context = {
+        'direccion': 'Cra 13 # 6510, Bogotá, Colombia',
+        'horario': 'Lunes a Sábado 9:00 a.m - 6:00 p.m',
+        'telefono': '+57 3026982043'
+    }
+    return render(request, 'cliente/contactanoscliente.html', context)
+def nosotroscliente(request):
+    return render(request, 'cliente/nosotroscliente.html')
+
+def perfilcliente(request):
+    return render(request, 'cliente/perfilcliente.html')
+
