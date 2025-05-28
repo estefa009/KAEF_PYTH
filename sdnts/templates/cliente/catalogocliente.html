@@ -176,21 +176,6 @@
                                         <div class="dona-topping" id="dona-topping"></div>
                                     </div>
                                     
-                                    <style>
-                                    .dona-topping {
-                                        width: 80%;
-                                        height: 80%;
-                                        position: absolute;
-                                        top: 50%;
-                                        left: 50%;
-                                        transform: translate(-50%, -50%);
-                                        z-index: 3;
-                                        background-size: 30% 30%;
-                                        background-repeat: space;
-                                        pointer-events: none;
-                                    }
-                                    </style>
-                                    
                                     <!-- Selector de sabores con miniaturas -->
                                     <div class="opcion-seleccion">
                                         <h4>Masa</h4><p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
@@ -553,7 +538,7 @@
                     </div>
                 </div>
             </div>
-            <div class="Cajas5 shadow href="#"><img src="{% static 'Image/mas.png' %}" alt="Imagen de mas"></div>
+            <a class="Cajas5 shadow" href="#"><img src="{% static 'Image/mas.png' %}" alt="Imagen de mas"></a>
         </div>
         <div class="campo"></div>
         <div class="cajones" id="ProductMasas"></div>
