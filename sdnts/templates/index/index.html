@@ -1,7 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-<head>
+<head> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stefa's DNUTS</title>
@@ -93,7 +93,7 @@
     <h1>¿Ya tienes <span class="cuenta">CUENTA?</span></h1>
     <h2>Inicia Sesión</h2>
     <br>
-    <form action="{% url 'login' %}" method="post">
+    <form action="{% url 'login' %}" method="post" id="loginForm">
         {% csrf_token %}
         {% if error %}
         <div class="alert alert-danger">
@@ -111,7 +111,7 @@
                 <button type="submit" class="btn2 btn form mx-2 shadow">INICIAR SESIÓN</button>
             </div>
             <div class="forgot">
-                <button type="button" class="btn-link pr-5">¿Olvidaste tu contraseña?</button>
+<a href="{% url 'password_reset' %}" class=" btn-link ">¿Olvidaste tu contraseña?</a>
             </div>
         </div>
     </form>

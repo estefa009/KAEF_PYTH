@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Admin{% endblock %}
+
+{% block content %}
+<!-- Alertas de éxito y error -->
+{% if success %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    <span>{{ success }}</span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+{% if error %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span>{{ error }}</span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<!-- Menú -->
+{% include "fragments/navs/menu_button.html" %}
+{% include "fragments/navs/menu_nav.html" %}
+
+<main>
+
+<!-- Barra de búsqueda -->
+<form id="searchForm" onsubmit="search(event)" class="search-form">
+    <label style="margin-left: 300px;">
+        <input type="text" id="buscar" placeholder="Buscar..">
+        <button type="submit" style="border: none; background: none;"><i class="bi bi-search"></i></button>
+    </label>
+</form>
+
+<!-- Menú de usuario -->
+<div class="d-flex align-items-center gap-3" style="margin-left: auto; margin-right: 40px;">
+    <li class="nav-item dropdown list-unstyled">
+        <a href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle" style="font-size: 30px; color: #333333"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
+            <li><span class="dropdown-header">Administrador</span></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'perfil_admin' %}">Perfil</a></li>
+            <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
+        </ul>
+    </li>
+</div>
+</main>
+
+<!-- Ventas -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 col-md-6 text-center mt-3">
+            <div class="vent_semanal p-3 shadow-sm bg-light">
+                <h5><i class="bi bi-bag-heart-fill"></i> <br>Ventas Semanales</h5>
+                <h4><b>$30,320</b></h4>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 text-center mt-3">
+            <div class="vent_mensual p-3 shadow-sm bg-light">
+                <h5><i class="bi bi-calendar-check"></i> <br>Ventas Mensuales</h5>
+                <h4><b>$300.328.55</b></h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Correos Masivos -->
+<div class="tablaa">
+    <div class="row">
+        <h2 class="mb-8">Envío de Correos Masivos</h2>
+
+        <div class="card shadow-sm" style="border: none; border-radius: 10px; font-size: 0.9rem;">
+            <div class="card-header py-2 px-3" style="background-color: #ff69b4; color: white; border-radius: 10px 10px 0 0;">
+                <h6 class="mb-0"><i class="bi bi-envelope-plus"></i> Nuevo Correo Masivo</h6>
+            </div>
+            <div class="card-body p-3">
+                <form action="{% url 'enviar_correos_masivos' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="destinatarios" class="form-label">Destinatarios</label>
+                        <select id="destinatarios" name="destinatarios" class="form-select" multiple size="4">
+                            <option value="CLIENTE">Clientes</option>
+                            <option value="DOMI">Domiciliarios</option>
+                            <option value="ADMIN">Administradores</option>
+                        </select>
+                        <div class="form-text">Usa Ctrl (o Cmd en Mac) para seleccionar varios</div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="asunto" class="form-label mb-1">Asunto</label>
+                        <input type="text" class="form-control form-control-sm" id="asunto" name="asunto"
+                               style="border-color: #ffb6c1;" required>
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="mensaje" class="form-label mb-1">Mensaje</label>
+                        <textarea class="form-control form-control-sm" id="mensaje" name="mensaje" rows="5"
+                                  style="border-color: #ffb6c1;" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="adjuntos" class="form-label mb-1">Adjuntos</label>
+                        <input type="file" class="form-control form-control-sm" id="adjuntos" name="adjuntos" multiple
+                               style="border-color: #ffb6c1;">
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="reset" class="btn btn-secondary btn-sm" style="background-color: #d8bfd8; border: none;">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-sm" style="background-color: #ff69b4; border: none;">
+                            <i class="bi bi-send-check"></i> Enviar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Historial de correos -->
+        <div class="card shadow-sm mt-4" style="border: none; border-radius: 15px;">
+            <div class="card-header" style="background-color: #ff69b4; color: white; border-radius: 15px 15px 0 0;">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Historial de Correos</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Asunto</th>
+                            <th>Destinatarios</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for correo in historial_correos %}
+                            <tr>
+                                <td>{{ correo.fecha }}</td>
+                                <td>{{ correo.asunto }}</td>
+                                <td>{{ correo.destinatarios }}</td>
+                                <td>
+                                    <span class="badge {% if correo.estado == 'Enviado' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                        {{ correo.estado }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-rosa">
+                                        <i class="bi bi-eye"></i> Ver
+                                    </button>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No hay correos en el historial.</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS del menú -->
+<script>
+    document.getElementById('menuToggle').addEventListener('click', function () {
+        document.getElementById('sidebar').classList.toggle('active');
+    });
+
+    function search(event) {
+        event.preventDefault();
+        const query = document.getElementById('buscar').value;
+        window.location.href = `/admin/correos?search=${query}`;
+    }
+{% endblock %}
+

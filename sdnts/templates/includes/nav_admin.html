@@ -1,0 +1,35 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  {% include 'includes/head_links.html' %}
+</head>
+<body>
+<!-- templates/base/navbar_admin.html -->
+<button id="menuToggle" class="menu-toggle"><i class="bi bi-list"></i></button>
+
+<nav id="sidebar" class="sidenav">
+  <div class="sidenav-content">
+    <img src="{% static 'icon/5.ico' %}" alt="Logo" class="logo">
+    <a class="nav-link" href="/admin/dashboard_admin/"><i class="bi bi-house"></i> Inicio</a>
+    <a class="nav-link" href="/admin/ventas/ventas_admin/"><i class="bi bi-currency-dollar"></i> Ventas</a>
+    <a class="nav-link" href="/admin/produccion/produccion_admin/"><i class="bi bi-gear"></i> Producción</a>
+    <a class="nav-link" href="/admin/envios_admin/"><i class="bi bi-truck"></i> Envíos</a>
+    <a class="nav-link" href="/admin/proveedores_admin/"><i class="bi bi-people"></i> Proveedores</a>
+    <a class="nav-link" href="/admin/entradas_admin/"><i class="bi bi-box-arrow-in-down"></i> Entradas</a>
+    <a class="nav-link" href="/admin/salidas_admin/"><i class="bi bi-box-arrow-up"></i> Salidas</a>
+  </div>
+</nav>
+<script>
+  document.getElementById('menuToggle').addEventListener('click', function() {
+    document.getElementById('sidebar').classList.toggle('active');
+  });
+</script>
+    <li><a class="dropdown-item" href="/admin/cargarDatos/"><i class="bi bi-upload"></i> Cargar Datos</a></li>
+    <li><a class="dropdown-item" href="/admin/usuarios_admin/"><i class="bi bi-person"></i> Usuarios</a></li>
+    <li><hr class="dropdown-divider"></li>
+  </ul>
+
+</body>
+</html>
