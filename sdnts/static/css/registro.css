@@ -1,223 +1,107 @@
-   @font-face {
-            font-family: 'Dunkin';
-            src: url('../font/Dunkin.otf') format('truetype');
-            /* Fallback para demo */
-            font-family: 'Arial', sans-serif;
-        }
+body {
+    background-color: #fc6998;
+    width: 100%;
+    height: 100%;
+}
+.contenedorPrincipal {
+    width: 75%;
+    height: 910px;
+    background-color: #ffe5f0;
+    border-radius: 100px;
+    margin-left: 100px;
+}
 
-        body {
-            background-color: #fc6998;
-            width: 100%;
-            height: 100vh;
-            margin: 0;
-            padding: 0;
-            font-family: 'Dunkin', Arial, sans-serif;
-        }
 
-        .formulario {
-            width: 50%;
-            height: 100vh;
-            padding-top: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
 
-        .contenedorPrincipal {
-            width: 70%;
-            min-height: 600px;
-            background-color: #ffe5f0;
-            border-radius: 100px;
-            margin: 0 auto;
-            padding: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
+input.form-control {
+    border-radius: 100px; 
+    background-color: white;
+    transition: background-color 0.3s ease, border-color 0.3s ease; 
+    border: 5px solid #4e4032; 
+    width: 100%;
+    height: 60px;
+    margin: 8px;
+}
+input.form-control:hover {
+    background-color: white; 
+    border-color: #4e4032; 
+}
+.row{
+    margin: auto;
+    width: 80%;
+    height: 600px;
+}
+.btn-link {
+    width: 300px;
+    height: 50px;
+    background-color: transparent;
+    border: none;
+    font-family: "Dunkin";
+    color: #4e4032;
+    font-size: 13px;
+    padding-bottom: 20px;
+    padding-right: 25px;
+}
+.btn-link:hover {
+    color: #93877e;
+    transform: scale(1.05); 
+}
+.forgot h1{
+    font-family: "Dunkin";
+    color: #695450;
+    font-size: 16px;
+    padding-left: 45px;
+}
+.forgot h1:hover{
+    transform: scale(1.05);
+    color: #93877e;
+}
+.btn{
+    border-radius: 50px;
+    background-color: #4e4032;
+    color: #ffc0cb;
+    border: 2px solid#695450;
+    font-family: "Dunkin";
+    padding-left: 130px;
+    padding-right: 130px;
+}
+.btn:hover{
+    background-color: #ffc0cb;
+    border: 2px solid #ffc0cb;
+    color: #695450;
+    transform: scale(1.05);
+    font-family: "Dunkin";
+}
+@font-face {
+    font-family: 'Dunkin';
+    src:url(../fonts/Dunkin.otf) format('truetype');
+}
 
-        .row {
-            margin: auto;
-            width: 80%;
-            padding-top: 50px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .row img {
-            width: 200px;
-            height: 200px;
-            margin: auto;
-            margin-bottom: 30px;
-        }
-
-        /* Estilos para los campos del formulario */
-        .form-group {
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        .form-group label {
-            font-family: "Dunkin", Arial, sans-serif;
-            color: #4e4032;
-            font-weight: bold;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        /* Estilos para todos los inputs */
-        input.form-control,
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="tel"],
-        input[type="number"],
-        select.form-control,
-        textarea.form-control {
-            border-radius: 100px !important;
-            background-color: white !important;
-            transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
-            border: 5px solid #4e4032 !important;
-            width: 100% !important;
-            height: 60px !important;
-            margin: 8px 0 !important;
-            padding: 15px 25px !important;
-            font-family: "Dunkin", Arial, sans-serif;
-            color: #4e4032;
-            box-shadow: 0 2px 8px rgba(78, 64, 50, 0.1);
-        }
-
-        /* Hover effects para inputs */
-        input.form-control:hover,
-        input[type="text"]:hover,
-        input[type="email"]:hover,
-        input[type="password"]:hover,
-        input[type="tel"]:hover,
-        input[type="number"]:hover,
-        select.form-control:hover,
-        textarea.form-control:hover {
-            background-color: white !important;
-            border-color: #4e4032 !important;
-            transform: scale(1.02);
-            box-shadow: 0 4px 15px rgba(78, 64, 50, 0.2);
-        }
-
-        /* Focus effects */
-        input.form-control:focus,
-        input[type="text"]:focus,
-        input[type="email"]:focus,
-        input[type="password"]:focus,
-        input[type="tel"]:focus,
-        input[type="number"]:focus,
-        select.form-control:focus,
-        textarea.form-control:focus {
-            background-color: white !important;
-            border-color: #fc6998 !important;
-            box-shadow: 0 0 0 0.2rem rgba(252, 105, 152, 0.25) !important;
-            outline: none !important;
-        }
-
-        /* Para textarea */
-        textarea.form-control {
-            height: auto !important;
-            min-height: 80px !important;
-            border-radius: 30px !important;
-            resize: vertical;
-        }
-
-        /* Para select */
-        select.form-control {
-            cursor: pointer;
-        }
-
-        .btn {
-            border-radius: 50px;
-            background-color: #4e4032;
-            color: #ffc0cb;
-            border: 2px solid #695450;
-            font-family: "Dunkin", Arial, sans-serif;
-            padding: 15px 60px;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            margin: 20px auto;
-            display: block;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn:hover {
-            background-color: #ffc0cb;
-            border: 2px solid #ffc0cb;
-            color: #695450;
-            transform: scale(1.05);
-            font-family: "Dunkin", Arial, sans-serif;
-            box-shadow: 0 4px 15px rgba(252, 192, 203, 0.3);
-        }
-
-        .forgot {
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        .forgot h5 {
-            font-family: "Dunkin", Arial, sans-serif;
-            color: #695450;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .forgot h5:hover {
-            transform: scale(1.05);
-            color: #93877e;
-        }
-
-        .forgot img {
-            width: 30px;
-            height: 30px;
-        }
-
-        /* Estilos para mensajes de error */
-        .errorlist {
-            list-style: none;
-            padding: 0;
-            margin: 5px 0;
-        }
-
-        .errorlist li {
-            color: #dc3545;
-            font-size: 14px;
-            font-family: "Dunkin", Arial, sans-serif;
-        }
-
-        /* Para campos requeridos */
-        .required label::after {
-            content: " *";
-            color: #dc3545;
-        }
-
-        hr {
-            border: 1px solid #4e4032;
-            opacity: 0.3;
-            margin: 20px 0;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .formulario {
-                width: 90%;
-                padding: 20px;
-            }
-            
-            .contenedorPrincipal {
-                width: 100%;
-                border-radius: 50px;
-            }
-            
-            .row {
-                width: 90%;
-            }
-        }
+.row img{
+    width: 200px;
+    height: 200px;
+    margin: auto;
+}
+.row{
+    padding-top: 50px;
+}
+.forgot img {
+    width: 13%;
+    height: auto;
+    margin-right: 20px;
+}
+.donasInicio{
+    width: 50%;
+    height: 115px;
+    float: right;
+}
+.donasInicio img{
+    width: 756px;
+    height:890%;
+}
+.formulario{
+    width: 50%;
+    height: 115px;
+    padding-top: 30px;
+    margin-bottom: 30px;
+}

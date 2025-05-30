@@ -1,4 +1,6 @@
 from django.shortcuts import render,redirect
+
+from sdnts.models import Usuario
 from .forms import UsuarioForm  # El punto (.) indica que es desde la misma app
 from django.contrib.auth import views as auth_views
 
@@ -31,9 +33,32 @@ def contactanos(request):
 def nosotros(request):
     
     return render(request, 'index/nosotros.html')
-
 def login(request):
-    return render(request,'auth/login.html')
+    if request.method == 'POST':
+        email = request.POST['email']
+        password = request.POST['password']
+        
+        # Usamos los campos reales: email y passw_usua
+        usuario = Usuario.objects.filter(email=email, passw_usua=password).first()
+
+        if usuario:
+            # Guardamos el ID del usuario en sesión
+            request.session['cod_usuario'] = usuario.cod_usuario
+            rol = usuario.rol.upper() if usuario.rol else ''
+
+            # Redirección por rol
+            if rol == 'ADMIN':
+                return redirect('admin_dashboard')
+            elif rol == 'CLIENTE':
+                return redirect('vistacliente')  # Asegúrate de que esta ruta exista
+            elif rol == 'DOMI':
+                return redirect('domiciliario_envios')
+            else:
+                return redirect('error_view')
+        else:
+            return render(request, 'auth/login.html', {'error': 'Credenciales inválidas'})
+    
+    return render(request, 'auth/login.html')
 
 def registro(request):
     if request.method == 'POST':
@@ -64,3 +89,25 @@ class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
 class CustomPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
     template_name = 'auth/password_reset.html'
     extra_context = {'etapa': 'completado'}
+    
+    
+    
+def vistacliente(request):
+    return render(request, 'cliente/vistacliente.html') 
+
+def catalogocliente(request):
+    return render(request, 'cliente/catalogocliente.html')
+
+def contactanoscliente(request):
+    context = {
+        'direccion': 'Cra 13 # 6510, Bogotá, Colombia',
+        'horario': 'Lunes a Sábado 9:00 a.m - 6:00 p.m',
+        'telefono': '+57 3026982043'
+    }
+    return render(request, 'cliente/contactanoscliente.html', context)
+def nosotroscliente(request):
+    return render(request, 'cliente/nosotroscliente.html')
+
+def perfilcliente(request):
+    return render(request, 'cliente/perfilcliente.html')
+

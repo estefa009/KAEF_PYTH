@@ -37,5 +37,11 @@ urlpatterns = [
     path('recuperar/done/', CustomPasswordResetDoneView.as_view(), name='password_reset_done'),
     path('recuperar/<uidb64>/<token>/', CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('recuperar/complete/', CustomPasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    path('vistacliente/', views.vistacliente, name='vistacliente'),
+    path('catalogocliente/', views.catalogocliente, name='catalogocliente'),
+    path('nosotroscliente/', views.nosotroscliente, name='nosotroscliente'),
+    path('contactanoscliente/', views.contactanoscliente, name='contactanoscliente'),
+    path('perfilcliente/', views.perfilcliente, name='perfilcliente'),
+    
 ]
  
