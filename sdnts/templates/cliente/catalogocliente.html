@@ -38,22 +38,32 @@
                     </a>
                 </li>
                 <div class="carrito"><h1>CARRITO</h1><img src="{% static 'Image/carrito.png' %}"></div>
-                <div class="count-products">
-                    <span id="contador-productos">0</span>
-                </div>
                 <div class="container-cart-products hidden-cart shadow">
-                    <div class="row-product">
-                        <div class="cart-product">
-                            <div class="info-cart-product">
-                                <span class="cantidad-producto-carrito">1</span>
-                                <p class="titulo-producto-carrito">Combo Talla S</p>
-                                <span class="precio-producto-carrito">$00.000</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-close">
-                                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
+    {% if carrito %}
+        {% for item in carrito.items.all %}
+        <div class="row-product">
+            <div class="cart-product">
+                <div class="info-cart-product">
+                    <span class="cantidad-producto-carrito">{{ item.cantidad }}</span>
+                    <p class="titulo-producto-carrito">{{ item.producto.nombre }}</p>
+                    <p class="personalizacion">
+                        Masa: {{ item.masa_seleccionada|default:"-" }}<br>
+                        Cobertura: {{ item.cobertura_seleccionada|default:"-" }}<br>
+                        Topping: {{ item.topping_seleccionado|default:"-" }}
+                    </p>
+                    <span class="precio-producto-carrito">${{ item.subtotal }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-close" onclick="eliminarItem({{ item.id }})">
+                        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="row-product">
+            <p>Tu carrito está vacío</p>
+        </div>
+    {% endif %}
                     <div class="container-general">
                         <button class="botonPagar shadow" id="btnPagar">PAGAR</button>
                         <div id="modalP" class="modal hidden">
