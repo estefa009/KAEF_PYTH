@@ -1,53 +1,216 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Navbar</title>
+        <link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
+    <link rel="stylesheet" href="{% static 'css/C_catalogo.css' %}">
+        <link rel="stylesheet" href="{% static 'css/menu.css' %}">
 </head>
 <body>
 {% load static %}
 <!-- templates/includes/nav_index.html -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light shadow">
-    <a class="navbar-brand" href="{% url 'vistacliente' %}">
-        <img src="{% static 'icon/7.ico' %}" width="300" alt="Logo Stefa's Donuts">
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse">
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'vistacliente' %}">Inicio</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active" href="{% url 'catalogocliente' %}">Catálogo</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'contactanoscliente' %}">Contáctanos</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'perfilcliente' %}">
-                    Perfil
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="Profile" width="24">
-                        <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
+   <nav class="navbar navbar-expand-lg navbar-light bg-light shadow">
+        <a class="navbar-brand" href="{% url 'vistacliente' %}"><img src="{% static 'icon/7.ico' %}" width="300"></a>
+        <div class="collapse navbar-collapse shadow" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'vistacliente' %}">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'catalogocliente' %}">Catálogo</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'contactanoscliente' %}">Contáctanos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'perfilcliente' %}">
+                        Perfil
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="Profile">
+                            <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
+                        </svg>  
+                    </a>
+                </li>
+                <div class="carrito"><h1>CARRITO</h1><img src="{% static 'Image/carrito.png' %}"></div>
+                <div class="container-cart-products hidden-cart shadow">
+    {% if carrito %}
+        {% for item in carrito.items.all %}
+        <div class="row-product">
+            <div class="cart-product">
+                <div class="info-cart-product">
+                    <span class="cantidad-producto-carrito">{{ item.cantidad }}</span>
+                    <p class="titulo-producto-carrito">{{ item.producto.nombre }}</p>
+                    <p class="personalizacion">
+                        Masa: {{ item.masa_seleccionada|default:"-" }}<br>
+                        Cobertura: {{ item.cobertura_seleccionada|default:"-" }}<br>
+                        Topping: {{ item.topping_seleccionado|default:"-" }}
+                    </p>
+                    <span class="precio-producto-carrito">${{ item.subtotal }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-close" onclick="eliminarItem({{ item.id }})">
+                        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
                     </svg>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Salir</a>
-            </li>
-            <li class="nav-item">
-                <div class="carrito">
-                    <h1>CARRITO</h1>
-                    <img src="{% static 'Images/carrito.png' %}" alt="Carrito">
-                    <div class="count-products">
-                        <span id="contador-productos">0</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="row-product">
+            <p>Tu carrito está vacío</p>
+        </div>
+    {% endif %}
+                    <div class="container-general">
+                        <button class="botonPagar shadow" id="btnPagar">PAGAR</button>
+                        <div id="modalP" class="modal hidden">
+                            <div class="modal-contentP">    
+                                <div class="miacolucci">
+                                    <div class="metodoPago">
+                                        <h1 id="modal-title">Método de Pago:</h1>
+                                        <!-- Primer Contenedor -->
+                                        <div class="nequi-container shadow">
+                                            <div class="formas">
+                                                <h1>N. de referencia:</h1>
+                                                <input type="text" name="txtCorreo" class="nroReferencia shadow" placeholder="Digita el N. de tu pago" required maxlength="10">
+                                                <h2>(Click al logo para info Nequi)</h2>
+                                            </div>
+                                            <div class="logo-nequi" onclick="openModal('modalNequiSpecific')">
+                                                <div class="imagen-nequi">
+                                                    <img src="{% static 'Image/nequi.png' %}" alt="Nequi">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Modal Específico para Nequi -->
+                                        <div id="modalNequiSpecific" class="modal-nequi">
+                                            <div class="modal-nequi-content">
+                                                <span class="close-nequi" onclick="closeModal('modalNequiSpecific')">&times;</span>
+                                                <img src="{% static 'Image/nequi.png' %}" alt="Nequi" class="modal-nequi-img">
+                                                <h2>Método de Pago: Nequi</h2>
+                                                <p>Número de Nequi: +57 3026982043</p>
+                                                <img class="nequiQR" src="{% static 'Image/nequiQR.jpg' %}">
+                                            </div>
+                                        </div>
+                                        <!-- Segundo Contenedor -->
+                                        <div class="davi-container shadow">
+                                            <div class="formas">
+                                                <h1>N. de referencia:</h1>
+                                                <input type="text" name="txtCorreo" class="nroReferencia shadow" placeholder="Digita el N. de tu pago" required maxlength="10">
+                                                <h2>(Click al logo para info Davi)</h2>
+                                            </div>
+                                            <div class="logo-davi" onclick="openModal('modalDaviSpecific')">
+                                                <div class="imagen-davi">
+                                                    <img src="{% static 'Image/davip.webp' %}" alt="Davivienda">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Modal Específico para Davivienda -->
+                                        <div id="modalDaviSpecific" class="modal-davi">
+                                            <div class="modal-davi-content">
+                                                <span class="close-davi" onclick="closeModal('modalDaviSpecific')">&times;</span>
+                                                <img src="{% static 'Image/davip.png' %}" alt="Davivienda" class="modal-davi-img">
+                                                <h2>Método de Pago: DaviPlata</h2>
+                                                <p>Número de DaviPlata: +57 3026982043</p>
+                                                <img class="nequiQR" src="{% static 'Image/nequiQR.jpg' %}">
+                                            </div>
+                                        </div>
+                                    </div>        
+                                    <div class="infoTotalCarrito">
+                                        <div class="infoCarrito">
+                                            <span id="equis" class="closeP close">&times;</span>
+                                            <div class="productosPagar">
+                                                <div class="cajita"></div>
+                                            </div>
+                                            <div class="totalPagar">
+                                                <h1>Total:<br>
+                                                    $0.00
+                                                </h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="botonComprar">
+                                    <button id="btnAgregarProducto" class="cart shadow">COMPRAR</button> 
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cart-total">
+                            <h3>Total:</h3>
+                            <span class="total-pagar">$00.000</span>
+                        </div>
                     </div>
                 </div>
-            </li>
-        </ul>
-    </div>
-</nav>
-
+            </ul>
+        </div>
+    </nav>
+    <script src="{% static 'js/catalogo.js' %}" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mapeo de colores y toppings
+            const colores = {
+                masa: {
+                    'vainilla': '#efd091',
+                    'chocolate': '#8B4513',
+                    'red-velvet': '#952d30'
+                },
+                cobertura: {
+                    'chocolate-blanco': '#f0e0c0',
+                    'chocolate-oscuro': '#5C4033',
+                    'arequipe': '#D4A76A'
+                },
+                toppings: {
+                    'chispas': 'url("{% static 'Image/pepitasPatron.png' %}")',
+                    'oreo': 'url("{% static 'Image/oreoPatron.png' %}")',
+                    'mym': 'url("{% static 'Image/mymPatron.png' %}")',
+                    'chips': 'url("{% static 'Image/chipsPatron.png' %}")',
+                    'ninguno': 'none'
+                }
+            };
+        
+            // Función para actualizar la vista
+            function actualizarDona(tipo, valor) {
+                if (tipo === 'masa') {
+                    document.getElementById('dona-masa').style.backgroundColor = colores.masa[valor];
+                } else if (tipo === 'cobertura') {
+                    document.getElementById('dona-cobertura').style.backgroundColor = colores.cobertura[valor];
+                } else if (tipo === 'toppings') {
+                    const toppingElement = document.getElementById('dona-topping');
+                    toppingElement.style.backgroundImage = colores.toppings[valor];
+                    
+                    // Mostrar/ocultar toppings
+                    if (valor === 'ninguno') {
+                        toppingElement.style.display = 'none';
+                    } else {
+                        toppingElement.style.display = 'block';
+                    }
+                }
+            }
+        
+            // Configurar eventos para todas las opciones
+            document.querySelectorAll('.sabor-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const tipo = this.closest('.opcion-seleccion').querySelector('h4').textContent.toLowerCase();
+                    const valor = this.dataset.value;
+                    
+                    // Actualizar selección visual
+                    this.parentElement.querySelectorAll('.sabor-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Actualizar dona
+                    actualizarDona(tipo, valor);
+                });
+            });
+        
+            // Inicializar con valores por defecto
+            actualizarDona('masa', 'vainilla');
+            actualizarDona('cobertura', 'chocolate-blanco');
+            actualizarDona('toppings', 'chispas');
+            
+            // Marcar opciones por defecto como activas
+            document.querySelector('.sabor-option[data-value="vainilla"]')?.classList.add('active');
+            document.querySelector('.sabor-option[data-value="chocolate-blanco"]')?.classList.add('active');
+            document.querySelector('.sabor-option[data-value="ninguno"]')?.classList.add('active');
+        });
+    </script> 
 </body>
 </html>
