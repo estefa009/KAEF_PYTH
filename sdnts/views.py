@@ -1,3 +1,5 @@
+import base64
+import openpyxl
 from django.shortcuts import render,redirect
 
 from sdnts.models import CategoriaInsumo, Entrada, Envio, Produccion, Proveedor, Salida, Usuario,Producto, Carrito, CarritoItem, Venta
@@ -9,7 +11,14 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import CargarDatosForm  # Asume que tienes este formulario creado
-
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.decorators import login_required
+from sdnts.models import SaborMasa, Glaseado, Topping, CombinacionProducto
+import io
+import matplotlib.pyplot as plt
+from django.http import HttpResponse
+from weasyprint import HTML
+from django.template.loader import render_to_string
 # Context processors
 def nav_index(request):
     return render(request, 'includes/nav_index.html')
@@ -38,17 +47,21 @@ def contactanos(request):
 def nosotros(request):
     
     return render(request, 'index/nosotros.html')
+
 def login(request):
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
         
-        # Usamos los campos reales: email y passw_usua
-        usuario = Usuario.objects.filter(email=email, passw_usua=password).first()
+        usuario = Usuario.objects.filter(email=email).first()
 
-        if usuario:
+        if usuario and usuario.check_password(password):
             # Guardamos el ID del usuario en sesión
             request.session['cod_usuario'] = usuario.cod_usuario
+            
+            # También puedes iniciar sesión con Django si quieres
+            auth_login(request, usuario)
+            
             rol = usuario.rol.upper() if usuario.rol else ''
 
             # Redirección por rol
@@ -163,7 +176,7 @@ def agregar_al_carrito(request):
 
 def eliminar_del_carrito(request, item_id):
     item = get_object_or_404(CarritoItem, id=item_id)
-    item.delete()
+    carrito = item.carrito
     return redirect('ver_carrito')
 
 def ver_carrito(request):
@@ -194,7 +207,6 @@ def actualizar_carrito(request):
     
     return JsonResponse({'success': False})
 
-<<<<<<< HEAD
 def domiciliario_envios(request):
     return render(request, 'domi/domiciliario_envios.html') 
 
@@ -332,5 +344,107 @@ def domiciliarios(request):
 def correos(request):
     """Vista para mostrar la página de correos"""
     return render(request, 'admin/correos.html')
-=======
->>>>>>> 43730b0fff9afea16ed7181adc564a0838f2e701
+
+
+
+def reporte_usuarios_pdf(request):
+    # Estadísticas: contar cuántos usuarios hay por rol
+    roles = ['ADMIN', 'CLIENTE', 'DOMI']
+    conteo_roles = [Usuario.objects.filter(rol=rol).count() for rol in roles]
+
+    # Generar gráfico con matplotlib
+    plt.figure(figsize=(6, 4))
+    plt.bar(roles, conteo_roles, color=['red', 'blue', 'green'])
+    plt.title('Usuarios por Rol')
+    plt.xlabel('Rol')
+    plt.ylabel('Cantidad')
+
+    # Guardar gráfico en memoria
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    grafico_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    buf.close()
+
+    # Renderizar template HTML con gráfico embebido
+    html_string = render_to_string('reportes/usuarios_pdf.html', {
+        'grafico_base64': grafico_base64,
+        'total_admin': conteo_roles[0],
+        'total_cliente': conteo_roles[1],
+        'total_domi': conteo_roles[2],
+    })
+
+    html = HTML(string=html_string)
+    pdf_file = html.write_pdf()
+
+    # Devolver PDF como respuesta
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="reporte_usuarios.pdf"'
+    return response
+
+
+
+def reporte_usuarios_excel(request):
+    # Crear libro de Excel
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Usuarios"
+
+    # Cabeceras
+    ws.append(['ID', 'Nombre', 'Apellido', 'Email', 'Rol', 'Activo'])
+
+    # Llenar filas con los datos
+    usuarios = Usuario.objects.all()
+    for usuario in usuarios:
+        ws.append([
+            usuario.pk,
+            usuario.nomUsua,
+            usuario.apellUsua,
+            usuario.emailUsua,
+            usuario.rol,
+            "Sí" if usuario.activo else "No"
+        ])
+
+    # Preparar respuesta
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=usuarios.xlsx'
+    wb.save(response)
+
+    return response
+
+def guardar_usuario(request):
+    if request.method == 'POST':
+        nombre = request.POST['nomUsua']
+        apellido = request.POST['apellUsua']
+        email = request.POST['emailUsua']
+        password = request.POST['passwUsua']
+        rol = request.POST['rol']
+        activo = request.POST['activo']
+
+        # Aquí va tu lógica para guardar el usuario
+        print(nombre, apellido, email, password, rol, activo)
+
+        return redirect('/')  # redirige a donde quieras
+    
+    
+def actualizar_usuario(request):
+    if request.method == 'POST':
+        cod_usuario = request.POST.get('codUsuario')
+        nombre = request.POST.get('nomUsua')
+        apellido = request.POST.get('apellUsua')
+        email = request.POST.get('emailUsua')
+        rol = request.POST.get('rol')
+
+        usuario = get_object_or_404(Usuario, pk=cod_usuario)
+        usuario.nom_usua = nombre
+        usuario.apell_usua = apellido
+        usuario.email_usua = email
+        usuario.rol = rol
+        usuario.save()
+
+        return redirect(request.META.get('HTTP_REFERER', '/'))  # Redirige a la misma página
+    
+def eliminar_usuario(request, cod_usuario):
+      usuario = get_object_or_404(Usuario, pk=cod_usuario)
+      usuario.delete()
+      return redirect(request.META.get('HTTP_REFERER', '/')) 

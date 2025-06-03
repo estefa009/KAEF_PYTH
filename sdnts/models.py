@@ -9,6 +9,13 @@ class UsuarioManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('El email es obligatorio')
+        if not extra_fields.get('nom_usua'):
+            raise ValueError('El nombre es obligatorio')
+        if not extra_fields.get('apell_usua'):
+            raise ValueError('El apellido es obligatorio')
+        if not extra_fields.get('tele_usua'):
+            raise ValueError('El teléfono es obligatorio')
+
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -34,14 +41,14 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         ('CLIENTE', 'Cliente'),
         ('DOMI', 'Domiciliario'),
     )
-    
+
     cod_usuario = models.AutoField(primary_key=True)
     email = models.EmailField('correo electrónico', unique=True)
-    nom_usua = models.CharField('nombre', max_length=15)
-    apell_usua = models.CharField('apellido', max_length=20)
-    tele_usua = models.CharField('teléfono', max_length=15)
+    nom_usua = models.CharField('nombre', max_length=15, blank=False, null=False)
+    apell_usua = models.CharField('apellido', max_length=20, blank=False, null=False)
+    tele_usua = models.CharField('teléfono', max_length=15, blank=False, null=False)
     rol = models.CharField('rol', max_length=7, choices=ROLES, default='CLIENTE')
-    
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
@@ -57,7 +64,6 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.nom_usua} {self.apell_usua}"
-    
 class Administrador(models.Model):
     """
     Modelo para administradores que extiende al usuario base

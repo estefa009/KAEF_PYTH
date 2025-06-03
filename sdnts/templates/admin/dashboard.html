@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'admin/base.html' %}
 {% load static %}
 
 {% block content %}
@@ -26,8 +26,8 @@
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
                 <li><span class="dropdown-header">Administrador</span></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'admin_perfil' %}">Perfil</a></li>
-                <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
+                <li><a class="dropdown-item" href="">Perfil</a></li>
+                <li><a class="dropdown-item text-danger" href="">Cerrar Sesión</a></li>
             </ul>
         </li>
     </div>
@@ -62,6 +62,9 @@
             <!-- Botón para generar reporte -->
             <a href="{% url 'reporte_usuarios_pdf' %}" class="btn btn-danger">
                 <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
+            </a>
+            <a href="{% url 'reporte_usuarios_excel' %}" class="btn btn-success">
+                <i class="bi bi-file-earmark-excel-fill"></i> Exportar a Excel
             </a>
 
             <!-- Tabla de usuarios -->

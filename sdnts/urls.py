@@ -76,6 +76,12 @@ urlpatterns = [
     path('productos/', views.productos, name='productos'),
     path('clientes/', views.clientes, name='clientes'),
     path('domiciliarios/', views.domiciliarios, name='domiciliarios'),
+    
+    path('reporte-usuarios-pdf/', views.reporte_usuarios_pdf, name='reporte_usuarios_pdf'),
+    path('guardar/', views.guardar_usuario, name='guardar_usuario'),
+    path('actualizar-usuario/', views.actualizar_usuario, name='actualizar_usuario'),
+    path('eliminar-usuario/<int:usuario_id>/', views.eliminar_usuario, name='eliminar_usuario'),
+    path('reporte-usuarios-excel/', views.reporte_usuarios_excel, name='reporte_usuarios_excel'),
 
 ]
  

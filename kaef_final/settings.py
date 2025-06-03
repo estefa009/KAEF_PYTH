@@ -137,7 +137,8 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'sdnts.Usuario'
 LOGIN_URL = '/login/'
-
+LOGIN_REDIRECT_URL = '/dashboard/'  # que redirija a tu vista
+LOGOUT_REDIRECT_URL = '/login/'  # que redirija a la página de login después de cerrar sesión
 
 # Configuración para enviar emails (usando SMTP de Gmail como ejemplo)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

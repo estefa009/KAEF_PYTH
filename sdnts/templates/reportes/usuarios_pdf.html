@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Reporte de Usuarios</title>
+    <style>
+        body { font-family: sans-serif; }
+        h1 { text-align: center; }
+        img { display: block; margin: 0 auto; width: 70%; }
+        .info { text-align: center; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Reporte de Usuarios por Rol</h1>
+    <img src="data:image/png;base64,{{ grafico_base64 }}" alt="Gráfico de roles">
+    
+    <div class="info">
+        <p>Total Administradores: {{ total_admin }}</p>
+        <p>Total Clientes: {{ total_cliente }}</p>
+        <p>Total Domiciliarios: {{ total_domi }}</p>
+    </div>
+</body>
+</html>
