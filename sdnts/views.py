@@ -191,3 +191,4 @@ def actualizar_carrito(request):
         })
     
     return JsonResponse({'success': False})
+
