@@ -136,6 +136,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'sdnts.Usuario'
+LOGIN_URL = '/login/'
 
 
 # Configuración para enviar emails (usando SMTP de Gmail como ejemplo)
@@ -146,3 +147,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'stefasdonuts@gmail.com'  # tu email
 EMAIL_HOST_PASSWORD = 'stsfrhekgtnltiny'  # contraseña o App Password (si usas 2FA)
 DEFAULT_FROM_EMAIL = 'stefasdonuts@gmail.com'  # email que aparece como remitente
+

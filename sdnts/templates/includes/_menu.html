@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Sitio</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+<!-- Menú Lateral (OCULTO inicialmente) -->
+ <!-- Botón del Menú (SOLO esto es visible inicialmente) -->
+<button id="menuToggle" class="menu-toggle">
+    <i class="bi bi-list"></i>
+</button>
+
+<nav id="sidebar" class="sidenav">
+    <div class="sidenav-content">
+        <img src="{% static 'icon/5.ico' %}" alt="Logo" class="logo">
+        <a class="nav-link" href="{% url 'dashboard_admin' %}">
+            <i class="bi bi-house"></i> Inicio
+        </a>
+        <a class="nav-link" href="{% url 'ventas_admin' %}">
+            <i class="bi bi-currency-dollar"></i> Ventas
+        </a>
+        <a class="nav-link" href="{% url 'produccion_admin' %}">
+            <i class="bi bi-gear"></i> Producción
+        </a>
+        <a class="nav-link" href="{% url 'envios_admin' %}">
+            <i class="bi bi-truck"></i> Envíos
+        </a>
+        <a class="nav-link" href="{% url 'proveedores_admin' %}">
+            <i class="bi bi-people"></i> Proveedores
+        </a>
+        <a class="nav-link" href="{% url 'entradas_admin' %}">
+            <i class="bi bi-box-arrow-in-down"></i> Entradas
+        </a>
+        <a class="nav-link" href="{% url 'salidas_admin' %}">
+            <i class="bi bi-box-arrow-up"></i> Salidas
+        </a>
+        <a class="nav-link" href="{% url 'categorias_admin' %}">
+            <i class="bi bi-tags"></i> Categorías
+        </a>
+        <a class="nav-link" href="{% url 'correos_admin' %}">
+            <i class="bi bi-envelope"></i> Correos
+        </a>
+        <a class="nav-link" href="{% url 'cargarDatos' %}">
+            <i class="bi bi-upload me-2"></i> Cargue de Usuarios
+        </a>
+    </div>
+</nav>
+</body>
+</html>

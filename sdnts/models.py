@@ -1,5 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.db import models
+from django.utils import timezone
+from django.contrib.auth.models import BaseUserManager
 from django.conf import settings
 
 class UsuarioManager(BaseUserManager):
@@ -24,44 +27,37 @@ class UsuarioManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
-from django.contrib.auth.models import AbstractUser
-from django.db import models
 
-class Usuario(AbstractUser):
-    """
-    Modelo de usuario personalizado que reemplaza al usuario por defecto de Django
-    Hereda de AbstractUser para tener toda la funcionalidad de autenticación
-    """
+class Usuario(AbstractBaseUser, PermissionsMixin):
     ROLES = (
         ('ADMIN', 'Administrador'),
         ('CLIENTE', 'Cliente'),
         ('DOMI', 'Domiciliario'),
     )
     
-    # Eliminamos el campo username y usamos email como identificador
-    username = None
-    email = models.EmailField('correo electrónico', unique=True)
-    
-    # Campos personalizados
     cod_usuario = models.AutoField(primary_key=True)
+    email = models.EmailField('correo electrónico', unique=True)
     nom_usua = models.CharField('nombre', max_length=15)
     apell_usua = models.CharField('apellido', max_length=20)
     tele_usua = models.CharField('teléfono', max_length=15)
-    passw_usua = models.CharField('contraseña', max_length=60)  # Django manejará el hash
-
-    # 👇 Valor por defecto en el rol
     rol = models.CharField('rol', max_length=7, choices=ROLES, default='CLIENTE')
     
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    date_joined = models.DateTimeField(default=timezone.now)
+
+    objects = UsuarioManager()
+
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['nom_usua', 'apell_usua', 'tele_usua']  # 🔥 Eliminamos 'rol' porque ahora tiene default
-    
+    REQUIRED_FIELDS = ['nom_usua', 'apell_usua', 'tele_usua']
+
     class Meta:
         verbose_name = 'Usuario'
         verbose_name_plural = 'Usuarios'
-    
+
     def __str__(self):
         return f"{self.nom_usua} {self.apell_usua}"
-
+    
 class Administrador(models.Model):
     """
     Modelo para administradores que extiende al usuario base
@@ -612,3 +608,20 @@ class CarritoItem(models.Model):
     
     def __str__(self):
         return f"{self.cantidad} x {self.producto.nombre}"
+    
+    
+    
+    class Correo(models.Model):
+        cod_correo = models.AutoField(primary_key=True)
+        destinatario = models.EmailField('destinatario')
+        asunto = models.CharField('asunto', max_length=200)
+        mensaje = models.TextField('mensaje')
+        fecha_envio = models.DateTimeField('fecha de envío', auto_now_add=True)
+        enviado = models.BooleanField('enviado', default=False)
+        
+        class Meta:
+            verbose_name = 'Correo'
+            verbose_name_plural = 'Correos'
+        
+        def __str__(self):
+            return f"Correo #{self.cod_correo} - {self.destinatario}"

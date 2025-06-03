@@ -42,3 +42,34 @@ class UsuarioForm(forms.ModelForm):
             self.add_error("password2", "Las contraseñas no coinciden")
 
         return cleaned_data
+
+
+
+class CargarDatosForm(forms.Form):
+    TIPOS_ARCHIVO = (
+        ('csv', 'CSV'),
+        ('excel', 'Excel'),
+        ('json', 'JSON'),
+    )
+    
+    tipo_archivo = forms.ChoiceField(
+        choices=TIPOS_ARCHIVO,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
+    archivo = forms.FileField(
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': '.csv,.xlsx,.json'
+        })
+    )
+    
+    descripcion = forms.CharField(
+        max_length=200,
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': 'Descripción opcional del archivo...'
+        })
+    )

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Sitio</title>
+</head>
+<body>
+   <nav class="top-nav">
+    <div class="menu-toggle" id="menuToggle">
+        <i class="bi bi-list"></i>
+    </div>
+    
+    <div class="user-menu">
+        <div class="dropdown">
+            <a href="#" id="adminDropdown" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><span class="dropdown-header">Administrador</span></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'perfil' %}">Perfil</a></li>
+                <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+    <!-- Aquí va el contenido principal -->
+</body>
+</html>
