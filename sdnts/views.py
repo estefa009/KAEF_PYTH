@@ -194,6 +194,7 @@ def actualizar_carrito(request):
     
     return JsonResponse({'success': False})
 
+<<<<<<< HEAD
 def domiciliario_envios(request):
     return render(request, 'domi/domiciliario_envios.html') 
 
@@ -331,3 +332,5 @@ def domiciliarios(request):
 def correos(request):
     """Vista para mostrar la página de correos"""
     return render(request, 'admin/correos.html')
+=======
+>>>>>>> 43730b0fff9afea16ed7181adc564a0838f2e701

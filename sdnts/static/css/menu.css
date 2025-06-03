@@ -96,7 +96,7 @@
     border: 2px solid #4e4032;
     border-radius: 50px;
     position: absolute;
-    margin-left: 43%;
+    margin-left: 35%;
     margin-top: 10px;
     z-index: 1001;
     cursor: pointer;
@@ -122,8 +122,8 @@
 }
 .count-products {
     position: absolute;
-    top: 43px; /* Ajusta según sea necesario */
-    right: 104px; /* Ajusta según sea necesario */
+    top: 5px; /* Ajusta según sea necesario */
+    left: 137px;/* Ajusta según sea necesario */
     background-color: #4e4032;
     color: #ffc0cb;
     width: 25px;
@@ -198,18 +198,24 @@
 .hidden-cart{
     display: none;
 }
+
 /*________________________INDEX________________________*/
 .Profile{
     width: auto;
     height: 30px;
-    padding-left: 0px;
+    padding-left: 10px;
 }
 
 .navbar-nav .nav-item .nav-link {
-    margin-right: 15px;
+    
     color: #4e4032;
-    padding: 10px;
+    
     margin: 0 10px;
+    
+}
+
+.navbar-nav {
+    padding-left: 70px;
 }
 .navbar-nav .nav-item .nav-link:hover{
     color: #93877e;
@@ -224,7 +230,7 @@
 }
 
 .navbar-collapse {
-    padding-right: 300px;
+    
     font-family: "Dunkin";
     background-color: #ffc0cb;;
     border-radius: 100px;

@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
     <link rel="stylesheet" href="{% static 'css/C_catalogo.css' %}">
         <link rel="stylesheet" href="{% static 'css/menu.css' %}">
 
@@ -51,10 +50,10 @@
                                     
                                     <!-- Vista previa de la dona -->
                                     <div class="dona-preview">
-                                        <div class="dona-base" id="dona-masa"></div>
-                                        <div class="dona-cobertura" id="dona-cobertura"></div>
+                                        <div class="dona-base" id="dona-masa-S"></div>
+                                        <div class="dona-cobertura" id="dona-cobertura-S"></div>
                                         <!-- Capa de toppings con imagen de patrón -->
-                                        <div class="dona-topping" id="dona-topping"></div>
+                                        <div class="dona-topping" id="dona-topping-S"></div>
                                     </div>
                                     
                                     <!-- Selector de sabores con miniaturas -->
@@ -152,10 +151,10 @@
                                     
                                     <!-- Vista previa de la dona -->
                                     <div class="dona-preview">
-                                        <div class="dona-base" id="dona-masa"></div>
-                                        <div class="dona-cobertura" id="dona-cobertura"></div>
+                                        <div class="dona-base" id="dona-masa-M"></div>
+                                        <div class="dona-cobertura" id="dona-cobertura-M"></div>
                                         <!-- Capa de toppings con imagen de patrón -->
-                                        <div class="dona-topping" id="dona-topping"></div>
+                                        <div class="dona-topping" id="dona-topping-M"></div>
                                     </div>
                                     <!-- Selector de sabores con miniaturas -->
                                     <div class="opcion-seleccion">
@@ -251,10 +250,10 @@
                                     
                                     <!-- Vista previa de la dona -->
                                     <div class="dona-preview">
-                                        <div class="dona-base" id="dona-masa"></div>
-                                        <div class="dona-cobertura" id="dona-cobertura"></div>
+                                        <div class="dona-base" id="dona-masa-L"></div>
+                                        <div class="dona-cobertura" id="dona-cobertura-L"></div>
                                         <!-- Capa de toppings con imagen de patrón -->
-                                        <div class="dona-topping" id="dona-topping"></div>
+                                        <div class="dona-topping" id="dona-topping-L"></div>
                                     </div>
                                     <!-- Selector de sabores con miniaturas -->
                                     <div class="opcion-seleccion">
@@ -349,10 +348,10 @@
                                     
                                     <!-- Vista previa de la dona -->
                                     <div class="dona-preview">
-                                        <div class="dona-base" id="dona-masa"></div>
-                                        <div class="dona-cobertura" id="dona-cobertura"></div>
+                                        <div class="dona-base" id="dona-masa-XL"></div>
+                                        <div class="dona-cobertura" id="dona-cobertura-XL"></div>
                                         <!-- Capa de toppings con imagen de patrón -->
-                                        <div class="dona-topping" id="dona-topping"></div>
+                                        <div class="dona-topping" id="dona-topping-XL"></div>
                                     </div>
                                     <!-- Selector de sabores con miniaturas -->
                                     <div class="opcion-seleccion">
@@ -751,6 +750,65 @@
                 © 2024 Stefa´s Donuts.</p>
         </div>
     </div>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const colores = {
+        masa: {
+            'vainilla': '#efd091',
+            'chocolate': '#8B4513',
+            'red-velvet': '#952d30'
+        },
+        cobertura: {
+            'chocolate-blanco': '#f0e0c0',
+            'chocolate-oscuro': '#5C4033',
+            'arequipe': '#D4A76A'
+        },
+        toppings: {
+            'chispas': 'url("{% static 'Image/pepitasPatron.png' %}")',
+            'oreo': 'url("{% static 'Image/oreoPatron.png' %}")',
+            'mym': 'url("{% static 'Image/mymPatron.png' %}")',
+            'chips': 'url("{% static 'Image/chipsPatron.png' %}")',
+            'ninguno': 'none'
+        }
+    };
 
+    // Para cada modal de combo
+    ['S', 'M', 'L', 'XL'].forEach(function(talla) {
+        const modal = document.getElementById('modal' + talla);
+        if (!modal) return;
+
+        modal.querySelectorAll('.sabor-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const tipo = this.closest('.opcion-seleccion').querySelector('h4').textContent.toLowerCase();
+                const valor = this.dataset.value;
+
+                // Quitar 'active' solo en este grupo
+                this.parentElement.querySelectorAll('.sabor-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                this.classList.add('active');
+
+                // Actualizar la dona solo en este modal
+                if (tipo === 'masa') {
+                    modal.querySelector('#dona-masa-' + talla).style.backgroundColor = colores.masa[valor];
+                } else if (tipo === 'cobertura') {
+                    modal.querySelector('#dona-cobertura-' + talla).style.backgroundColor = colores.cobertura[valor];
+                } else if (tipo === 'toppings') {
+                    const topping = modal.querySelector('#dona-topping-' + talla);
+                    topping.style.backgroundImage = colores.toppings[valor];
+                    topping.style.display = (valor === 'ninguno') ? 'none' : 'block';
+                }
+            });
+        });
+
+        // Inicializar valores por defecto en cada modal
+        modal.querySelector('#dona-masa-' + talla).style.backgroundColor = colores.masa['vainilla'];
+        modal.querySelector('#dona-cobertura-' + talla).style.backgroundColor = colores.cobertura['chocolate-blanco'];
+        const topping = modal.querySelector('#dona-topping-' + talla);
+        topping.style.backgroundImage = colores.toppings['chispas'];
+        topping.style.display = 'block';
+    });
+});
+</script>
 </body>
 </html>
