@@ -72,26 +72,7 @@
         }
     </script>
     <div class="InicioSesion shadow">
-        <h1>¿Ya tienes <span class="cuenta">CUENTA?</span></h1>
-        <h2>Inicia Sesión</h2>
-        <br>
-        <form method="post" action="{% url 'login' %}">
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-5">
-                    <input type="text" name="username" class="form-control shadow" placeholder="Correo" required maxlength="50">
-                </div>
-                <div class="col-5">
-                    <input type="password" name="password" class="form-control shadow" placeholder="Contraseña" required maxlength="50">
-                </div>
-                <div>
-                    <button type="submit" class="btn btn form mx-2 shadow">INICIAR SESIÓN</button>
-                </div>
-                <div class="forgot">
-                    <a href="{% url 'password_reset' %}" class="btn-link pr-5">¿Olvidaste tu contraseña?</a>
-                </div>
-            </div>
-        </form>
+     
     </div>
     <div class="RedesSociales">
         <h1>Síguenos en nuestras redes sociales</h1>

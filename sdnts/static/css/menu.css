@@ -86,118 +86,175 @@
 }
 
 /*________________________CLIENTE________________________*/
+ .carrito {
+            width: 10%;
+            height: 30px;
+            display: flex;
+            background-color: #fc6998;
+            border: 2px solid #4e4032;
+            border-radius: 50px;
+            position: absolute;
+            margin-left: 35%;
+            margin-top: 10px;
+            z-index: 1001;
+            cursor: pointer;
+        }
+        
+        .carrito h1 {
+            font-family: "Dunkin";
+            font-size: 13px;
+            color: #4e4032;
+            margin-left: 15px;
+            margin-top: 4px;
+        }
+        
+        .carrito img {
+            width: auto;
+            height: 100%;
+            margin-top: 2px;
+            margin-left: 15px;
+            transition: transform 0.3s ease;
+        }
+        
+        .carrito:hover {
+            transform: scale(1.05);
+        }
+        
+        .count-products {
+            position: absolute;
+            top: 5px;
+            left: 117px;
+            background-color: #4e4032;
+            color: #ffc0cb;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            z-index: 1001;
+        }
+        
+        .container-cart-products {
+            position: absolute;
+            top: 50px;
+            right: 50px;
+            background-color: #fff;
+            border: 7px solid #ffc0cb;
+            border-radius: 50px;
+            width: 450px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            color: #4e4032;
+        }
+        
+        .titulo-producto-carrito {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-top: 20px;
+            font-size: 19px;
+        }
+        
+        .total-pagar {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            margin-right: 12px;
+            text-decoration: none;
+            border: none;
+        }
+        
+        .cart-product {
+            display: flex;
+            padding: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .info-cart-product {
+            display: flex;
+            justify-content: space-between;
+            flex: 1;
+            align-items: center;
+        }
+        
+        .cart-total {
+            padding: 10px;
+            text-align: right;
+            margin-right: 20px;
+        }
+        
+        .icon-close {
+            cursor: pointer;
+            width: 25px;
+            height: 25px;
+            stroke: #4e4032;
+            margin-top: 10px;
+            stroke-width: 2;
+        }
+        
+        .icon-close:hover {
+            stroke: #ffc0cb;
+            transform: scale(1.0);
+        }
+        
+        .precio-producto-carrito {
+            font-size: 22px;
+            margin-top: 10px;
+        }
+        
+        .hidden-cart {
+            display: none;
+        }
+        
+        /* Estilos para los modales */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal:not(.hidden) {
+            display: flex;
+        }
 
-
+        /* Asegura que estos estilos estén en tu archivo CSS */
 .carrito {
-    width: 10%;
+    width: 12%;
     height: 30px;
     display: flex;
     background-color: #fc6998;
     border: 2px solid #4e4032;
     border-radius: 50px;
     position: absolute;
-    margin-left: 35%;
+    margin-left: 40%;
     margin-top: 10px;
     z-index: 1001;
     cursor: pointer;
+}
 
-}
-.carrito h1 {
-    font-family: "Dunkin";
-    font-size: 13px; /* Ajuste del tamaño para que no sea muy grande */
-    color: #4e4032;
-    margin-left: 15px;
-    margin-top: 4px;
-
-}
-.carrito img {
-    width: auto;
-    height: 100%;
-    margin-top: 2px;
-    margin-left: 30px;
-    transition: transform 0.3s ease; /* Añadir transición si es necesario */
-}
-.carrito:hover {
-    transform: scale(1.05); /* Efecto de hover */
-}
-.count-products {
-    position: absolute;
-    top: 5px; /* Ajusta según sea necesario */
-    left: 137px;/* Ajusta según sea necesario */
-    background-color: #4e4032;
-    color: #ffc0cb;
-    width: 25px;
-    height: 25px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    z-index: 1001;
-}
 .container-cart-products {
     position: absolute;
-    top: 50px; /* Ajusta según sea necesario */
-    right: 50px; /* Ajusta según sea necesario */
+    top: 50px;
+    right: 50px;
     background-color: #fff;
-    border: 7px solid #ffc0cb; /* Añade un borde */
-    border-radius: 50px; /* Esquinas redondeadas */
-    width: 450px; /* Ancho del contenedor */
+    border: 7px solid #ffc0cb;
+    border-radius: 50px;
+    width: 450px;
     z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     color: #4e4032;
-}
-.titulo-producto-carrito{
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin-top: 20px;
-    font-size: 19px;
-}
-.total-pagar{
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    margin-right: 12px;
-    text-decoration: none;
-    border: none;
+    display: none !important; /* Inicialmente oculto */
 }
 
-.cart-product {
-    display: flex;
-    padding: 20px; /* Espaciado interno */
-    border-bottom: 2px solid #eee; /* Separador entre productos */
+.container-cart-products.visible {
+       display: block !important; /* Mostrar cuando tenga esta clase */
 }
 
-.info-cart-product {
-    display: flex;
-    justify-content: space-between;
-    flex: 1; /* Permite que ocupe el espacio disponible */
-    align-items: center; /* Alinear verticalmente */
-}
-
-.cart-total {
-    padding: 10px;
-    text-align: right; /* Alinear texto a la derecha */
-    margin-right: 20px;
-}
-
-.icon-close {
-    cursor: pointer; /* Cambia el cursor al pasar sobre el icono */
-    width: 25px;
-    height: 25px;
-    stroke: #4e4032;
-    margin-top: 10px;
-    stroke-width: 2;
-    cursor: pointer;
-}
-.icon-close :hover{
-    stroke: #ffc0cb;
-    transform: scale(1.0);
-}
-.precio-producto-carrito{
-    font-size: 22px;
-    margin-top: 10px;
-}
-.hidden-cart{
-    display: none;
-}
 
 /*________________________INDEX________________________*/
 .Profile{

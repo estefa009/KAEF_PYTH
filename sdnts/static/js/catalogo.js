@@ -1,36 +1,161 @@
 // Selección de elementos del DOM
 const btnCart = document.querySelector('.carrito');
-const ContainerCartProducts = document.querySelector('.container-cart-products');
+const containerCartProducts = document.querySelector('.container-cart-products');
 const rowProduct = document.querySelector('.row-product');
 let allProducts = [];
 const valorTotal = document.querySelector('.total-pagar');
 const countProducts = document.querySelector('#contador-productos');
 const emptyCartMessage = '<p class="empty-cart-message">Tu carrito está vacío</p>';
 
-// Evento para mostrar/ocultar el carrito
-btnCart.addEventListener('click', () => {
-    ContainerCartProducts.classList.toggle('hidden-cart');
-});
-// Cerrar el carrito al hacer clic fuera del contenedor
-document.addEventListener('click', (event) => {
-    const isClickInsideCart = ContainerCartProducts.contains(event.target);
-    const isClickOnButton = btnCart.contains(event.target);
-
-    // Si el clic no es en el carrito ni en el botón, ocultamos el carrito
-    if (!isClickInsideCart && !isClickOnButton) {
-        ContainerCartProducts.classList.add('hidden-cart');
+// Configuración inicial de colores
+const colores = {
+    masa: {
+        'vainilla': '#efd091',
+        'chocolate': '#8B4513',
+        'red-velvet': '#952d30'
+    },
+    cobertura: {
+        'chocolate-blanco': '#f0e0c0',
+        'chocolate-oscuro': '#5C4033',
+        'arequipe': '#D4A76A'
+    },
+    toppings: {
+        'chispas': "url('{% static 'Image/pepitasPatron.png' %}')",
+        'oreo': "url('{% static 'Image/oreoPatron.png' %}')",
+        'mym': "url('{% static 'Image/mymPatron.png' %}')",
+        'chips': "url('{% static 'Image/chipsPatron.png' %}')",
+        'ninguno': 'none'
     }
-});
+};
+
+// Función para inicializar modales de manera genérica
+function initModal(modalId, openButtonId, closeButtonClass, addToCartBtnId = null, size = null) {
+    const modal = document.getElementById(modalId);
+    const openButton = openButtonId ? document.getElementById(openButtonId) : null;
+    const closeButton = closeButtonClass ? document.querySelector(`.${closeButtonClass}`) : null;
+    const addToCartBtn = addToCartBtnId ? document.getElementById(addToCartBtnId) : null;
+
+    if (!modal) return;
+
+    // Configurar apertura del modal
+    if (openButton) {
+        openButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            modal.classList.remove('hidden');
+        });
+    }
+
+    // Configurar cierre del modal
+    if (closeButton) {
+        closeButton.addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
+    }
+
+    // Configurar botón de agregar al carrito si existe
+    if (addToCartBtn && size) {
+        addToCartBtn.addEventListener('click', () => {
+            agregarProductoAlCarrito(size);
+            modal.classList.add('hidden');
+        });
+    }
+
+    // Cerrar al hacer clic fuera del modal
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
+
+    // Configurar selección de sabores para modales de combos
+    if (['S', 'M', 'L', 'XL'].includes(size)) {
+        configurarSeleccionSabores(modal, size);
+    }
+}
+
+// Función para configurar la selección de sabores
+function configurarSeleccionSabores(modal, size) {
+    modal.querySelectorAll('.sabor-option').forEach(option => {
+        option.addEventListener('click', function() {
+            const tipo = this.closest('.opcion-seleccion').querySelector('h4').textContent.toLowerCase();
+            const valor = this.dataset.value;
+
+            // Quitar 'active' solo en este grupo
+            this.parentElement.querySelectorAll('.sabor-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+            this.classList.add('active');
+
+            // Actualizar la vista previa de la dona
+            if (tipo === 'masa') {
+                modal.querySelector(`#dona-masa-${size}`).style.backgroundColor = colores.masa[valor];
+            } else if (tipo === 'cobertura') {
+                modal.querySelector(`#dona-cobertura-${size}`).style.backgroundColor = colores.cobertura[valor];
+            } else if (tipo === 'toppings') {
+                const topping = modal.querySelector(`#dona-topping-${size}`);
+                topping.style.backgroundImage = colores.toppings[valor];
+                topping.style.display = (valor === 'ninguno') ? 'none' : 'block';
+            }
+        });
+    });
+
+    // Inicializar valores por defecto
+    const masaElement = modal.querySelector(`#dona-masa-${size}`);
+    const coberturaElement = modal.querySelector(`#dona-cobertura-${size}`);
+    const toppingElement = modal.querySelector(`#dona-topping-${size}`);
+
+    if (masaElement && coberturaElement && toppingElement) {
+        masaElement.style.backgroundColor = colores.masa['vainilla'];
+        coberturaElement.style.backgroundColor = colores.cobertura['chocolate-blanco'];
+        toppingElement.style.backgroundImage = colores.toppings['chispas'];
+        toppingElement.style.display = 'block';
+    }
+}
+
+// Función para agregar producto al carrito
+function agregarProductoAlCarrito(size) {
+    const modal = document.getElementById(`modal${size}`);
+    if (!modal) return;
+
+    const titulo = modal.querySelector('h1')?.textContent || `Combo Talla ${size}`;
+    const priceElement = modal.querySelector('.precio');
+    let price = 0;
+
+    if (priceElement) {
+        price = parseFloat(priceElement.textContent.replace('$', '').replace('.', '').replace(',', ''));
+    } else {
+        // Precios por defecto según talla si no se encuentra el elemento
+        const prices = { 'S': 10000, 'M': 20000, 'L': 30000, 'XL': 40000 };
+        price = prices[size] || 0;
+    }
+
+    const infoProduct = {
+        quantity: 1,
+        titulo: titulo,
+        price: price,
+        size: size
+    };
+
+    const existingProduct = allProducts.find(item => item.titulo === infoProduct.titulo && item.size === infoProduct.size);
+    if (existingProduct) {
+        existingProduct.quantity++;
+    } else {
+        allProducts.push(infoProduct);
+    }
+
+    showHTML();
+}
 
 // Función para mostrar los productos en el carrito
-// Función para mostrar los productos en el carrito
-const showHTML = () => {
-    rowProduct.innerHTML = ''; // Limpiar el contenedor antes de agregar nuevos elementos
+function showHTML() {
+    if (!rowProduct) return;
+
+    rowProduct.innerHTML = '';
 
     if (allProducts.length === 0) {
-        rowProduct.innerHTML = emptyCartMessage; // Mostrar mensaje si el carrito está vacío
-        valorTotal.innerText = '$0.00'; // Asegúrate de que el total sea cero
-        countProducts.innerText = '0'; // Asegúrate de que el contador sea cero
+        rowProduct.innerHTML = emptyCartMessage;
+        if (valorTotal) valorTotal.innerText = '$0.00';
+        if (countProducts) countProducts.innerText = '0';
     } else {
         let total = 0;
         let totalOfProduct = 0;
@@ -43,8 +168,8 @@ const showHTML = () => {
                 <div class="info-cart-product">
                     <span class="cantidad-producto-carrito">${product.quantity}</span>
                     <p class="titulo-producto-carrito">${product.titulo}</p>
-                    <span class="precio-producto-carrito">$${(product.price * product.quantity).toFixed(2)}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-close" data-title="${product.titulo}">
+                    <span class="precio-producto-carrito">$${(product.price * product.quantity).toLocaleString()}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-close" data-title="${product.titulo}" data-size="${product.size}">
                         <path fill-rule="evenodd" d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
                     </svg>
                 </div>`;
@@ -54,443 +179,298 @@ const showHTML = () => {
             totalOfProduct += product.quantity;
         });
 
-        valorTotal.innerText = `$${total.toFixed(2)}`; // Actualizar el total
-        countProducts.innerText = totalOfProduct; // Actualizar el contador
+        if (valorTotal) valorTotal.innerText = `$${total.toLocaleString()}`;
+        if (countProducts) countProducts.innerText = totalOfProduct;
     }
-};
-
-
+}
 
 // Evento para eliminar productos del carrito
-rowProduct.addEventListener('click', e => {
-    if (e.target.classList.contains('icon-close')) {
-        const titleToRemove = e.target.getAttribute('data-title');
-        allProducts = allProducts.filter(product => product.titulo !== titleToRemove);
-        showHTML();
-    }
+if (rowProduct) {
+    rowProduct.addEventListener('click', e => {
+        if (e.target.classList.contains('icon-close')) {
+            const titleToRemove = e.target.getAttribute('data-title');
+            const sizeToRemove = e.target.getAttribute('data-size');
+            allProducts = allProducts.filter(product => 
+                !(product.titulo === titleToRemove && product.size === sizeToRemove)
+            );
+            showHTML();
+        }
+    });
+}
+
+
+// Evento para mostrar/ocultar el carrito
+if (btnCart && containerCartProducts) {
+    btnCart.addEventListener('click', (e) => {
+        e.stopPropagation(); // Esto evita que el evento se propague y cierre inmediatamente
+        containerCartProducts.classList.toggle('hidden-cart');
+    });
+
+    // Cerrar el carrito al hacer clic fuera
+    document.addEventListener('click', (event) => {
+        // Verificar si el clic fue fuera del carrito o del botón del carrito
+        const isClickInside = containerCartProducts.contains(event.target) || btnCart.contains(event.target);
+        
+        if (!isClickInside) {
+            containerCartProducts.classList.add('hidden-cart');
+        }
+    });
+
+    // También puedes prevenir que el clic dentro del carrito lo cierre
+    containerCartProducts.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+}
+
+// Inicializar todos los modales
+document.addEventListener('DOMContentLoaded', function() {
+    // Modales de combos
+    initModal('modalS', 'btnAgregar', 'closeS', 'btnCerrarModalS', 'S');
+    initModal('modalM', 'btnAgregarM', 'closeM', 'btnCerrarModalM', 'M');
+    initModal('modalL', 'btnAgregarL', 'closeL', 'btnCerrarModalL', 'L');
+    initModal('modalXL', 'btnAgregarXL', 'closeXL', 'btnCerrarModalXL', 'XL');
+    
+    // Modales de información
+    initModal('modalV', 'btnInfoV', 'closeV', 'btnCerrarModalV');
+    initModal('modalC', 'btnInfoC', 'closeC', 'btnCerrarModalC');
+    initModal('modalR', 'btnInfoR', 'closeR', 'btnCerrarModalR');
+    initModal('modalB', 'btnInfoB', 'closeB', 'btnCerrarModalB');
+    initModal('modalOS', 'btnInfoOS', 'closeOS', 'btnCerrarModalOS');
+    initModal('modalA', 'btnInfoA', 'closeA', 'btnCerrarModalA');
+    initModal('modalT1', 'btnInfoT1', 'closeT1', 'btnCerrarModalT1');
+    initModal('modalT2', 'btnInfoT2', 'closeT2', 'btnCerrarModalT2');
+    initModal('modalT3', 'btnInfoT3', 'closeT3', 'btnCerrarModalT3');
+    initModal('modalT4', 'btnInfoT4', 'closeT4', 'btnCerrarModalT4');
+    initModal('modalP', 'btnPagar', 'closeP');
+
+    // Mostrar estado inicial del carrito
+    showHTML();
 });
 
-const productList = document.querySelector('.modal-content');
-
-// Función para agregar el producto al carrito
-const agregarProductoAlCarrito = (size) => {
-    const modal = document.querySelector(`#modal${size}`);
-    const titulo = modal.querySelector('h1').textContent;
-    const price = parseFloat(modal.querySelector('.modal-price').textContent.replace('$', '').replace('.', '').replace(',', ''));
-
-    const infoProduct = {
-        quantity: 1,
-        titulo: titulo,
-        price: price,
-        size: size 
-    };
-
-    const existingProduct = allProducts.find(item => item.titulo === infoProduct.titulo && item.size === infoProduct.size);
-    if (existingProduct) {
-        existingProduct.quantity++;
-    } else {
-        allProducts.push(infoProduct);
-    }
-
-    showHTML(); 
-}
-
-// Funciones para manejar los modales y añadir productos con talla
-const handleModal = (btnAgregar, modal, closeBtn, addToCartBtn, size) => {
-    if (btnAgregar) {
-        btnAgregar.addEventListener('click', () => {
-            modal.classList.remove('hidden'); 
-        });
-    }
-
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            modal.classList.add('hidden'); 
-        });
-    }
-
-    if (addToCartBtn) {
-        addToCartBtn.addEventListener('click', () => {
-            agregarProductoAlCarrito(size); 
-            modal.classList.add('hidden'); 
-        });
-    }
-};
-
-// Manejo de modales para las diferentes tallas
-const btnInfoS = document.getElementById('btnAgregar');
-const modalS = document.getElementById('modalS');
-const closeS = document.querySelector('.closeS');
-const btnCerrarModalS = document.getElementById('btnCerrarModalS');
-handleModal(btnInfoS, modalS, closeS, btnCerrarModalS, 'S');
-
-const btnInfoM = document.getElementById('btnAgregarM');
-const modalM = document.getElementById('modalM');
-const closeM = document.querySelector('.closeM');
-const btnCerrarModalM = document.getElementById('btnCerrarModalM');
-handleModal(btnInfoM, modalM, closeM, btnCerrarModalM, 'M');
-
-const btnInfoL = document.getElementById('btnAgregarL');
-const modalL = document.getElementById('modalL');
-const closeL = document.querySelector('.closeL');
-const btnCerrarModalL = document.getElementById('btnCerrarModalL');
-handleModal(btnInfoL, modalL, closeL, btnCerrarModalL, 'L');
-
-const btnInfoXL = document.getElementById('btnAgregarXL');
-const modalXL = document.getElementById('modalXL');
-const closeXL = document.querySelector('.closeXL');
-const btnCerrarModalXL = document.getElementById('btnCerrarModalXL');
-handleModal(btnInfoXL, modalXL, closeXL, btnCerrarModalXL, 'XL');
-
-const btnInfoP = document.getElementById('btnPagar');
-const modalP = document.getElementById('modalP');
-const closeP = document.querySelector('.closeP');
-const btnCerrarModalP = document.getElementById('btnCerrarModalP');
-handleModal(btnInfoP, modalP, closeP, btnCerrarModalP, 'P');
-
-// Llamar a showHTML al inicio para mostrar el estado inicial del carrito
-showHTML(); 
-
-
-//////////////////BOTON PAGAR////////////////////////////////
-
-
-// Funciones para manejar el modal de Talla V
-const btnInfoV = document.getElementById('btnInfoV');
-const modalV = document.getElementById('modalV');
-const closeV = document.querySelector('.closeV');
-const btnCerrarModalV = document.getElementById('btnCerrarModalV');
-
-// Función para abrir el modal de Talla V
-if (btnInfoV) {
-    btnInfoV.addEventListener('click', () => {
-        modalV.classList.remove('hidden'); // Muestra el modal
-    });
-}
-
-// Función para cerrar el modal de Talla V
-const cerrarModalV = () => {
-    modalV.classList.add('hidden'); // Oculta el modal
-};
-
-// Añadir eventos para cerrar el modal de Talla V
-if (closeV) {
-    closeV.addEventListener('click', cerrarModalV);
-}
-if (btnCerrarModalV) {
-    btnCerrarModalV.addEventListener('click', cerrarModalV);
-}
-
-
-// Funciones para manejar el modal de Talla C
-const btnInfoC = document.getElementById('btnInfoC');
-const modalC = document.getElementById('modalC');
-const closeC = document.querySelector('.closeC');
-const btnCerrarModalC = document.getElementById('btnCerrarModalC');
-
-// Función para abrir el modal de Talla C
-if (btnInfoC) {
-    btnInfoC.addEventListener('click', () => {
-        modalC.classList.remove('hidden'); // Muestra el modal
-    });
-}
-
-// Función para cerrar el modal de Talla C
-const cerrarModalC = () => {
-    modalC.classList.add('hidden'); // Oculta el modal
-};
-
-// Añadir eventos para cerrar el modal de Talla C
-if (closeC) {
-    closeC.addEventListener('click', cerrarModalC);
-}
-if (btnCerrarModalC) {
-    btnCerrarModalC.addEventListener('click', cerrarModalC);
-}
-
-// Funciones para manejar el modal de Talla R
-const btnInfoR = document.getElementById('btnInfoR');
-const modalR = document.getElementById('modalR');
-const closeR = document.querySelector('.closeR');
-const btnCerrarModalR = document.getElementById('btnCerrarModalR');
-
-// Función para abrir el modal de Talla R
-if (btnInfoR) {
-    btnInfoR.addEventListener('click', () => {
-        modalR.classList.remove('hidden'); // Muestra el modal
-    });
-}
-
-// Función para cerrar el modal de Talla R
-const cerrarModalR = () => {
-    modalR.classList.add('hidden'); // Oculta el modal
-};
-
-// Añadir eventos para cerrar el modal de Talla R
-if (closeR) {
-    closeR.addEventListener('click', cerrarModalR);
-}
-if (btnCerrarModalR) {
-    btnCerrarModalR.addEventListener('click', cerrarModalR);
-}
-
-// Funciones para manejar el modal de Talla B
-const btnInfoB = document.getElementById('btnInfoB');
-const modalB = document.getElementById('modalB');
-const closeB = document.querySelector('.closeB');
-const btnCerrarModalB = document.getElementById('btnCerrarModalB');
-
-// Función para abrir el modal de Talla B
-if (btnInfoB) {
-    btnInfoB.addEventListener('click', () => {
-        modalB.classList.remove('hidden'); // Muestra el modal
-    });
-}
-
-// Función para cerrar el modal de Talla B
-const cerrarModalB = () => {
-    modalB.classList.add('hidden'); // Oculta el modal
-};
-
-// Añadir eventos para cerrar el modal de Talla B
-if (closeB) {
-    closeB.addEventListener('click', cerrarModalB);
-}
-if (btnCerrarModalB) {
-    btnCerrarModalB.addEventListener('click', cerrarModalB);
-}
-
-
-// Funciones para manejar el modal de Talla OS
-const btnInfoOS = document.getElementById('btnInfoOS');
-const modalOS = document.getElementById('modalOS');
-const closeOS = document.querySelector('.closeOS');
-const btnCerrarModalOS = document.getElementById('btnCerrarModalOS');
-
-// Función para abrir el modal de Talla OS
-if (btnInfoOS) {
-    btnInfoOS.addEventListener('click', () => {
-        modalOS.classList.remove('hidden'); // Muestra el modal
-    });
-}
-
-// Función para cerrar el modal de Talla OS
-const cerrarModalOS = () => {
-    modalOS.classList.add('hidden'); // Oculta el modal
-};
-
-// Añadir eventos para cerrar el modal de Talla OS
-if (closeOS) {
-    closeOS.addEventListener('click', cerrarModalOS);
-}
-if (btnCerrarModalOS) {
-    btnCerrarModalOS.addEventListener('click', cerrarModalOS);
-}
-
-
-
-// Funciones para manejar el modal de Talla A
-const btnInfoA = document.getElementById('btnInfoA');
-const modalA = document.getElementById('modalA');
-const closeA = document.querySelector('.closeA');
-const btnCerrarModalA = document.getElementById('btnCerrarModalA');
-
-// Función para abrir el modal de Talla A
-if (btnInfoA) {
-    btnInfoA.addEventListener('click', () => {
-        modalA.classList.remove('hidden'); // Muestra el modal
-    });
-}
-
-// Función para cerrar el modal de Talla A
-const cerrarModalA = () => {
-    modalA.classList.add('hidden'); // Oculta el modal
-};
-
-// Añadir eventos para cerrar el modal de Talla A
-if (closeA) {
-    closeA.addEventListener('click', cerrarModalA);
-}
-if (btnCerrarModalA) {
-    btnCerrarModalA.addEventListener('click', cerrarModalA);
-}
-
-// Funciones para manejar el modal de Talla T1
-
-const btnInfoT1 = document.getElementById('btnInfoT1');
-const modalT1 = document.getElementById('modalT1');
-const closeT1 = document.querySelector('.closeT1');
-const btnCerrarModalT1 = document.getElementById('btnCerrarModalT1');
-
-// Función para abrir el modal de Talla T1
-
-if (btnInfoT1) {
-    btnInfoT1.addEventListener('click', () => {
-        modalT1.classList.remove('hidden'); // Muestra el modal
-    });
-}
-
-// Función para cerrar el modal de Talla T1
-
-const cerrarModalT1 = () => {
-    modalT1.classList.add('hidden'); // Oculta el modal
-};
-
-// Añadir eventos para cerrar el modal de Talla T1
-
-if (closeT1) {
-    closeT1.addEventListener('click', cerrarModalT1);
-}
-if (btnCerrarModalT1) {
-    btnCerrarModalT1.addEventListener('click', cerrarModalT1);
-}
-
-
-// Funciones para manejar el modal de Talla T2
-
-const btnInfoT2 = document.getElementById('btnInfoT2');
-const modalT2 = document.getElementById('modalT2');
-const closeT2 = document.querySelector('.closeT2');
-const btnCerrarModalT2 = document.getElementById('btnCerrarModalT2');
-
-// Función para abrir el modal de Talla T2
-
-if (btnInfoT2) {
-    btnInfoT2.addEventListener('click', () => {
-        modalT2.classList.remove('hidden'); // Muestra el modal
-    });
-}
-
-// Función para cerrar el modal de Talla T2
-
-const cerrarModalT2 = () => {
-    modalT2.classList.add('hidden'); // Oculta el modal
-};
-
-// Añadir eventos para cerrar el modal de Talla T2
-
-if (closeT2) {
-    closeT2.addEventListener('click', cerrarModalT2);
-}
-if (btnCerrarModalT2) {
-    btnCerrarModalT2.addEventListener('click', cerrarModalT2);
-}
-
-
-
-// Funciones para manejar el modal de Talla T3
-
-const btnInfoT3 = document.getElementById('btnInfoT3');
-const modalT3 = document.getElementById('modalT3');
-const closeT3 = document.querySelector('.closeT3');
-const btnCerrarModalT3 = document.getElementById('btnCerrarModalT3');
-
-// Función para abrir el modal de Talla T3
-
-if (btnInfoT3) {
-    btnInfoT3.addEventListener('click', () => {
-        modalT3.classList.remove('hidden'); // Muestra el modal
-    });
-}
-
-// Función para cerrar el modal de Talla T3
-
-const cerrarModalT3 = () => {
-    modalT3.classList.add('hidden'); // Oculta el modal
-};
-
-// Añadir eventos para cerrar el modal de Talla T3
-
-if (closeT3) {
-    closeT3.addEventListener('click', cerrarModalT3);
-}
-if (btnCerrarModalT3) {
-    btnCerrarModalT3.addEventListener('click', cerrarModalT3);
-}
-
-
-// Funciones para manejar el modal de Talla T4
-
-const btnInfoT4 = document.getElementById('btnInfoT4');
-const modalT4 = document.getElementById('modalT4');
-const closeT4 = document.querySelector('.closeT4');
-const btnCerrarModalT4 = document.getElementById('btnCerrarModalT4');
-
-// Funciones para manejar el modal de Talla S
-
-if (btnInfoT4) {
-    btnInfoT4.addEventListener('click', () => {
-        modalT4.classList.remove('hidden'); // Muestra el modal
-    });
-}
-
-// Función para cerrar el modal de Talla T4
-
-const cerrarModalT4 = () => {
-    modalT4.classList.add('hidden'); // Oculta el modal
-};
-
-// Añadir eventos para cerrar el modal de Talla T4
-
-if (closeT4) {
-    closeT4.addEventListener('click', cerrarModalT4);
-}
-if (btnCerrarModalT4) {
-    btnCerrarModalT4.addEventListener('click', cerrarModalT4);
-}
-
-// Cerrar el modal al hacer clic fuera de él (para todos los modales)
-window.addEventListener('click', (event) => {
-    if (event.target === modalV) {
-        cerrarModalV();
-    }
-    if (event.target === modalV) {
-        cerrarModalV();
-    }
-    if (event.target === modalC) {
-        cerrarModalC();
-    }
-    if (event.target === modalR) {
-        cerrarModalR();
-    }
-    if (event.target === modalB) {
-        cerrarModalB();
-    }
-    if (event.target === modalOS) {
-        cerrarModalOS();
-    }
-    if (event.target === modalA) {
-        cerrarModalA();
-    }
-    if (event.target === modalT1) {
-        cerrarModalT1();
-    }
-    if (event.target === modalT2) {
-        cerrarModalT2();
-    }
-    if (event.target === modalT3) {
-        cerrarModalT3();
-    }
-    if (event.target === modalT4) {
-        cerrarModalT4();
-    }
-});
-
+// Funciones para los modales de métodos de pago
 function openModal(modalId) {
-    document.getElementById(modalId).style.display = "block";
+    const modal = document.getElementById(modalId);
+    if (modal) modal.style.display = "block";
 }
 
 function closeModal(modalId) {
-    document.getElementById(modalId).style.display = "none";
+    const modal = document.getElementById(modalId);
+    if (modal) modal.style.display = "none";
 }
 
-// Cerrar modal al hacer clic fuera del contenido
-window.onclick = function (event) {
+// Cerrar modales al hacer clic fuera
+window.addEventListener('click', function(event) {
     const modals = document.querySelectorAll(".modal-nequi, .modal-davi");
     modals.forEach(modal => {
         if (event.target === modal) {
             modal.style.display = "none";
         }
     });
-};
+});
 
+
+// -----------------------------ajustes para el carrito carlexy-------------------------------
+
+// Selección de elementos del DOM
+const totalPagarModal = document.getElementById('total-pagar-modal');
+
+// Carrito en memoria (temporal) con localStorage
+allProducts = JSON.parse(localStorage.getItem('cart')) || [];
+
+// Función para guardar el carrito en localStorage
+function saveCartToStorage() {
+    localStorage.setItem('cart', JSON.stringify(allProducts));
+}
+
+// Función para actualizar el contador
+function updateCartCounter() {
+    if (countProducts) {
+        const totalItems = allProducts.reduce((total, product) => total + product.quantity, 0);
+        countProducts.textContent = totalItems;
+    }
+}
+
+// Función para actualizar el total
+function updateTotal() {
+    const total = allProducts.reduce((sum, product) => sum + (product.price * product.quantity), 0);
+    
+    if (valorTotal) {
+        valorTotal.textContent = `$${total.toLocaleString()}`;
+    }
+    
+    if (totalPagarModal) {
+        totalPagarModal.textContent = total.toLocaleString();
+    }
+}
+
+// Función para mostrar los productos en el carrito
+function showHTML() {
+    if (!rowProduct) return;
+
+    rowProduct.innerHTML = '';
+
+    if (allProducts.length === 0) {
+        rowProduct.innerHTML = emptyCartMessage;
+    } else {
+        allProducts.forEach(product => {
+            const containerProduct = document.createElement('div');
+            containerProduct.classList.add('cart-product');
+
+            containerProduct.innerHTML = `
+                <div class="info-cart-product">
+                    <span class="cantidad-producto-carrito">${product.quantity}</span>
+                    <p class="titulo-producto-carrito">${product.titulo}</p>
+                    <p class="personalizacion">
+                        Masa: ${product.masa || '-'}<br>
+                        Cobertura: ${product.cobertura || '-'}<br>
+                        Topping: ${product.topping || '-'}
+                    </p>
+                    <span class="precio-producto-carrito">$${(product.price * product.quantity).toLocaleString()}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-close" data-id="${product.id}">
+                        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
+                    </svg>
+                </div>`;
+
+            rowProduct.append(containerProduct);
+        });
+    }
+
+    updateCartCounter();
+    updateTotal();
+    saveCartToStorage();
+}
+
+// Función para agregar producto al carrito
+function agregarProductoAlCarrito(size) {
+    const modal = document.getElementById(`modal${size}`);
+    if (!modal) return;
+
+    const titulo = modal.querySelector('h1')?.textContent || `Combo Talla ${size}`;
+    const priceElement = modal.querySelector('.precio');
+    let price = 0;
+
+    // Obtener selecciones de personalización
+    const masaSeleccionada = modal.querySelector('.opcion-seleccion:nth-child(1) .sabor-option.active')?.textContent.trim() || 'Vainilla';
+    const coberturaSeleccionada = modal.querySelector('.opcion-seleccion:nth-child(2) .sabor-option.active')?.textContent.trim() || 'Chocolate Blanco';
+    const toppingSeleccionado = modal.querySelector('.opcion-seleccion:nth-child(3) .sabor-option.active')?.textContent.trim() || 'Chispas';
+
+    if (priceElement) {
+        price = parseFloat(priceElement.textContent.replace('$', '').replace('.', ''));
+    } else {
+        // Precios por defecto según talla
+        const prices = { 'S': 10000, 'M': 20000, 'L': 30000, 'XL': 40000 };
+        price = prices[size] || 0;
+    }
+
+    const productId = `${size}-${masaSeleccionada}-${coberturaSeleccionada}-${toppingSeleccionado}`.replace(/\s+/g, '-');
+
+    const infoProduct = {
+        id: productId,
+        quantity: 1,
+        titulo: titulo,
+        price: price,
+        size: size,
+        masa: masaSeleccionada,
+        cobertura: coberturaSeleccionada,
+        topping: toppingSeleccionado
+    };
+
+    const existingProduct = allProducts.find(item => item.id === productId);
+    if (existingProduct) {
+        existingProduct.quantity++;
+    } else {
+        allProducts.push(infoProduct);
+    }
+
+    showHTML();
+}
+
+// Evento para eliminar productos del carrito
+if (rowProduct) {
+    rowProduct.addEventListener('click', e => {
+        if (e.target.classList.contains('icon-close')) {
+            const productId = e.target.getAttribute('data-id');
+            allProducts = allProducts.filter(product => product.id !== productId);
+            showHTML();
+        }
+    });
+}
+
+// Evento para mostrar/ocultar el carrito
+if (btnCart && containerCartProducts) {
+    btnCart.addEventListener('click', () => {
+        containerCartProducts.classList.toggle('hidden-cart');
+    });
+
+    // Cerrar el carrito al hacer clic fuera
+    document.addEventListener('click', (event) => {
+        const isClickInsideCart = containerCartProducts.contains(event.target);
+        const isClickOnButton = btnCart.contains(event.target);
+
+        if (!isClickInsideCart && !isClickOnButton) {
+            containerCartProducts.classList.add('hidden-cart');
+        }
+    });
+}
+
+// Funciones para los modales de pago
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.style.display = "block";
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.style.display = "none";
+}
+
+// Cerrar modales al hacer clic fuera
+window.addEventListener('click', function(event) {
+    const modals = document.querySelectorAll(".modal-nequi, .modal-davi");
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+});
+
+// Inicialización del carrito al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Cargar carrito desde localStorage
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+        allProducts = JSON.parse(savedCart);
+    }
+    
+    // Mostrar el estado inicial del carrito
+    showHTML();
+    
+    // Configurar botón de pagar
+    const btnPagar = document.getElementById('btnPagar');
+    if (btnPagar) {
+        btnPagar.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('modalP').classList.remove('hidden');
+        });
+    }
+    
+    // Configurar botón de cerrar modal de pago
+    const closeP = document.querySelector('.closeP');
+    if (closeP) {
+        closeP.addEventListener('click', () => {
+            document.getElementById('modalP').classList.add('hidden');
+        });
+    }
+    
+    // Configurar botón de comprar
+    const btnComprar = document.getElementById('btnAgregarProducto');
+    if (btnComprar) {
+        btnComprar.addEventListener('click', () => {
+            // Aquí puedes agregar lógica para procesar el pago
+            alert('Compra realizada con éxito!');
+            allProducts = [];
+            showHTML();
+            document.getElementById('modalP').classList.add('hidden');
+        });
+    }
+});

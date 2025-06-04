@@ -6,12 +6,9 @@
     <title>Navbar</title>
     <link rel="stylesheet" href="{% static 'css/C_catalogo.css' %}">
     <link rel="stylesheet" href="{% static 'css/menu.css' %}">
-    
+   
 </head>
 <body>
-<!-- templates/includes/nav_index.html -->
- {% load static %}
-
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow">
     <a class="navbar-brand" href="{% url 'vistacliente' %}"><img src="{% static 'icon/7.ico' %}" width="300"></a>
     <div class="collapse navbar-collapse shadow" id="navbarNav">
@@ -28,7 +25,7 @@
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="perfilDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Perfil
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="Profile" style="width: 20px; height: 20px;">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="Profile" style="width: 30px; height: 20px;">
                      <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
                   </svg>  
               </a>
@@ -39,50 +36,18 @@
               </div>
           </li>
 
-
-            
             <div class="carrito">
                 <h1>CARRITO</h1>
                 <img src="{% static 'Image/carrito.png' %}">
-                <!-- Contador de productos -->
                 <div class="count-products">
-                    <span id="contador-productos">
-                        {% if carrito %}
-                            {{ carrito.get_total_items }}
-                        {% else %}
-                            0
-                        {% endif %}
-                    </span>
+                    <span id="contador-productos">0</span>
                 </div>
             </div>
             
-            <div class="container-cart-products hidden-cart shadow">
-                {% if carrito %}
-                    {% for item in carrito.items.all %}
-                    <div class="row-product">
-                        <div class="cart-product">
-                            <div class="info-cart-product">
-                                <span class="cantidad-producto-carrito">{{ item.cantidad }}</span>
-                                <p class="titulo-producto-carrito">{{ item.producto.nombre }}</p>
-                                <p class="personalizacion">
-                                    Masa: {{ item.masa_seleccionada|default:"-" }}<br>
-                                    Cobertura: {{ item.cobertura_seleccionada|default:"-" }}<br>
-                                    Topping: {{ item.topping_seleccionado|default:"-" }}
-                                </p>
-                                <span class="precio-producto-carrito">${{ item.subtotal }}</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-close" onclick="eliminarItem({{ item.id }})">
-                                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="row-product">
-                        <p>Tu carrito está vacío</p>
-                    </div>
-                {% endif %}
-                
+               <div class="container-cart-products">
+                <div class="row-product">
+                    <!-- Productos se agregarán dinámicamente con JavaScript -->
+                </div>
                 <div class="container-general">
                     <button class="botonPagar shadow" id="btnPagar">PAGAR</button>
                     <div id="modalP" class="modal hidden">
@@ -90,7 +55,6 @@
                             <div class="miacolucci">
                                 <div class="metodoPago">
                                     <h1 id="modal-title">Método de Pago:</h1>
-                                    <!-- Primer Contenedor -->
                                     <div class="nequi-container shadow">
                                         <div class="formas">
                                             <h1>N. de referencia:</h1>
@@ -103,7 +67,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- Modal Específico para Nequi -->
                                     <div id="modalNequiSpecific" class="modal-nequi">
                                         <div class="modal-nequi-content">
                                             <span class="close-nequi" onclick="closeModal('modalNequiSpecific')">&times;</span>
@@ -113,7 +76,6 @@
                                             <img class="nequiQR" src="{% static 'Image/nequiQR.jpg' %}">
                                         </div>
                                     </div>
-                                    <!-- Segundo Contenedor -->
                                     <div class="davi-container shadow">
                                         <div class="formas">
                                             <h1>N. de referencia:</h1>
@@ -126,7 +88,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- Modal Específico para Davivienda -->
                                     <div id="modalDaviSpecific" class="modal-davi">
                                         <div class="modal-davi-content">
                                             <span class="close-davi" onclick="closeModal('modalDaviSpecific')">&times;</span>
@@ -145,11 +106,7 @@
                                         </div>
                                         <div class="totalPagar">
                                             <h1>Total:<br>
-                                                {% if carrito %}
-                                                    ${{ carrito.get_total_price }}
-                                                {% else %}
-                                                    $0.00
-                                                {% endif %}
+                                                $<span id="total-pagar-modal">0.00</span>
                                             </h1>
                                         </div>
                                     </div>
@@ -162,28 +119,20 @@
                     </div>
                     <div class="cart-total">
                         <h3>Total:</h3>
-                        <span class="total-pagar">
-                            {% if carrito %}
-                                ${{ carrito.get_total_price }}
-                            {% else %}
-                                $00.000
-                            {% endif %}
-                        </span>
+                        <span class="total-pagar">$0.00</span>
                     </div>
                 </div>
             </div>
         </ul>
     </div>
-    
 </nav>
+
 <!-- jQuery (requerido por Bootstrap 4) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <!-- Popper.js (requerido por Bootstrap para dropdowns) -->
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-
 <!-- Bootstrap JS -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+<script src="{% static 'js/catalogo.js' %}"></script>
 </body>
 </html>
