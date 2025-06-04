@@ -33,6 +33,11 @@
                     </svg>  
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
+            </li>
+
+            
             <div class="carrito">
                 <h1>CARRITO</h1>
                 <img src="{% static 'Image/carrito.png' %}">
@@ -166,6 +171,7 @@
             </div>
         </ul>
     </div>
+    
 </nav>
 <script src="{% static 'js/catalogo.js' %}" defer></script>
 </body>

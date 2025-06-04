@@ -1,35 +1,67 @@
 {% extends 'admin/base.html' %}
-{% load static %}
 
 {% block content %}
-    {% if request.user.is_authenticated %}
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4>Bienvenid@ {{ request.user.nom_usua }}</h4>
-            
-            <!-- Menú de usuario -->
-            <div class="dropdown">
-                <button class="btn btn-transparent dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown">
-                    <i class="bi bi-person-circle fs-4"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><span class="dropdown-header">{{ request.user.get_rol_display }}</span></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="{% url 'perfil' %}">Perfil</a></li>
-                    <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
-                </ul>
-            </div>
-        </div>
-    {% endif %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <link rel="icon" type="Image/ico" href="{% static 'icon/2.ico' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap Bundle con Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    <link rel="stylesheet" href="{% static 'css/menu.css' %}">
+</head>
+
+<body>
+<!-- Insertar botón de menú -->
+{% include "includes/_menu.html" %}
+
+<!-- Insertar menú nav -->
+{% include "includes/nav_admin.html" %}
+
+<main>
+
+    <h4>
+        {% if usuarioLogueado %}
+            <p>Bienvenid@ {{ usuarioLogueado.nomUsua }}</p>
+        {% endif %}
+    </h4>
+
 
     <!-- Barra de búsqueda -->
-    <form id="searchForm" class="search-form mb-4">
-        <label>
+    <form id="searchForm" onsubmit="search(event)" class="search-form">
+        <label style="margin-left: 300px;">
             <input type="text" id="buscar" placeholder="Buscar..">
-            <button type="submit" class="btn btn-link"><i class="bi bi-search"></i></button>
+            <button type="submit" style="border: none; background: none;"><i class="bi bi-search"></i></button>
         </label>
     </form>
 
-    <!-- Contenido principal -->
+    <!-- Menú de usuario -->
+    <div class="d-flex align-items-center gap-3" style="margin-left: auto; margin-right: 40px;">
+        <li class="nav-item dropdown list-unstyled">
+            <a href="#" id="adminDropdown" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle" style="font-size: 30px; color: #333333"></i>
+
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
+                <li><span class="dropdown-header">Administrador</span></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
+            </ul>
+        </li>
+    </div>
+</main>
+
+<!-- Contenido principal -->
+<div class="container-fluid">
     <div class="row">
         <div class="col-12 col-md-6 text-center mt-3">
             <div class="vent_semanal p-3 shadow-sm bg-light">
@@ -44,191 +76,199 @@
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Gestión de usuarios -->
-    <div class="tablaa mt-4">
-        <div class="row">
-            <h2 class="mb-4">Gestión de Usuarios</h2>
+<!-- Gestión de usuarios -->
+<div class="tablaa">
+    <div class="row">
+        <h2 class="mb-4">Gestión de Usuarios</h2>
 
-            <!-- Botones de acción -->
-            <div class="d-flex gap-2 mb-3">
-                <button class="btn btn-rosa" data-bs-toggle="modal" data-bs-target="#modalAgregar">
-                    <i class="bi bi-person-plus"></i> Agregar Usuario
-                </button>
-                <a href="{% url 'reporte_usuarios_pdf' %}" class="btn btn-danger">
-                    <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
-                </a>
-            </div>
+        <!-- Botón para agregar usuario -->
+        <button class="btn btn-rosa mb-3" data-bs-toggle="modal" data-bs-target="#modalAgregar">
+            <i class="bi bi-person-plus"></i> Agregar Usuario
+        </button>
+        <!-- Botón para generar reporte -->
+        <a href="{% url 'reporte_usuarios_pdf' %}" class="btn btn-danger">
+            <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
+        </a>
 
-            <!-- Tabla de usuarios -->
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Apellido</th>
-                            <th>Email</th>
-                            <th>Rol</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if not usuarios %}
-                            <tr>
-                                <td colspan="6" class="text-center">No hay usuarios registrados</td>
-                            </tr>
-                        {% else %}
-                            {% for user in usuarios %}
-                                <tr>
-                                    <td>{{ user.cod_usuario }}</td>
-                                    <td>{{ user.nom_usua }}</td>
-                                    <td>{{ user.apell_usua }}</td>
-                                    <td>{{ user.email }}</td>
-                                    <td>{{ user.get_rol_display }}</td>
-                                    <td>
-                                        <button class="btn btn-rosa me-2"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#modalEditar"
-                                                data-id="{{ user.cod_usuario }}"
-                                                data-nombre="{{ user.nom_usua }}"
-                                                data-apellido="{{ user.apell_usua }}"
-                                                data-email="{{ user.email }}"
-                                                data-rol="{{ user.rol }}">
-                                            <i class="bi bi-pencil"></i> Editar
-                                        </button>
 
-                                        <a href="{% url 'eliminar_usuario' user.cod_usuario %}"
-                                           onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?');"
-                                           class="btn btn-danger">
-                                            Eliminar
-                                        </a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        {% endif %}
-                    </tbody>
-                </table>
+        <!-- Tabla de usuarios -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% if not listaUsuarios %}
+                    <tr>
+                        <td colspan="4" class="text-center">No hay usuarios registrados</td>
+                    </tr>
+                {% else %}
+                    {% for user in listaUsuarios %}
+                    <tr>
+                        <td>{{ user.codUsuario }}</td>
+                        <td>{{ user.nomUsua }}</td>
+                        <td>{{ user.apellUsua }}</td>
+                        <td>{{ user.emailUsua }}</td>
+                        <td>{{ user.rol }}</td>
+                        <td>
+                            <button class="btn btn-rosa me-2"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalEditar"
+                                    data-id="{{ user.codUsuario }}"
+                                    data-nombre="{{ user.nomUsua }}"
+                                    data-apellido="{{ user.apellUsua }}"
+                                    data-email="{{ user.emailUsua }}"
+                                    data-rol="{{ user.rol }}">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button>
+
+                            <a href="{% url 'eliminar_usuario' user.codUsuario %}"
+                               onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?');"
+                               class="btn btn-danger">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Modal Agregar Usuario -->
+        <div class="modal fade" id="modalAgregar" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content" style="border: none;">
+                    <div class="modal-header" style="background-color: #ff69b4; color: white;">
+                        <h5 class="modal-title">Agregar Nuevo Usuario</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form action="{% url 'guardar_usuario' %}" method="post">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="nomUsuaAgregar" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" id="nomUsuaAgregar" name="nomUsua"
+                                           style="border-color: #ffb6c1;" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="apellUsuaAgregar" class="form-label">Apellido</label>
+                                    <input type="text" class="form-control" id="apellUsuaAgregar" name="apellUsua"
+                                           style="border-color: #ffb6c1;" required>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="emailUsuaAgregar" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="emailUsuaAgregar" name="emailUsua"
+                                           style="border-color: #ffb6c1;" required>
+                                </div>
+
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="passwUsuaAgregar" class="form-label">Contraseña</label>
+                                    <input type="password" class="form-control" id="passwUsuaAgregar" name="passwUsua"
+                                           style="border-color: #ffb6c1;" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="confirmPasswordAgregar" class="form-label">Confirmar Contraseña</label>
+                                    <input type="password" class="form-control" id="confirmPasswordAgregar" name="confirmPassword"
+                                           style="border-color: #ffb6c1;" required>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="rolAgregar" class="form-label">Rol</label>
+                                    <select class="form-select" id="rolAgregar" name="rol" style="border-color: #ffb6c1;">
+                                        <option value="ADMIN">ADMIN</option>
+                                        <option value="DOMI">DOMI</option>
+                                        <option value="CLIENTE">CLIENTE</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="estadoAgregar" class="form-label">Estado</label>
+                                    <select class="form-select" id="estadoAgregar" name="activo" style="border-color: #ffb6c1;">
+                                        <option value="true">Activo</option>
+                                        <option value="false">Inactivo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                    style="background-color: #d8bfd8; border: none;">Cancelar</button>
+                            <button type="submit" class="btn btn-primary"
+                                    style="background-color: #ff69b4; border: none;">Guardar Usuario</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Modal Agregar Usuario -->
-    <div class="modal fade" id="modalAgregar" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-rosa text-white">
-                    <h5 class="modal-title">Agregar Nuevo Usuario</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
+        <!-- Modal Editar Usuario -->
+        <div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-rosa text-white" style="background-color: #ff69b4; color: white;">
+                        <h5 class="modal-title" >Editar Usuario</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="{% url 'actualizar_usuario' %}" method="post">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <input type="hidden" name="codUsuario" id="codUsuarioEditar">
+                            <div class="mb-3">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="nomUsuaEditar" name="nomUsua" required>
+                            </div>
 
-                <form method="post" action="{% url 'guardar_usuario' %}">
-                    {% csrf_token %}
-                    <div class="modal-body">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="nom_usua" class="form-label">Nombre</label>
-                                <input type="text" class="form-control" id="nom_usua" name="nom_usua" required>
+                            <div class="mb-3">
+                                <label class="form-label">Apellido</label>
+                                <input type="text" class="form-control" id="apellUsuaEditar" name="apellUsua" required>
                             </div>
-                            <div class="col-md-6">
-                                <label for="apell_usua" class="form-label">Apellido</label>
-                                <input type="text" class="form-control" id="apell_usua" name="apell_usua" required>
-                            </div>
-                        </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="emailUsuaEditar" name="emailUsua" required>
                             </div>
-                        </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="password1" class="form-label">Contraseña</label>
-                                <input type="password" class="form-control" id="password1" name="password1" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="password2" class="form-label">Confirmar Contraseña</label>
-                                <input type="password" class="form-control" id="password2" name="password2" required>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="rol" class="form-label">Rol</label>
-                                <select class="form-select" id="rol" name="rol" required>
-                                    <option value="ADMIN">Administrador</option>
-                                    <option value="DOMI">Domiciliario</option>
-                                    <option value="CLIENTE">Cliente</option>
+                            <div class="mb-3">
+                                <label class="form-label">Rol</label>
+                                <select class="form-select" id="rolEditar" name="rol" required>
+                                    <option value="ADMIN">ADMIN</option>
+                                    <option value="DOMI">DOMI</option>
+                                    <option value="CLIENTE">CLIENTE</option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label for="is_active" class="form-label">Estado</label>
-                                <select class="form-select" id="is_active" name="is_active">
-                                    <option value="True">Activo</option>
-                                    <option value="False">Inactivo</option>
-                                </select>
-                            </div>
                         </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-rosa">Guardar Usuario</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Editar Usuario -->
-    <div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-rosa text-white">
-                    <h5 class="modal-title">Editar Usuario</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-rosa">Guardar Cambios</button>
+                        </div>
+                    </form>
                 </div>
-                <form method="post" action="{% url 'actualizar_usuario' %}">
-                    {% csrf_token %}
-                    <div class="modal-body">
-                        <input type="hidden" name="cod_usuario" id="codUsuarioEditar">
-                        <div class="mb-3">
-                            <label class="form-label">Nombre</label>
-                            <input type="text" class="form-control" id="nomUsuaEditar" name="nom_usua" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Apellido</label>
-                            <input type="text" class="form-control" id="apellUsuaEditar" name="apell_usua" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" id="emailUsuaEditar" name="email" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Rol</label>
-                            <select class="form-select" id="rolEditar" name="rol" required>
-                                <option value="ADMIN">Administrador</option>
-                                <option value="DOMI">Domiciliario</option>
-                                <option value="CLIENTE">Cliente</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-rosa">Guardar Cambios</button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
-{% endblock %}
+</div>
 
-{% block extra_js %}
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         $('#modalEditar').on('show.bs.modal', function (event) {
@@ -240,16 +280,24 @@
             modal.find('#apellUsuaEditar').val(button.data('apellido'));
             modal.find('#emailUsuaEditar').val(button.data('email'));
             modal.find('#rolEditar').val(button.data('rol'));
+
+            // Si tienes campos de contraseña opcionales
+            $('#passwordFieldsEditar').hide();
+            modal.find('#passwUsuaEditar').val('');
+            modal.find('#confirmPasswordEditar').val('');
         });
 
-        $('#searchForm').on('submit', function(e) {
-            e.preventDefault();
-            const searchTerm = $('#buscar').val().toLowerCase();
-            $('table tbody tr').each(function() {
-                const rowText = $(this).text().toLowerCase();
-                $(this).toggle(rowText.includes(searchTerm));
-            });
+        $('#cambiarPasswordEditar').change(function () {
+            const shouldShow = this.checked;
+            $('#passwordFieldsEditar').toggle(shouldShow);
+            $('#passwUsuaEditar').prop('required', shouldShow);
+            $('#confirmPasswordEditar').prop('required', shouldShow);
         });
     });
 </script>
+
+<!-- Insertar scripts -->
+
+</body>
+</html>
 {% endblock %}

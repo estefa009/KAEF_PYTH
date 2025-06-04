@@ -14,18 +14,17 @@
     <link rel="stylesheet" href="{% static 'css/menu.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
-
 <body>
     <!-- Incluir menú de navegación -->
-    {% include 'fragments/navs.html' %}
+    {% include 'includes/nav_admin.html/navs.html' %}
 
     <main class="container-fluid">
         {% block content %}
         {% endblock %}
     </main>
 
-    {% include 'fragments/footer.html' %}
-
+    <footer class="text-center mt-4">
+        <p>&copy; 2023 - Todos los derechos reservados</p>
     {% block extra_js %}
     {% endblock %}
 </body>
