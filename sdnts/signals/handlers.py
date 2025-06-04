@@ -2,7 +2,18 @@
 from django.db.models.signals import post_save, pre_save, pre_delete
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError
-from sdnts.models import Entrada, Salida, Venta, Pago, Envio, CombinacionProducto
+from sdnts.models import Entrada, Salida, Venta, Pago, Envio, CombinacionProducto,Usuario,Cliente,Domiciliario, Administrador
+
+
+@receiver(post_save, sender=Usuario)
+def crear_modelo_por_rol(sender, instance, created, **kwargs):
+    if created:
+        if instance.rol == 'DOMI':
+            Domiciliario.objects.create(cod_usua=instance)
+        elif instance.rol == 'CLIENTE':
+            Cliente.objects.create(cod_usua=instance, direc_cliente='Sin dirección')
+        elif instance.rol == 'ADMIN':
+            Administrador.objects.create(cod_usua=instance, estado_admin='ACTIVO')
 
 # Trigger 1: Actualizar inventario después de entrada
 @receiver(post_save, sender=Entrada)
