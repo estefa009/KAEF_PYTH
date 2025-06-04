@@ -24,7 +24,6 @@ body {
     src: url('fonts/Dunkin.otf') format('truetype');
 }
 .navbar-collapse {
-padding-right: 300px;
 font-family: "Dunkin";
 background-color: #ffc0cb;;
 border-radius: 100px;

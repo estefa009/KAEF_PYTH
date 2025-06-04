@@ -64,6 +64,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.nom_usua} {self.apell_usua}"
+    
 class Administrador(models.Model):
     """
     Modelo para administradores que extiende al usuario base

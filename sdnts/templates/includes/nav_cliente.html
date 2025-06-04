@@ -25,14 +25,22 @@
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'contactanoscliente' %}">Contáctanos</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'perfilcliente' %}">
-                    Perfil
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="Profile">
-                        <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
-                    </svg>  
-                </a>
-            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="perfilDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Perfil
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="Profile" style="width: 20px; height: 20px;">
+                     <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
+                  </svg>  
+              </a>
+              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="perfilDropdown">
+                  <a class="dropdown-item" href="{% url 'perfilcliente' %}">Ver Perfil</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="{% url 'logout' %}">Cerrar Sesión</a>
+              </div>
+          </li>
+
+
+            
             <div class="carrito">
                 <h1>CARRITO</h1>
                 <img src="{% static 'Image/carrito.png' %}">
@@ -166,7 +174,16 @@
             </div>
         </ul>
     </div>
+    
 </nav>
-<script src="{% static 'js/catalogo.js' %}" defer></script>
+<!-- jQuery (requerido por Bootstrap 4) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Popper.js (requerido por Bootstrap para dropdowns) -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 </html>

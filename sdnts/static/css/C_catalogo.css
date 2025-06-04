@@ -1109,6 +1109,27 @@ border-radius: 100px;
     pointer-events: none;
 }
 
+/* Cambiar estilo del menú desplegable */
+.dropdown-menu {
+    border: 7px solid #ffc0cb; /* Añade un borde */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Sombra */
+    border-radius: 40px; /* Bordes redondeados */
+}
+
+/* Cambiar estilo de los items del menú */
+.dropdown-item {
+    color: #333; /* Color del texto */
+    padding: 8px 20px; /* Espaciado interno */
+    transition: all 0.2s ease;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fuente */
+}
+
+/* Cambiar estilo al pasar el mouse sobre items */
+.dropdown-item:hover {
+    color: #fc6998;
+    border-radius: 100px;
+}
+
 
 
 

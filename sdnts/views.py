@@ -1,7 +1,7 @@
 import base64
 import openpyxl
 from django.shortcuts import render,redirect
-
+from django.contrib.auth import logout
 from sdnts.models import CategoriaInsumo, Entrada, Envio, Produccion, Proveedor, Salida, Usuario,Producto, Carrito, CarritoItem, Venta
 from .forms import UsuarioForm  # El punto (.) indica que es desde la misma app
 from django.contrib.auth import views as auth_views
@@ -109,6 +109,9 @@ class CustomPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
     extra_context = {'etapa': 'completado'}
     
     
+def logout_view(request):
+    logout(request)
+    return redirect('login') 
     
 def vistacliente(request):
     return render(request, 'cliente/vistacliente.html') 
