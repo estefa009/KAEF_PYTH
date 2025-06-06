@@ -117,8 +117,10 @@
                                 </div>
                             </div>
                         </div>
-                        <button id="btnCerrarModalS" class="addToCartBtn cart shadow">Agregar al carrito</button> 
-                    </div>
+<!-- Añadir data attributes al botón de agregar al carrito -->
+<button id="btnCerrarModalS" class="addToCartBtn cart shadow" 
+        data-talla="S" 
+        data-precio="25.00">Agregar al carrito</button>                    </div>
                 </div>
             </div>
             <div class="Cajas2 shadow">
@@ -357,15 +359,15 @@
                                     <div class="opcion-seleccion">
                                         <h4>Masa</h4><p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
                                         <div class="sabor-options">
-                                            <div class="sabor-option active" id="vainilla" data-value="vainilla" data-color="#f5e6c8" data-img="url('dona-vainilla.png')">
+                                            <div class="sabor-option active" data-value="vainilla" data-color="#f5e6c8" data-img="url('dona-vainilla.png')">
                                                 <div class="color-box" style="background-color: #efd091"></div>
                                                 <span>Vainilla</span>
                                             </div>
-                                            <div class="sabor-option" data-value="chocolate" id="chocolate" data-color="#8B4513" data-img="url('dona-chocolate.png')">
+                                            <div class="sabor-option" data-value="chocolate" data-color="#8B4513" data-img="url('dona-chocolate.png')">
                                                 <div class="color-box" style="background-color: #8B4513"></div>
                                                 <span>Chocolate</span>
                                             </div>
-                                            <div class="sabor-option" data-value="red-velvet" id="red-velvet" data-color="#C62127" data-img="url('dona-redvelvet.png')">
+                                            <div class="sabor-option" data-value="red-velvet" data-color="#C62127" data-img="url('dona-redvelvet.png')">
                                                 <div class="color-box" style="background-color: #952d30"></div>
                                                 <span>Red Velvet</span>
                                             </div>
@@ -375,15 +377,15 @@
                                     <div class="opcion-seleccion">
                                         <h4>Cobertura</h4><p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
                                         <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="chocolate-blanco" id="chocolate-blanco" data-color="#f0e0c0" data-img="url('cobertura-blanco.png')">
+                                            <div class="sabor-option active" data-value="chocolate-blanco" data-color="#f0e0c0" data-img="url('cobertura-blanco.png')">
                                                 <div class="color-box" style="background-color: #f0e0c0"></div>
                                                 <span>Choc. Blanco</span>
                                             </div>
-                                            <div class="sabor-option" data-value="chocolate-oscuro" id="chocolate-oscuro" data-color="#5C4033" data-img="url('cobertura-oscuro.png')">
+                                            <div class="sabor-option" data-value="chocolate-oscuro" data-color="#5C4033" data-img="url('cobertura-oscuro.png')">
                                                 <div class="color-box" style="background-color: #5C4033"></div>
                                                 <span>Choc. Oscuro</span>
                                             </div>
-                                            <div class="sabor-option" data-value="arequipe" id="arequipe" data-color="#D4A76A" data-img="url('cobertura-arequipe.png')">
+                                            <div class="sabor-option" data-value="arequipe" data-color="#D4A76A" data-img="url('cobertura-arequipe.png')">
                                                 <div class="color-box" style="background-color: #D4A76A"></div>
                                                 <span>Arequipe</span>
                                             </div>
@@ -393,19 +395,19 @@
                                     <div class="opcion-seleccion">
                                         <h4>Toppings</h4><p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
                                         <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="chispas" id="chispas" data-img="url('topping-chispas.png')">
+                                            <div class="sabor-option active" data-value="chispas" data-img="url('topping-chispas.png')">
                                                 <div class="img-box" style="background-image: url('{% static 'Image/pepitasPatron.png' %}')"></div>
                                                 <span>Chispas</span>
                                             </div>
-                                            <div class="sabor-option" data-value="oreo" id="oreo" data-img="url('topping-oreo.png')">
+                                            <div class="sabor-option" data-value="oreo" data-img="url('topping-oreo.png')">
                                                 <div class="img-box" style="background-image: url('{% static 'Image/oreoPatron.png' %}')"></div>
                                                 <span>Oreo</span>
                                             </div>
-                                            <div class="sabor-option" data-value="mym" id="mym" data-img="url('topping-mym.png')">
+                                            <div class="sabor-option" data-value="mym" data-img="url('topping-mym.png')">
                                                 <div class="img-box" style="background-image: url('{% static 'Image/mymPatron.png' %}')"></div>
                                                 <span>M&M's</span>
                                             </div>
-                                            <div class="sabor-option" data-value="chips" id="chips" data-img="url('topping-chips.png')">
+                                            <div class="sabor-option" data-value="chips" data-img="url('topping-chips.png')">
                                                 <div class="img-box" style="background-image: url('{% static 'Image/chipsPatron.png' %}')"></div>
                                                 <span>Chips</span>
                                             </div>
@@ -414,11 +416,8 @@
                                 </div>
                             </div>
                         </div>
-<!-- Botón de agregar al carrito - Añadir data attributes -->
-<button id="btnCerrarModalXL" class="addToCartBtn cart shadow" 
-        data-talla="XL" 
-        data-precio="25.00">Agregar al carrito</button>
-                        </div>
+                        <button id="btnCerrarModalXL" class="addToCartBtn cart shadow">Agregar al carrito</button> 
+                    </div>
                 </div>
             </div>
             <a class="Cajas5 shadow" href="#"><img src="{% static 'Image/mas.png' %}" alt="Imagen de mas"></a>
