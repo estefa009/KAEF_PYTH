@@ -199,10 +199,7 @@
             font-size: 22px;
             margin-top: 10px;
         }
-        
-        .hidden-cart {
-            display: none;
-        }
+    
         
         /* Estilos para los modales */
         .modal {
@@ -254,7 +251,25 @@
 .container-cart-products.visible {
        display: block !important; /* Mostrar cuando tenga esta clase */
 }
+/* Estilos para los detalles del producto en el carrito */
+.detalles-producto-carrito {
+    padding: 0 15px 10px 15px;
+    font-size: 0.8em;
+    color: #666;
+    border-bottom: 1px solid #eee;
+}
 
+.detalles-producto-carrito small {
+    display: inline-block;
+    margin: 2px 0;
+}
+
+.cart-product {
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
 
 /*________________________INDEX________________________*/
 .Profile{

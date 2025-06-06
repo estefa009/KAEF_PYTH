@@ -146,7 +146,116 @@ function agregarProductoAlCarrito(size) {
     showHTML();
 }
 
-// Función para mostrar los productos en el carrito
+document.addEventListener('DOMContentLoaded', function() {
+    // Configuración de productos
+    const productConfig = {
+        precios: { S: 10.00, M: 15.00, L: 20.00, XL: 25.00 },
+        nombres: {
+            masa: {
+                'vainilla': 'Vainilla',
+                'chocolate': 'Chocolate',
+                'red-velvet': 'Red Velvet'
+            },
+            cobertura: {
+                'chocolate-blanco': 'Chocolate Blanco',
+                'chocolate-oscuro': 'Chocolate Oscuro',
+                'arequipe': 'Arequipe'
+            },
+            topping: {
+                'chispas': 'Chispas',
+                'oreo': 'Oreo',
+                'mym': 'M&M\'s',
+                'chips': 'Chips'
+            }
+        }
+    };
+
+    // Obtener elementos del DOM
+    const btnAgregarXL = document.getElementById('btnCerrarModalXL');
+    
+    // Evento para el botón Agregar al carrito
+    if (btnAgregarXL) {
+        btnAgregarXL.addEventListener('click', function() {
+            const talla = this.dataset.talla;
+            const precio = parseFloat(this.dataset.precio);
+            
+            // Obtener selecciones actuales
+            const selecciones = getSeleccionesActuales('XL');
+            
+            // Crear objeto producto para el carrito
+            const producto = {
+                id: generarIdUnico(selecciones),
+                tipo: 'combo-dona',
+                talla: talla,
+                masa: selecciones.masa,
+                cobertura: selecciones.cobertura,
+                topping: selecciones.topping,
+                precio: precio,
+                titulo: generarTituloProducto(selecciones, talla),
+                quantity: 1
+            };
+            
+            // Agregar al carrito
+            agregarAlCarrito(producto);
+        });
+    }
+
+    // Función para obtener las selecciones actuales
+    function getSeleccionesActuales(talla) {
+        const modal = document.getElementById(`modal${talla}`);
+        if (!modal) return {};
+        
+        return {
+            masa: {
+                valor: modal.querySelector('.opcion-seleccion[data-tipo="masa"] .sabor-option.active').dataset.value,
+                nombre: productConfig.nombres.masa[modal.querySelector('.opcion-seleccion[data-tipo="masa"] .sabor-option.active').dataset.value]
+            },
+            cobertura: {
+                valor: modal.querySelector('.opcion-seleccion[data-tipo="cobertura"] .sabor-option.active').dataset.value,
+                nombre: productConfig.nombres.cobertura[modal.querySelector('.opcion-seleccion[data-tipo="cobertura"] .sabor-option.active').dataset.value]
+            },
+            topping: {
+                valor: modal.querySelector('.opcion-seleccion[data-tipo="topping"] .sabor-option.active').dataset.value,
+                nombre: productConfig.nombres.topping[modal.querySelector('.opcion-seleccion[data-tipo="topping"] .sabor-option.active').dataset.value]
+            }
+        };
+    }
+
+    // Función para generar ID único basado en las selecciones
+    function generarIdUnico(selecciones) {
+        return `dona-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`;
+    }
+
+    // Función para generar título descriptivo del producto
+    function generarTituloProducto(selecciones, talla) {
+        return `Combo Donas ${talla}: ${selecciones.masa.nombre}, ${selecciones.cobertura.nombre}, ${selecciones.topping.nombre}`;
+    }
+
+    // Función para agregar al carrito (adaptar a tu implementación)
+    function agregarAlCarrito(producto) {
+        // Verificar si el producto ya está en el carrito
+        const index = allProducts.findIndex(p => p.id === producto.id);
+        
+        if (index !== -1) {
+            // Si ya existe, incrementar cantidad
+            allProducts[index].quantity += 1;
+        } else {
+            // Si no existe, agregar nuevo producto
+            allProducts.push(producto);
+        }
+        
+        // Actualizar localStorage
+        localStorage.setItem('cart', JSON.stringify(allProducts));
+        
+        // Actualizar interfaz
+        showHTML();
+        
+        // Mostrar notificación
+        alert(`¡Agregado al carrito!\n${producto.titulo}`);
+    }
+});
+
+// Función para mostrar los productos en el carrito (actualizada)
 function showHTML() {
     if (!rowProduct) return;
 
@@ -169,9 +278,12 @@ function showHTML() {
                     <span class="cantidad-producto-carrito">${product.quantity}</span>
                     <p class="titulo-producto-carrito">${product.titulo}</p>
                     <span class="precio-producto-carrito">$${(product.price * product.quantity).toLocaleString()}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-close" data-title="${product.titulo}" data-size="${product.size}">
-                        <path fill-rule="evenodd" d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-                    </svg>
+                    <button class="btn-eliminar" data-id="${product.id}">−</button>
+                </div>
+                <div class="detalles-producto-carrito">
+                    <small>Masa: ${product.masa.nombre}</small><br>
+                    <small>Cobertura: ${product.cobertura.nombre}</small><br>
+                    <small>Topping: ${product.topping.nombre}</small>
                 </div>`;
 
             rowProduct.append(containerProduct);
@@ -183,7 +295,6 @@ function showHTML() {
         if (countProducts) countProducts.innerText = totalOfProduct;
     }
 }
-
 // Evento para eliminar productos del carrito
 if (rowProduct) {
     rowProduct.addEventListener('click', e => {
@@ -202,21 +313,18 @@ if (rowProduct) {
 // Evento para mostrar/ocultar el carrito
 if (btnCart && containerCartProducts) {
     btnCart.addEventListener('click', (e) => {
-        e.stopPropagation(); // Esto evita que el evento se propague y cierre inmediatamente
-        containerCartProducts.classList.toggle('hidden-cart');
+        e.stopPropagation();
+        containerCartProducts.classList.toggle('visible');
     });
 
     // Cerrar el carrito al hacer clic fuera
     document.addEventListener('click', (event) => {
-        // Verificar si el clic fue fuera del carrito o del botón del carrito
-        const isClickInside = containerCartProducts.contains(event.target) || btnCart.contains(event.target);
-        
-        if (!isClickInside) {
-            containerCartProducts.classList.add('hidden-cart');
+        if (!containerCartProducts.contains(event.target)) {
+            containerCartProducts.classList.remove('visible');
         }
     });
 
-    // También puedes prevenir que el clic dentro del carrito lo cierre
+    // Prevenir que el clic dentro del carrito lo cierre
     containerCartProducts.addEventListener('click', (e) => {
         e.stopPropagation();
     });
