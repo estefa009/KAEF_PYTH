@@ -1,0 +1,181 @@
+body {
+    padding: 0;
+    margin: 0;
+    font-family: 'Century Gothic', sans-serif;
+    color: #000;
+    background-image: url(../Images/fondo.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    text-decoration: none;
+    text-align: center;
+    position: relative;
+}
+
+/* Capa de transparencia */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 200%;
+    background-color:#fc6998;  /* Color blanco con opacidad del 50% */
+    opacity: 0.2;
+    z-index: -1; /* Se coloca detrás del contenido del body */
+}
+/* Asegura que todo el contenido del body esté sobre el overlay */
+main, header, footer, .content {
+    position: relative;
+    z-index: 1;
+}
+
+.sidenav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #fc6998;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.sidenav.open {
+    transform: translateX(0);
+}
+
+.sidenav img {
+    width: 90%;
+    height: auto;
+    margin-bottom: 25%;
+}
+
+.sidenav a {
+    margin-top: 5%;
+    padding: 10px 15px;
+    text-decoration: none;
+    display: block;
+    color: #ffffff;
+}
+
+.sidenav a:hover {
+    background-color: #d390a0;
+    border-radius: 40px;
+}
+
+.sidenav .dropdown-content {
+    display: none;
+    position: absolute;
+    min-width: 160px;
+    z-index: 1;
+}
+
+.sidenav .dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.sidenav .dropdown-content a:hover {
+    background-color: #d390a0;
+}
+hr{color: #f5f4f4;}
+.menu-toggle {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.menu-toggle.open {
+    left: 265px;
+}
+
+@media (max-width: 750px) {
+    .sidenav {
+        width: 100%;
+        transform: translateX(-100%);
+    }
+
+    .sidenav.open {
+        transform: translateX(0);
+    }
+
+    .menu-toggle {
+        left: 20px;
+    }
+
+    main {
+        margin-left: 0;
+    
+    }
+}
+
+
+main {
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Ajusta según tus necesidades */
+    padding: 10px;
+}
+
+main input{
+    padding: 5px;
+    width: 80%;
+    padding-right:5px ;
+    border-radius: 20px 20px;
+    border: none;
+    background-color: #f3f0f0;
+    position: relative;
+    width: 150%;
+    top: -3px;
+}
+main button{
+    position: absolute;
+    left:52%; /* Ajusta la posición desde el lado izquierdo */
+    top:18px;
+    box-decoration-break: clone;
+}       
+main input#searchInput {
+    background-color: rgb(223, 220, 220);
+}
+
+
+main h5{
+    margin: 0;
+    margin-bottom: 10px; /* Espacio debajo del h5 */
+    /* Para mover el h5 hacia la izquierda pero no completamente */
+    margin-left: 100px; /* Ajusta este valor según tus necesidades */
+}
+
+main .icons {
+    margin: 0;
+    margin-bottom: 10px; /* Espacio debajo del h5 */
+    /* Para mover el h5 hacia la izquierda pero no completamente */
+    margin-right: 100px; /* Ajusta este valor según tus necesidades */
+}
+main .icons a {
+color: #000;
+text-decoration: none;
+}
+
+/*---------------------------------------------------------------------------------------*/
+.table_envios{
+    display: flex;
+    flex-direction: column; /* Si es necesario, usa columna */
+    align-items: center; /* Centra horizontalmente */
+    right: 50%;
+    margin-top: 10%;
+    background-color: #fff;
+    border-radius: 15px;
+    width: 70%;
+    height: auto;
+    margin-top: 50px; /* Mueve la tabla hacia abajo */
+    margin-left: auto; /* Centra horizontalmente */
+    margin-right: auto; /* Centra horizontalmente */
+
+}

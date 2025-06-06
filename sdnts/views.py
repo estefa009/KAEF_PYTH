@@ -8,6 +8,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 import json
 from django.contrib import messages
+from reportlab.pdfgen import canvas
 
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -72,7 +73,7 @@ def login(request):
             elif rol == 'CLIENTE':
                 return redirect('vistacliente')  # Asegúrate de que esta ruta exista
             elif rol == 'DOMI':
-                return redirect('domiciliario_envios')
+                return redirect('mis_domicilios')
             else:
                 return redirect('error_view')
         else:
@@ -248,11 +249,62 @@ def actualizar_carrito(request):
     
     return JsonResponse({'success': False})
 
+
+
+def exportar_excel(request):
+    usuario = request.user
+    fecha_desde = request.GET.get('desde')
+    fecha_hasta = request.GET.get('hasta')
+
+    envios = Envio.objects.filter(domiciliario__usuario=usuario)
+    if fecha_desde:
+        envios = envios.filter(fecha_hora_entrega__date__gte=fecha_desde)
+    if fecha_hasta:
+        envios = envios.filter(fecha_hora_entrega__date__lte=fecha_hasta)
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.append(["Código", "Fecha Entrega", "Tarifa", "Estado"])
+
+    for envio in envios:
+        ws.append([envio.cod_envio, str(envio.fecha_hora_entrega), envio.tarifa, envio.estado])
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="historial_envios.xlsx"'
+    wb.save(response)
+    return response
+
+def exportar_pdf(request):
+    usuario = request.user
+    fecha_desde = request.GET.get('desde')
+    fecha_hasta = request.GET.get('hasta')
+
+    envios = Envio.objects.filter(domiciliario__usuario=usuario)
+    if fecha_desde:
+        envios = envios.filter(fecha_hora_entrega__date__gte=fecha_desde)
+    if fecha_hasta:
+        envios = envios.filter(fecha_hora_entrega__date__lte=fecha_hasta)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="historial_envios.pdf"'
+    
+    p = canvas.Canvas(response)
+    y = 800
+    p.drawString(100, y, "Historial de Envíos")
+    y -= 30
+    for envio in envios:
+        p.drawString(100, y, f"{envio.cod_envio} | {envio.fecha_hora_entrega} | {envio.tarifa} | {envio.estado}")
+        y -= 20
+        if y < 50:
+            p.showPage()
+            y = 800
+    p.save()
+    return response
 @login_required
 def mis_domicilios(request):
     try:
         domiciliario = request.user.domiciliario  # Obtener el domiciliario vinculado al usuario
-        envios = Envio.objects.filter(domiciliario=domiciliario, estado='PENDIENTE')  # O el estado que desees filtrar
+        envios = Envio.objects.filter(cod_domi=request.user.domiciliario, estado='PENDIENTE')  # O el estado que desees filtrar
     except Domiciliario.DoesNotExist:
         messages.error(request, "No tienes un perfil de domiciliario asignado.")
         envios = []
@@ -265,12 +317,12 @@ def historial_envios(request):
     fecha_desde = request.GET.get('desde')
     fecha_hasta = request.GET.get('hasta')
     
-    envios = Envio.objects.filter(domiciliario__usuario=usuario)
+    envios = Envio.objects.filter(cod_domi= request.user.domiciliario).order_by('fecha_entrega')
 
     if fecha_desde:
-        envios = envios.filter(fecha_hora_entrega__date__gte=fecha_desde)
+        envios = envios.filter(fecha_entrega__date__gte=fecha_desde)
     if fecha_hasta:
-        envios = envios.filter(fecha_hora_entrega__date__lte=fecha_hasta)
+        envios = envios.filter(fecha_entrega__date__lte=fecha_hasta)
 
     return render(request, 'domiciliario/historial_envios.html', {
         'envios': envios,

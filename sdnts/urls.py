@@ -57,7 +57,8 @@ urlpatterns = [
     #Domiciliario
     path('mis_domicilios/', views.mis_domicilios, name='mis_domicilios'),
     path('historial_envios/', views.historial_envios, name='historial_envios'),
-
+    path('exportar-pdf/', views.exportar_pdf, name='exportar_pdf'),
+    path('exportar-excel/', views.exportar_excel, name='exportar_excel'),
       # Dashboard
     path('dashboard/', views.dashboard, name='dashboard'),
     # Gestión de Ventas
