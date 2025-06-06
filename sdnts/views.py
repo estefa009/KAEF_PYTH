@@ -3,10 +3,12 @@ import openpyxl
 from django.shortcuts import render,redirect
 from django.contrib.auth import logout
 from sdnts.models import CategoriaInsumo, Entrada, Envio, Produccion, Proveedor, Salida, Usuario,Producto, Carrito, CarritoItem, Venta
-from .forms import UsuarioForm  # El punto (.) indica que es desde la misma app
+from .forms import UsuarioForm, PerfilForm  # El punto (.) indica que es desde la misma app
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 import json
+from django.contrib import messages
+
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -130,7 +132,43 @@ def nosotroscliente(request):
     return render(request, 'cliente/nosotroscliente.html')
 
 def perfilcliente(request):
+    usuario = request.user  # usuario autenticado
+    try:
+        cliente = usuario.cliente  # acceso al modelo Cliente relacionado
+    except:
+        cliente = None  # por si no es un cliente (es admin u otro)
+
+    contexto = {
+        'usuario': usuario,
+        'cliente': cliente,
+    }
     return render(request, 'cliente/perfilcliente.html')
+
+@login_required
+def editar_perfil(request):
+    if request.method == 'POST':
+        # Procesar el formulario
+        request.user.nom_usua = request.POST.get('nombre')
+        request.user.apell_usua = request.POST.get('apellido')
+        request.user.email = request.POST.get('email')
+        request.user.tele_usua = request.POST.get('telefono')
+        request.user.cliente.direc_cliente = request.POST.get('direccion')
+        
+        try:
+            request.user.save()
+            request.user.cliente.save()
+            messages.success(request, 'Perfil actualizado correctamente')
+            return redirect('perfilcliente')
+        except Exception as e:
+            messages.error(request, f'Error al actualizar: {str(e)}')
+    
+    # Para la Opción 2:
+    editando = request.GET.get('editar') == '1'
+    
+    return render(request, 'cliente/editar_perfil.html' if not editando else 'perfilcliente.html', {
+        'user': request.user,
+        'editando': editando  # Solo para Opción 2
+    })
 
 
 def agregar_al_carrito(request):

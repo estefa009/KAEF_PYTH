@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil - Stefa's DNUTS</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+</head>
+<body>
+    {% include 'includes/nav_cliente.html' %}
+
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header text-white" style="background-color: #f78fb3;">
+                        <h3 style= "font-family: 'Dunkin' " >Editar Perfil</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="nombre">Nombre</label>
+                                    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ user.nom_usua }}" required>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="apellido">Apellido</label>
+                                    <input type="text" class="form-control" id="apellido" name="apellido" value="{{ user.apell_usua }}" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Correo electrónico</label>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="telefono">Teléfono</label>
+                                <input type="tel" class="form-control" id="telefono" name="telefono" value="{{ user.tele_usua }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="direccion">Dirección</label>
+                                <textarea class="form-control" id="direccion" name="direccion" rows="3" required>{{ user.cliente.direc_cliente }}</textarea>
+                            </div>
+                            <div class="form-group text-center">
+                                <button type="submit" class="btn btn-primary mr-2">Guardar Cambios</button>
+                                <a href="{% url 'perfilcliente' %}" class="btn btn-secondary">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="InformacionFinal">
+        <ul class="navbarFinal">
+            <li><a href="{% url 'vistacliente' %}">Inicio</a></li>
+            <li><a href="{% url 'catalogocliente' %}">Catálogo</a></li>
+            <li><a href="{% url 'nosotroscliente' %}">Nosotros</a></li>
+            <li><a href="{% url 'contactanoscliente' %}">Contáctanos</a></li>
+            <li><a href="{% url 'perfilcliente' %}">Perfil</a></li>
+        </ul>
+        <div class="Direccion">
+            <br><hr><br>
+            <p>Cra 13 # 6510, Bogotá, Colombia <br>
+                © 2024 Stefa´s Donuts.</p>
+        </div>
+    </div>
+</body>
+</html>

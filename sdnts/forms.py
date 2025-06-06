@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Usuario
+from .models import Usuario, Cliente
 
 class UsuarioForm(UserCreationForm):
     password1 = forms.CharField(
@@ -75,3 +75,32 @@ class CargarDatosForm(forms.Form):
             'placeholder': 'Descripción opcional del archivo...'
         })
     )
+    
+class PerfilForm(forms.ModelForm):
+    nom_usua = forms.CharField(label="Nombre", max_length=15)
+    tele_usua = forms.CharField(label="Teléfono", max_length=15)
+
+    class Meta:
+        model = Cliente
+        fields = ['direc_cliente', 'nom_usua', 'tele_usua']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        if user:
+            self.fields['nom_usua'].initial = user.nom_usua
+            self.fields['tele_usua'].initial = user.tele_usua
+            self.fields['direc_cliente'].initial = user.cliente.direc_cliente
+
+    def save(self, commit=True):
+        cliente = super().save(commit=False)
+        user = self.instance.cod_usua
+
+        user.nom_usua = self.cleaned_data['nom_usua']
+        user.tele_usua = self.cleaned_data['tele_usua']
+        if commit:
+            user.save()
+            cliente.cod_usua = user
+            cliente.save()
+        return cliente

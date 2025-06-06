@@ -10,12 +10,13 @@
     <link rel="icon" href="{% static 'icon/2.ico' %}" sizes="128x128" type="image/x-icon">
     <style>
         .combos {
-            cursor: pointer; 
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-        {% include 'includes/nav_cliente.html' %}
+
+    {% include 'includes/nav_cliente.html' %}
 
     <div class="profile-container">
         <div class="profile-header">
@@ -24,7 +25,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                 </svg> 
             </div>
-            <div class="nombre">{{ user.username }}</div>
+
+            <div class="nombre">{{ user.nom_usua }} {{ user.apell_usua }}</div>
+
             <section class="settings-menu">
                 <nav class="settings-tabs">
                     <a href="#perfil" class="tab active">Carrito</a>
@@ -38,17 +41,27 @@
                         <h2>Carro de compras</h2>
                         <p>Aquí podrás ver la información de tu carrito de compras.</p>
                     </div>
+
                     <div id="comunicacion" class="content">
                         <h2>Dirección</h2>
-                        <p>Aquí podrás agregar tus direcciones.</p>
+                        <p><strong>Dirección principal:</strong> {{ user.cliente.direc_cliente }}</p>
                     </div>
+
                     <div id="direcciones" class="content">
                         <h2>Mis pedidos</h2>
                         <p>Aquí podrás observar tus anteriores pedidos.</p>
+                        <!-- Aquí podrías agregar una tabla con pedidos si los manejas -->
                     </div>
+
                     <div id="pago" class="content">
-                        <h2>Cuenta</h2>
-                        <p>Actualiza tu información de cuenta.</p>
+                        <h2>Mi cuenta</h2>
+                        <p><strong>Nombre:</strong> {{ user.nom_usua }} {{ user.apell_usua }}</p>
+                        <p><strong>Correo:</strong> {{ user.email }}</p>
+                        <p><strong>Teléfono:</strong> {{ user.tele_usua }}</p>
+                        <p><strong>Dirección:</strong> {{ user.cliente.direc_cliente }}</p>
+                        <p><strong>Historial de compras:</strong> {{ user.cliente.historial_compras }}</p>
+
+                        <a href="{% url 'editar_perfil' %}" class="btn btn-primary mt-3">Editar perfil</a>
                     </div>
                 </div>
             </section>
@@ -71,6 +84,7 @@
                 © 2024 Stefa´s Donuts.</p>
         </div>
     </div>
+
     <script src="{% static 'js/perfil.js' %}" defer></script>
 </body>
 </html>

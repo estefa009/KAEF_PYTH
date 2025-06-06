@@ -111,7 +111,7 @@ class Cliente(models.Model):
         verbose_name_plural = 'Clientes'
     
     def __str__(self):
-        return f"Cliente {self.cod_usua.nom_usua}"
+        return f'Cliente: {self.cod_usua.nom_usua} {self.cod_usua.apell_usua}'
 
 class Domiciliario(models.Model):
     """
