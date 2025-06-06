@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domiciliario</title>
+  <link rel="icon" href="{% static 'icon/2.ico' %}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="{% static 'css/Mis_Domicilios.css' %}">
+</head>
+
+<body>
+
+  <!-- Menú lateral -->
+  <div class="menu-toggle" id="menuToggle">
+    <i class="bi bi-list"></i>
+  </div>
+
+  <nav>
+    <div class="sidenav" id="mySidenav"><br>
+      <img src="{% static 'icon/5.ico' %}" alt="">
+      <a class="degradado" href="#">Mis Domicilios <i class="bi bi-scooter"></i></a>
+     <a class="degradado" href="{% url 'historial_envios' %}">Historial de Envios <i class="bi bi-clipboard-data"></i></a>
+      <br><br><br><br><hr><br><br><br><br><br>
+      <a class="degradado" href="#"><b> Cerrar Sesión <i class="bi bi-arrow-bar-right"></i></b></a>
+    </div>
+  </nav>
+
+  <main>
+    <h5>Bienvenid@</h5>
+    <form id="searchForm" class="search-form">
+      <label for="buscar">
+        <input type="text" id="buscar" placeholder="Buscar..">
+        <button type="submit" style="border: none; background: none;"><i class="bi bi-search"></i></button>
+      </label>
+    </form>
+    <div class="icons">
+      <h5>
+        <i id="noti" class="bi bi-bell"></i>
+        <i id="user" class="bi bi-person-circle"></i>
+        <a href="#">Domiciliario</a>
+      </h5>
+    </div>
+  </main>
+
+  <div class="table_envios">
+    <br>
+    <center><h5><b>Mis Domicilios</b></h5></center>
+    <div class="container mt-4">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>COD ASIGNACIÓN</th>
+              <th>Fecha y Hora Asignada</th>
+              <th>Fecha y Hora Entrega</th>
+              <th>Tarifa</th>
+              <th>Segunda Fecha</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if envios %}
+              {% for envio in envios %}
+                <tr>
+                  <td>{{ envio.cod_asignacion }}</td>
+                  <td>{{ envio.fecha_hora_asignada }}</td>
+                  <td><input type="datetime-local" class="form-control" name="fecha_hora_entrega_{{ envio.id }}" value="{{ envio.fecha_hora_entrega|date:'Y-m-d\\TH:i' }}" disabled></td>
+                  <td><input type="text" class="form-control" name="tarifa_{{ envio.id }}" value="{{ envio.tarifa_envio }}" disabled></td>
+                  <td><input type="datetime-local" class="form-control" name="segunda_fecha_{{ envio.id }}" value="{{ envio.segunda_fecha_entrega|date:'Y-m-d\\TH:i' }}" disabled></td>
+                  <td><input type="text" class="form-control" name="estado_{{ envio.id }}" value="{{ envio.estado_envio }}" disabled></td>
+                  <td>
+                    <button class="btn btn-primary" onclick="enableEdit({{ envio.id }})">Editar</button>
+                    <button class="btn btn-warning" onclick="sendToHistorial({{ envio.id }})">Archivar</button>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="7" class="text-center">No hay envíos disponibles.</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const sidenav = document.getElementById('mySidenav');
+    const mainContent = document.querySelector('main');
+
+    menuToggle.addEventListener('click', () => {
+      sidenav.classList.toggle('open');
+      mainContent.classList.toggle('shifted');
+    });
+
+    function enableEdit(id) {
+      document.querySelector(`[name='fecha_hora_entrega_${id}']`).disabled = false;
+      document.querySelector(`[name='tarifa_${id}']`).disabled = false;
+      document.querySelector(`[name='segunda_fecha_${id}']`).disabled = false;
+      document.querySelector(`[name='estado_${id}']`).disabled = false;
+    }
+
+    function sendToHistorial(id) {
+      const fecha = document.querySelector(`[name='fecha_hora_entrega_${id}']`).value;
+      const tarifa = document.querySelector(`[name='tarifa_${id}']`).value;
+      const segunda = document.querySelector(`[name='segunda_fecha_${id}']`).value;
+      const estado = document.querySelector(`[name='estado_${id}']`).value;
+
+      const url = `/historial_envios/?id=${id}&fecha=${fecha}&tarifa=${tarifa}&segunda=${segunda}&estado=${estado}`;
+      window.location.href = url;
+    }
+  </script>
+</body>
+</html>

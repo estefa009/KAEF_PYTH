@@ -2,7 +2,7 @@ import base64
 import openpyxl
 from django.shortcuts import render,redirect
 from django.contrib.auth import logout
-from sdnts.models import CategoriaInsumo, Entrada, Envio, Produccion, Proveedor, Salida, Usuario,Producto, Carrito, CarritoItem, Venta
+from sdnts.models import CategoriaInsumo, Entrada, Envio, Produccion, Proveedor, Salida, Usuario,Producto, Carrito, CarritoItem, Venta,Domiciliario
 from .forms import UsuarioForm, PerfilForm  # El punto (.) indica que es desde la misma app
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
@@ -227,7 +227,7 @@ def ver_carrito(request):
         session_key = request.session.get('session_key')
         carrito = Carrito.objects.filter(session_key=session_key, completado=False).first() if session_key else None
     
-    return render(request, 'carrito.html', {'carrito': carrito})
+    return render(request, 'includes/carrito.html', {'carrito': carrito})
 
 def actualizar_carrito(request):
     if request.method == 'POST':
@@ -248,8 +248,37 @@ def actualizar_carrito(request):
     
     return JsonResponse({'success': False})
 
-def domiciliario_envios(request):
-    return render(request, 'domi/domiciliario_envios.html') 
+@login_required
+def mis_domicilios(request):
+    try:
+        domiciliario = request.user.domiciliario  # Obtener el domiciliario vinculado al usuario
+        envios = Envio.objects.filter(domiciliario=domiciliario, estado='PENDIENTE')  # O el estado que desees filtrar
+    except Domiciliario.DoesNotExist:
+        messages.error(request, "No tienes un perfil de domiciliario asignado.")
+        envios = []
+
+    return render(request, 'domiciliario/mis_domicilios.html', {'envios': envios})
+   
+@login_required
+def historial_envios(request):
+    usuario = request.user  # Asegúrate de usar autenticación
+    fecha_desde = request.GET.get('desde')
+    fecha_hasta = request.GET.get('hasta')
+    
+    envios = Envio.objects.filter(domiciliario__usuario=usuario)
+
+    if fecha_desde:
+        envios = envios.filter(fecha_hora_entrega__date__gte=fecha_desde)
+    if fecha_hasta:
+        envios = envios.filter(fecha_hora_entrega__date__lte=fecha_hasta)
+
+    return render(request, 'domiciliario/historial_envios.html', {
+        'envios': envios,
+        'fecha_desde': fecha_desde,
+        'fecha_hasta': fecha_hasta
+    })
+    
+
 
 
 @login_required
