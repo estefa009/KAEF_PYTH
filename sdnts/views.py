@@ -570,3 +570,41 @@ def eliminar_usuario(request, cod_usuario):
       usuario = get_object_or_404(Usuario, pk=cod_usuario)
       usuario.delete()
       return redirect(request.META.get('HTTP_REFERER', '/')) 
+  
+#administrador
+
+def cargar_datos(request):
+    return render(request, 'admin/cargarDatos.html')
+
+def categorias_admin(request):
+    return render(request, 'admin/categorias_admin.html')
+
+def correos_admin(request):
+    return render(request, 'admin/correos_admin.html')
+
+def dashboard_admin(request):
+    return render(request, 'admin/dashboard_admin.html')
+
+def entradas_admin(request):
+    return render(request, 'admin/entradas_admin.html')
+
+def envios_admin(request):
+    return render(request, 'admin/envios_admin.html')
+
+def insumos_admin(request):
+    return render(request, 'admin/insumos_admin.html')
+
+def perfil_admin(request):
+    return render(request, 'admin/perfil_admin.html')
+
+def produccion_admin(request):
+    return render(request, 'admin/produccion_admin.html')
+
+def proveedores_admin(request):
+    return render(request, 'admin/proveedores_admin.html')
+
+def salidas_admin(request):
+    return render(request, 'admin/salidas_admin.html')
+
+def ventas_admin(request):
+    return render(request, 'admin/ventas_admin.html')

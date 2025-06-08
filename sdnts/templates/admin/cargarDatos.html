@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,9 +14,7 @@
 </head>
 
 <body>
-  {% include 'includes/nav_admin.html' %}
 
-<!-- Mensajes de éxito o error -->
 {% if success %}
 <div class="alert alert-success alert-dismissible fade show" role="alert">
     <span>{{ success }}</span>
@@ -30,11 +29,14 @@
 </div>
 {% endif %}
 
-<!-- Fragmentos de navegación -->
+<!-- Insertar botón de menú -->
 {% include "fragments/navs/menu_button.html" %}
+
+<!-- Insertar menú nav -->
 {% include "fragments/navs/menu_nav.html" %}
 
 <main>
+
     {% if usuarioLogueado %}
     <h4>
         <p>Bienvenid@ {{ usuarioLogueado.nomUsua }}</p>
@@ -103,7 +105,8 @@
     </form>
 </div>
 
-<!-- Scripts -->
+<!-- Insertar scripts -->
+{% include "fragments/navs/menu_js.html" %}
 
 </body>
 </html>

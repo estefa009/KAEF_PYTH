@@ -89,6 +89,22 @@ urlpatterns = [
     path('actualizar-usuario/', views.actualizar_usuario, name='actualizar_usuario'),
     path('eliminar-usuario/<int:usuario_id>/', views.eliminar_usuario, name='eliminar_usuario'),
     path('reporte-usuarios-excel/', views.reporte_usuarios_excel, name='reporte_usuarios_excel'),
+    
+    
+    #administrador
+    path('cargar-datos/', views.cargar_datos, name='cargar_datos'),
+    path('categorias/', views.categorias_admin, name='categorias_admin'),
+    path('correos/', views.correos_admin, name='correos_admin'),
+    path('dashboard/', views.dashboard_admin, name='dashboard_admin'),
+    path('entradas/', views.entradas_admin, name='entradas_admin'),
+    path('envios/', views.envios_admin, name='envios_admin'),
+    path('insumos/', views.insumos_admin, name='insumos_admin'),
+    path('perfil/', views.perfil_admin, name='perfil_admin'),
+    path('produccion/', views.produccion_admin, name='produccion_admin'),
+    path('proveedores/', views.proveedores_admin, name='proveedores_admin'),
+    path('salidas/', views.salidas_admin, name='salidas_admin'),
+    path('ventas/', views.ventas_admin, name='ventas_admin'),
+
 
 ]
  
