@@ -279,27 +279,69 @@ def exportar_pdf(request):
     fecha_desde = request.GET.get('desde')
     fecha_hasta = request.GET.get('hasta')
 
-    envios = Envio.objects.filter(domiciliario__usuario=usuario)
-    if fecha_desde:
-        envios = envios.filter(fecha_hora_entrega__date__gte=fecha_desde)
-    if fecha_hasta:
-        envios = envios.filter(fecha_hora_entrega__date__lte=fecha_hasta)
+    envios = Envio.objects.filter(cod_domi=usuario.domiciliario).order_by('fecha_entrega')
+
+    if fecha_desde not in [None, '', 'None']:
+        envios = envios.filter(fecha_entrega__date__gte=fecha_desde)
+
+    if fecha_hasta not in [None, '', 'None']:
+        envios = envios.filter(fecha_entrega__date__lte=fecha_hasta)
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="historial_envios.pdf"'
-    
+
     p = canvas.Canvas(response)
     y = 800
+    p.setFont("Helvetica-Bold", 14)
     p.drawString(100, y, "Historial de Envíos")
     y -= 30
+
+    p.setFont("Helvetica", 10)
     for envio in envios:
-        p.drawString(100, y, f"{envio.cod_envio} | {envio.fecha_hora_entrega} | {envio.tarifa} | {envio.estado}")
+        fecha_str = envio.fecha_entrega.strftime("%Y-%m-%d %H:%M") if envio.fecha_entrega else "Sin entregar"
+        p.drawString(100, y, f"{envio.cod_envio} | {fecha_str} | {envio.tarifa_envio} | {envio.estado}")
         y -= 20
         if y < 50:
             p.showPage()
             y = 800
+            p.setFont("Helvetica", 10)
+
     p.save()
     return response
+
+
+def exportar_excel(request):
+    usuario = request.user
+    fecha_desde = request.GET.get('desde')
+    fecha_hasta = request.GET.get('hasta')
+
+    envios = Envio.objects.filter(cod_domi=usuario.domiciliario)
+
+    if fecha_desde not in [None, '', 'None']:
+        envios = envios.filter(fecha_entrega__date__gte=fecha_desde)
+
+    if fecha_hasta not in [None, '', 'None']:
+        envios = envios.filter(fecha_entrega__date__lte=fecha_hasta)
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.append(["Código", "Fecha de Entrega", "Tarifa", "Estado"])
+
+    for envio in envios:
+        ws.append([
+            envio.cod_envio,
+            envio.fecha_entrega.strftime("%Y-%m-%d %H:%M") if envio.fecha_entrega else "Sin entregar",
+            envio.tarifa_envio,
+            envio.estado
+        ])
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="historial_envios.xlsx"'
+    wb.save(response)
+    return response
+
+
+
 @login_required
 def mis_domicilios(request):
     try:
@@ -330,6 +372,22 @@ def historial_envios(request):
         'fecha_hasta': fecha_hasta
     })
     
+##def perfildomi(request):
+    domiciliario = request.user.domiciliario  # o como obtengas el domiciliario
+    usuario = request.user  # usuario autenticado
+
+    try:
+        domiciliario = usuario.domiciliario  # acceso al modelo Cliente relacionado
+    except:
+        domiciliario = None  # por si no es un cliente (es admin u otro)
+
+    contexto = {
+        'usuario': usuario,
+        'domiciliario': domiciliario,
+    }
+    return render(request, 'perfil_domi.html', {'domiciliario': domiciliario})
+
+
 
 
 

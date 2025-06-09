@@ -55,11 +55,12 @@ urlpatterns = [
     path('eliminar_del_carrito/<int:item_id>/', views.eliminar_del_carrito, name='eliminar_del_carrito'),
     path('ver_carrito/', views.ver_carrito, name='ver_carrito'),
     path('actualizar_carrito/', views.actualizar_carrito, name='actualizar_carrito'),
-    #Domiciliario
+     #Domiciliario
     path('mis_domicilios/', views.mis_domicilios, name='mis_domicilios'),
     path('historial_envios/', views.historial_envios, name='historial_envios'),
     path('exportar-pdf/', views.exportar_pdf, name='exportar_pdf'),
     path('exportar-excel/', views.exportar_excel, name='exportar_excel'),
+     #path('perfildomi/', views.perfildomi, name='perfildomi'),
       # Dashboard
     path('dashboard/', views.dashboard, name='dashboard'),
     # Gestión de Ventas
