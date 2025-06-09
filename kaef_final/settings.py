@@ -60,7 +60,7 @@ ROOT_URLCONF = 'kaef_final.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [BASE_DIR / 'sdnts' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
