@@ -13,9 +13,7 @@
 </head>
 <body>
 
-    <!-- Incluyo el nav desde includes/nav_domi.html -->
-
-       <!-- Menú lateral -->
+ <!-- Menú lateral -->
   <div class="menu-toggle" id="menuToggle">
     <i class="bi bi-list"></i>
   </div>
@@ -29,24 +27,21 @@
       <br><br><br><br><hr><br><br><br><br><br>
       <a class="degradado" href="{% url 'logout' %}"><b>Cerrar Sesión <i class="bi bi-arrow-bar-right"></i></b></a>
     </div>
+    <main>
+      <h1 id="site-name">
+       <img src="{% static 'icon/7.ico' %}" alt="Logo Stefas Donuts" class="brand-logo">
+     </h1>
+     <h1>Bienvenid@ {{ user.nom_usua }}</h1>
+      </form>
+      <div class="icons">
+        <h5>
+          <i id="noti" class="bi bi-bell"></i>
+          <i id="user" class="bi bi-person-circle"></i>
+          Domiciliario
+        </h5>
+      </div>
+   </main>
   </nav>
-
-  <main>
-    <h5>Bienvenid@ {{ request.user.first_name }}</h5>
-    <form id="searchForm" class="search-form" method="GET" action="{% url 'mis_domicilios' %}">
-      <label for="buscar">
-        <input type="text" id="buscar" name="q" placeholder="Buscar..">
-        <button type="submit" style="border: none; background: none;"><i class="bi bi-search"></i></button>
-      </label>
-    </form>
-    <div class="icons">
-      <h5>
-        <i id="noti" class="bi bi-bell"></i>
-        <i id="user" class="bi bi-person-circle"></i>
-        <a href="#">Domiciliario</a>
-      </h5>
-    </div>
-  </main>
 
     <main class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -55,6 +50,7 @@
                 <a href="{% url 'exportar_pdf' %}?desde={{ fecha_desde }}&hasta={{ fecha_hasta }}" class="btn btn-danger btn-sm">
                     <i class="bi bi-file-earmark-pdf-fill"></i> Exportar PDF
                 </a>
+                
                 <a href="{% url 'exportar_excel' %}?desde={{ fecha_desde }}&hasta={{ fecha_hasta }}" class="btn btn-success btn-sm">
                     <i class="bi bi-file-earmark-excel-fill"></i> Exportar Excel
                 </a>
