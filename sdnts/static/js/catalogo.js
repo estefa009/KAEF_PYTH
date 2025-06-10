@@ -525,7 +525,7 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', functio
                 <p><b>IVA (19%):</b> $${venta.iva}</p>
                 <p><b>Total:</b> $${venta.total}</p>
             `;
-            document.querySelector('.cajita').innerHTML = facturaHTML;
+            document.querySelector('.infoTotalCarrito').innerHTML = facturaHTML;
 
             // Mostrar el modal de compra exitosa
             document.getElementById('modalCompraExitosa').style.display = 'flex';
