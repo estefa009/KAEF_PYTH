@@ -36,7 +36,7 @@
               </div>
           </li>
 
-            <div class="carrito">
+            <div class="carrito" id="carrito">
                 <h1>CARRITO</h1>
                 <img src="{% static 'Image/carrito.png' %}">
                 <div class="count-products">
@@ -113,8 +113,32 @@
                                 </div>
                             </div>
                             <div class="botonComprar">
-                                <button id="btnAgregarProducto" class="cart shadow">COMPRAR</button> 
+                                <button type="submit" value="Comprar" id="btnAgregarProducto" class="cart shadow">COMPRAR</button> 
                             </div>
+                            <!-- Modal de compra exitosa -->
+<!-- Modal de compra exitosa -->
+<div id="modalCompraExitosa" class="modal" style="display:none;">
+  <div class="modal-content" style="background:#fff; padding:30px; border-radius:20px; text-align:center;">
+    <span id="cerrarModalCompra" style="cursor:pointer; float:right; font-size:24px;">&times;</span>
+    <div class="infoTotalCarrito"></div>
+    <h2>¡Compra realizada con éxito!</h2>
+    <p>Gracias por tu compra.</p>
+    <button id="okCompraExitosa" class="btn btn-pinck" style="margin-top:15px;">OK</button>
+  </div>
+</div>
+
+<script>
+// Cerrar modal con la X
+document.getElementById('cerrarModalCompra')?.addEventListener('click', function() {
+    document.getElementById('modalCompraExitosa').style.display = 'none';
+    location.reload();
+});
+// Cerrar modal y recargar con el botón OK
+document.getElementById('okCompraExitosa')?.addEventListener('click', function() {
+    document.getElementById('modalCompraExitosa').style.display = 'none';
+    location.reload();
+});
+</script>
                         </div>
                     </div>
                     <div class="cart-total">

@@ -1,15 +1,16 @@
 import base64
+from datetime import timezone
 import openpyxl
 from django.shortcuts import render,redirect
 from django.contrib.auth import logout
-from sdnts.models import CategoriaInsumo, Entrada, Envio, Produccion, Proveedor, Salida, Usuario,Producto, Carrito, CarritoItem, Venta,Domiciliario
+from sdnts.models import CategoriaInsumo, DetalleVenta, Entrada, Envio, Produccion, Proveedor, Salida, Usuario,Producto, Carrito, CarritoItem, Venta,Domiciliario
 from .forms import UsuarioForm, PerfilForm  # El punto (.) indica que es desde la misma app
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 import json
 from django.contrib import messages
-from reportlab.pdfgen import canvas
-
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -22,6 +23,8 @@ import matplotlib.pyplot as plt
 from django.http import HttpResponse
 from weasyprint import HTML
 from django.template.loader import render_to_string
+from decimal import Decimal
+
 # Context processors
 def nav_index(request):
     return render(request, 'includes/nav_index.html')
@@ -249,7 +252,93 @@ def actualizar_carrito(request):
     
     return JsonResponse({'success': False})
 
+from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
+from django.http import JsonResponse
 
+@login_required
+@csrf_exempt
+def procesar_compra(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            carrito = data.get('carrito', [])
+            direccion = data.get('direccion', '')  # Puedes pedirla en el modal
+            observaciones = data.get('observaciones', '')
+        except Exception:
+            return JsonResponse({'success': False, 'error': 'Datos inválidos'}, status=400)
+
+        if not carrito:
+            return JsonResponse({'success': False, 'error': 'Carrito vacío'}, status=400)
+
+        try:
+            cliente = request.user.cliente
+        except Exception:
+            return JsonResponse({'success': False, 'error': 'No es cliente'}, status=400)
+
+        subtotal = Decimal('0.00')
+        detalles = []
+
+        for item in carrito:
+            # Busca el producto por nombre y tamaño
+            talla = item.get('talla')
+            nombre = item.get('titulo')
+            cantidad = int(item.get('quantity', 1))
+            precio_unitario = Decimal(str(item.get('precio', 0)))
+            try:
+                producto = Producto.objects.get(nomb_pro=nombre, tamano=talla)
+            except Producto.DoesNotExist:
+                continue
+
+            detalles.append({
+                'producto': producto,
+                'cantidad': cantidad,
+                'precio_unitario': precio_unitario,
+            })
+            subtotal += precio_unitario * cantidad
+
+        iva = subtotal * Decimal('0.19')
+        total = subtotal + iva
+
+        venta = Venta.objects.create(
+            cod_cliente=cliente,
+            subtotal=subtotal,
+            iva=iva,
+            total=total,
+            direccion_entrega=direccion,
+            observaciones=observaciones
+        )
+
+        for det in detalles:
+            DetalleVenta.objects.create(
+                cod_venta=venta,
+                cod_producto=det['producto'],
+                cantidad=det['cantidad'],
+                precio_unitario=det['precio_unitario']
+            )
+
+        return JsonResponse({
+            'success': True,
+            'venta': {
+                'id': venta.cod_venta,
+                'fecha': venta.fecha_hora.strftime('%Y-%m-%d %H:%M'),
+                'subtotal': str(subtotal),
+                'iva': str(iva),
+                'total': str(total),
+                'direccion': venta.direccion_entrega,
+                'detalles': [
+                    {
+                        'producto': str(det['producto']),
+                        'cantidad': det['cantidad'],
+                        'precio_unitario': str(det['precio_unitario']),
+                        'subtotal': str(det['precio_unitario'] * det['cantidad'])
+                    }
+                    for det in detalles
+                ]
+            }
+        })
+
+    return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
 
 def exportar_excel(request):
     usuario = request.user
@@ -288,7 +377,7 @@ def exportar_pdf(request):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="historial_envios.pdf"'
     
-    p = canvas.Canvas(response)
+    p = canvas.Canvas(response) # type: ignore
     y = 800
     p.drawString(100, y, "Historial de Envíos")
     y -= 30
@@ -569,4 +658,4 @@ def actualizar_usuario(request):
 def eliminar_usuario(request, cod_usuario):
       usuario = get_object_or_404(Usuario, pk=cod_usuario)
       usuario.delete()
-      return redirect(request.META.get('HTTP_REFERER', '/')) 
+      return redirect(request.META.get('HTTP_REFERER', '/'))

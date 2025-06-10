@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static 'css/C_catalogo.css' %}">
     <link rel="stylesheet" href="{% static 'css/menu.css' %}">
-
     <link rel="icon" href="{% static 'icon/2.ico' %}" sizes="128x128" type="image/x-icon">
 </head>
 <body>
@@ -60,15 +59,15 @@
                                     <div class="opcion-seleccion">
                                         <h4>Masa</h4><p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
                                         <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="vainilla" data-color="#f5e6c8" data-img="url('dona-vainilla.png')">
+                                            <div class="sabor-option active" data-value="vainilla" data-color="#efd091">
                                                 <div class="color-box" style="background-color: #efd091"></div>
                                                 <span>Vainilla</span>
                                             </div>
-                                            <div class="sabor-option" data-value="chocolate" data-color="#8B4513" data-img="url('dona-chocolate.png')">
+                                            <div class="sabor-option" data-value="chocolate" data-color="#8B4513">
                                                 <div class="color-box" style="background-color: #8B4513"></div>
                                                 <span>Chocolate</span>
                                             </div>
-                                            <div class="sabor-option" data-value="red-velvet" data-color="#C62127" data-img="url('dona-redvelvet.png')">
+                                            <div class="sabor-option" data-value="red-velvet" data-color="#952d30">
                                                 <div class="color-box" style="background-color: #952d30"></div>
                                                 <span>Red Velvet</span>
                                             </div>
@@ -78,15 +77,15 @@
                                     <div class="opcion-seleccion">
                                         <h4>Cobertura</h4><p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
                                         <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="chocolate-blanco" data-color="#f0e0c0" data-img="url('cobertura-blanco.png')">
+                                            <div class="sabor-option active" data-value="chocolate-blanco" data-color="#f0e0c0">
                                                 <div class="color-box" style="background-color: #f0e0c0"></div>
                                                 <span>Choc. Blanco</span>
                                             </div>
-                                            <div class="sabor-option" data-value="chocolate-oscuro" data-color="#5C4033" data-img="url('cobertura-oscuro.png')">
+                                            <div class="sabor-option" data-value="chocolate-oscuro" data-color="#5C4033">
                                                 <div class="color-box" style="background-color: #5C4033"></div>
                                                 <span>Choc. Oscuro</span>
                                             </div>
-                                            <div class="sabor-option" data-value="arequipe" data-color="#D4A76A" data-img="url('cobertura-arequipe.png')">
+                                            <div class="sabor-option" data-value="arequipe" data-color="#D4A76A">
                                                 <div class="color-box" style="background-color: #D4A76A"></div>
                                                 <span>Arequipe</span>
                                             </div>
@@ -96,20 +95,20 @@
                                     <div class="opcion-seleccion">
                                         <h4>Toppings</h4><p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
                                         <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="chispas" data-img="url('topping-chispas.png')">
-                                                <div class="img-box" style="background-image: url('{% static 'Image/pepitasPatron.png' %}')"></div>
+                                            <div class="sabor-option active" data-value="chispas">
+                                                <div class="img-box" style="background-image: url('{% static 'image/pepitasPatron.png' %}')"></div>
                                                 <span>Chispas</span>
                                             </div>
-                                            <div class="sabor-option" data-value="oreo" data-img="url('topping-oreo.png')">
-                                                <div class="img-box" style="background-image: url('{% static 'Image/oreoPatron.png' %}')"></div>
+                                            <div class="sabor-option" data-value="oreo">
+                                                <div class="img-box" style="background-image: url('{% static 'image/oreoPatron.png' %}')"></div>
                                                 <span>Oreo</span>
                                             </div>
-                                            <div class="sabor-option" data-value="mym" data-img="url('topping-mym.png')">
-                                                <div class="img-box" style="background-image: url('{% static 'Image/mymPatron.png' %}')"></div>
+                                            <div class="sabor-option" data-value="mym">
+                                                <div class="img-box" style="background-image: url('{% static 'image/mymPatron.png' %}')"></div>
                                                 <span>M&M's</span>
                                             </div>
-                                            <div class="sabor-option" data-value="chips" data-img="url('topping-chips.png')">
-                                                <div class="img-box" style="background-image: url('{% static 'Image/chipsPatron.png' %}')"></div>
+                                            <div class="sabor-option" data-value="chips">
+                                                <div class="img-box" style="background-image: url('{% static 'image/chipsPatron.png' %}')"></div>
                                                 <span>Chips</span>
                                             </div>
                                         </div>
@@ -117,12 +116,12 @@
                                 </div>
                             </div>
                         </div>
-<!-- Añadir data attributes al botón de agregar al carrito -->
-<button id="btnCerrarModalS" class="addToCartBtn cart shadow" 
-        data-talla="S" 
-        data-precio="25.00">Agregar al carrito</button>                    </div>
+                        <button id="btnCerrarModalS" class="addToCartBtn cart shadow">Agregar al carrito</button>
+                    </div>
                 </div>
             </div>
+            
+     
             <div class="Cajas2 shadow">
                 <div class="descripcionCombo">
                     <h1>Talla M</h1>
@@ -737,6 +736,8 @@
         <div class="campo"></div>
         <div class="cajones" id="Product"></div>
     </div>
+
+
     <div class="InformacionFinal">
         <ul class="navbarFinal">
             <li><a href="{% url 'vistacliente' %}">Inicio</a></li>
@@ -752,66 +753,7 @@
                 © 2024 Stefa´s Donuts.</p>
         </div>
     </div>
-    <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const colores = {
-        masa: {
-            'vainilla': '#efd091',
-            'chocolate': '#8B4513',
-            'red-velvet': '#952d30'
-        },
-        cobertura: {
-            'chocolate-blanco': '#f0e0c0',
-            'chocolate-oscuro': '#5C4033',
-            'arequipe': '#D4A76A'
-        },
-        toppings: {
-            'chispas': 'url("{% static 'Image/pepitasPatron.png' %}")',
-            'oreo': 'url("{% static 'Image/oreoPatron.png' %}")',
-            'mym': 'url("{% static 'Image/mymPatron.png' %}")',
-            'chips': 'url("{% static 'Image/chipsPatron.png' %}")',
-            'ninguno': 'none'
-        }
-    };
-
-    // Para cada modal de combo
-    ['S', 'M', 'L', 'XL'].forEach(function(talla) {
-        const modal = document.getElementById('modal' + talla);
-        if (!modal) return;
-
-        modal.querySelectorAll('.sabor-option').forEach(option => {
-            option.addEventListener('click', function() {
-                const tipo = this.closest('.opcion-seleccion').querySelector('h4').textContent.toLowerCase();
-                const valor = this.dataset.value;
-
-                // Quitar 'active' solo en este grupo
-                this.parentElement.querySelectorAll('.sabor-option').forEach(opt => {
-                    opt.classList.remove('active');
-                });
-                this.classList.add('active');
-
-                // Actualizar la dona solo en este modal
-                if (tipo === 'masa') {
-                    modal.querySelector('#dona-masa-' + talla).style.backgroundColor = colores.masa[valor];
-                } else if (tipo === 'cobertura') {
-                    modal.querySelector('#dona-cobertura-' + talla).style.backgroundColor = colores.cobertura[valor];
-                } else if (tipo === 'toppings') {
-                    const topping = modal.querySelector('#dona-topping-' + talla);
-                    topping.style.backgroundImage = colores.toppings[valor];
-                    topping.style.display = (valor === 'ninguno') ? 'none' : 'block';
-                }
-            });
-        });
-
-        // Inicializar valores por defecto en cada modal
-        modal.querySelector('#dona-masa-' + talla).style.backgroundColor = colores.masa['vainilla'];
-        modal.querySelector('#dona-cobertura-' + talla).style.backgroundColor = colores.cobertura['chocolate-blanco'];
-        const topping = modal.querySelector('#dona-topping-' + talla);
-        topping.style.backgroundImage = colores.toppings['chispas'];
-        topping.style.display = 'block';
-    });
-});
-</script>
-<script src="{% static 'js/catalogo.js' %}" defer></script>
+   
+    <script src="{% static 'js/catalogo.js' %}"></script>
 </body>
 </html>

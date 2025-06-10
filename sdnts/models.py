@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import BaseUserManager
 from django.conf import settings
@@ -301,7 +300,7 @@ class DetalleVenta(models.Model):
         verbose_name = 'Detalle de Venta'
         verbose_name_plural = 'Detalles de Ventas'
     
-    @property
+    @property 
     def subtotal(self):
         return self.cantidad * self.precio_unitario
     

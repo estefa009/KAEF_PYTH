@@ -20,11 +20,31 @@ const colores = {
         'arequipe': '#D4A76A'
     },
     toppings: {
-        'chispas': "url('{% static 'Image/pepitasPatron.png' %}')",
-        'oreo': "url('{% static 'Image/oreoPatron.png' %}')",
-        'mym': "url('{% static 'Image/mymPatron.png' %}')",
-        'chips': "url('{% static 'Image/chipsPatron.png' %}')",
-        'ninguno': 'none'
+        chispas: "url('/static/image/pepitasPatron.png')",
+        oreo: "url('/static/image/oreoPatron.png')",
+        mym: "url('/static/image/mymPatron.png')",
+        chips: "url('/static/image/chipsPatron.png')",
+        ninguno: 'none'
+    }
+};
+
+// Mapeo de nombres para mostrar
+const nombresParaMostrar = {
+    masa: {
+        'vainilla': 'Vainilla',
+        'chocolate': 'Chocolate',
+        'red-velvet': 'Red Velvet'
+    },
+    cobertura: {
+        'chocolate-blanco': 'Chocolate Blanco',
+        'chocolate-oscuro': 'Chocolate Oscuro',
+        'arequipe': 'Arequipe'
+    },
+    topping: {
+        'chispas': 'Chispas',
+        'oreo': 'Oreo',
+        'mym': 'M&M\'s',
+        'chips': 'Chips'
     }
 };
 
@@ -67,30 +87,15 @@ function initModal(modalId, openButtonId, closeButtonClass, addToCartBtnId = nul
         }
     });
 
-    // Configurar selección de sabores para modales de combos
-    if (['S', 'M', 'L', 'XL'].includes(size)) {
-        configurarSeleccionSabores(modal, size);
-    }
-}document.addEventListener('DOMContentLoaded', function() {
-    // Mapeo de nombres para mostrar
-    const nombresParaMostrar = {
-        masa: {
-            'vainilla': 'Vainilla',
-            'chocolate': 'Chocolate',
-            'red-velvet': 'Red Velvet'
-        },
-        cobertura: {
-            'chocolate-blanco': 'Chocolate Blanco',
-            'chocolate-oscuro': 'Chocolate Oscuro',
-            'arequipe': 'Arequipe'
-        },
-        topping: {
-            'chispas': 'Chispas',
-            'oreo': 'Oreo',
-            'mym': 'M&M\'s',
-            'chips': 'Chips'
-        }
-    };
+      // Configurar selección de sabores para modales de combos
+    if (size && ['S', 'M', 'L', 'XL'].includes(size)) {
+        // Inicializar la vista previa con valores por defecto
+        setTimeout(() => {
+            configurarSeleccionSabores(modal, size);
+            actualizarVistaPrevia(size); // Actualizar vista previa al abrir el modal
+        }, 100);}
+}
+
 function obtenerSeleccionesActuales(talla) {
     const modal = document.getElementById(`modal${talla}`);
     if (!modal) {
@@ -99,9 +104,19 @@ function obtenerSeleccionesActuales(talla) {
     }
     
     // Buscar las opciones activas de manera más robusta
-    const masaActive = modal.querySelector('.opcion-seleccion h4:contains("Masa")').nextElementSibling.querySelector('.sabor-option.active');
-    const coberturaActive = modal.querySelector('.opcion-seleccion h4:contains("Cobertura")').nextElementSibling.querySelector('.sabor-option.active');
-    const toppingActive = modal.querySelector('.opcion-seleccion h4:contains("Toppings")').nextElementSibling.querySelector('.sabor-option.active');
+    const opcionesSeleccion = modal.querySelectorAll('.opcion-seleccion');
+    let masaActive, coberturaActive, toppingActive;
+
+    opcionesSeleccion.forEach(opcion => {
+        const titulo = opcion.querySelector('h4')?.textContent.toLowerCase();
+        if (titulo.includes('masa')) {
+            masaActive = opcion.querySelector('.sabor-option.active');
+        } else if (titulo.includes('cobertura')) {
+            coberturaActive = opcion.querySelector('.sabor-option.active');
+        } else if (titulo.includes('toppings')) {
+            toppingActive = opcion.querySelector('.sabor-option.active');
+        }
+    });
 
     if (!masaActive || !coberturaActive || !toppingActive) {
         console.error('No se encontraron todas las selecciones:', {masaActive, coberturaActive, toppingActive});
@@ -123,52 +138,80 @@ function obtenerSeleccionesActuales(talla) {
         }
     };
 }
-    btnAgregarS.addEventListener('click', function() {
-    const talla = this.dataset.talla;
-    const precio = parseFloat(this.dataset.precio);
-    
-    console.log('Intentando agregar producto talla:', talla);
-    
-    const selecciones = obtenerSeleccionesActuales(talla);
-    
-    if (!selecciones) {
-        alert('Por favor selecciona masa, cobertura y topping antes de agregar al carrito');
-        return; // Detener la ejecución si no hay selecciones
-    }
-    
-    console.log('Selecciones encontradas:', selecciones);
-    
-    const producto = {
-        id: `${talla}-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
-        tipo: 'combo-dona',
-        talla: talla,
-        masa: selecciones.masa,
-        cobertura: selecciones.cobertura,
-        topping: selecciones.topping,
-        precio: precio,
-        titulo: `Donas ${talla}`,
-        descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
-        quantity: 1,
-        timestamp: Date.now() // Para hacer el ID más único
-    };
-    
-    console.log('Producto a agregar:', producto);
-    
-    agregarAlCarrito(producto);
-});
 
-    // Función para generar ID único del producto
-    function generarIdProducto(selecciones) {
-        return `dona-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}-${Date.now()}`;
-    }
+function configurarSeleccionSabores(modal, size) {
+    // Configurar eventos para los botones de selección de sabores
+    const saborOptions = modal.querySelectorAll('.sabor-option');
+    
+    saborOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Encontrar el contenedor padre de opciones
+            const optionsContainer = this.closest('.sabor-options');
+            
+            // Remover clase active de todos los hermanos
+            optionsContainer.querySelectorAll('.sabor-option').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Agregar clase active al seleccionado
+            this.classList.add('active');
+            
+            // Actualizar vista previa
+            actualizarVistaPrevia(size);
+        });
+    });
 
-    // Función para generar descripción detallada
-    function generarDescripcion(selecciones) {
-        return `Masa: ${selecciones.masa.nombre}, Cobertura: ${selecciones.cobertura.nombre}, Topping: ${selecciones.topping.nombre}`;
+    // Actualizar vista previa con valores iniciales
+    actualizarVistaPrevia(size);
+}
+
+function actualizarVistaPrevia(size) {
+    const selecciones = obtenerSeleccionesActuales(size);
+    if (!selecciones) return;
+
+    // Actualizar masa
+    const masaElement = document.getElementById(`dona-masa-${size}`);
+    if (masaElement) {
+        const colorMasa = colores.masa[selecciones.masa.valor];
+        masaElement.style.backgroundColor = colorMasa;
+        console.log(`Actualizando masa ${size} a color:`, colorMasa);
     }
 
-    // Función para agregar al carrito (adaptar a tu implementación)
-    function agregarAlCarrito(producto) {
+    // Actualizar cobertura
+    const coberturaElement = document.getElementById(`dona-cobertura-${size}`);
+    if (coberturaElement) {
+        const colorCobertura = colores.cobertura[selecciones.cobertura.valor];
+        coberturaElement.style.backgroundColor = colorCobertura;
+        console.log(`Actualizando cobertura ${size} a color:`, colorCobertura);
+    }
+
+     // Actualizar topping - PARTE CORREGIDA
+    const toppingElement = document.getElementById(`dona-topping-${size}`);
+    if (toppingElement) {
+        const toppingValue = selecciones.topping.valor;
+        
+        // Resetear estilos primero
+        toppingElement.style.backgroundImage = 'none';
+        toppingElement.style.backgroundColor = 'transparent';
+        
+        if (toppingValue !== 'ninguno') {
+            // Verificar si la imagen existe en el objeto colores
+            if (colores.toppings[toppingValue]) {
+                toppingElement.style.backgroundImage = colores.toppings[toppingValue];
+                toppingElement.style.backgroundSize = 'cover';
+                toppingElement.style.backgroundRepeat = 'no-repeat';
+                toppingElement.style.backgroundPosition = 'center';
+            } else {
+                console.error(`No se encontró imagen para topping: ${toppingValue}`);
+            }
+        }
+        console.log(`Topping actualizado (${size}):`, toppingValue, colores.toppings[toppingValue]);
+    }
+}
+
+
+
+function agregarAlCarrito(producto) {
     if (!producto || !producto.id) {
         console.error('Producto inválido:', producto);
         return;
@@ -203,7 +246,6 @@ function obtenerSeleccionesActuales(talla) {
     alert(`¡Agregado al carrito!\n${producto.titulo}\n${producto.descripcion}`);
 }
 
-// Función showHTML actualizada para mostrar detalles
 function showHTML() {
     if (!rowProduct) return;
 
@@ -255,7 +297,6 @@ if (rowProduct) {
     });
 }
 
-
 // Evento para mostrar/ocultar el carrito
 if (btnCart && containerCartProducts) {
     btnCart.addEventListener('click', (e) => {
@@ -276,7 +317,7 @@ if (btnCart && containerCartProducts) {
     });
 }
 
-// Inicializar todos los modales
+// Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function() {
     // Modales de combos
     initModal('modalS', 'btnAgregar', 'closeS', 'btnCerrarModalS', 'S');
@@ -285,17 +326,122 @@ document.addEventListener('DOMContentLoaded', function() {
     initModal('modalXL', 'btnAgregarXL', 'closeXL', 'btnCerrarModalXL', 'XL');
     
     // Modales de información
-    initModal('modalV', 'btnInfoV', 'closeV', 'btnCerrarModalV');
-    initModal('modalC', 'btnInfoC', 'closeC', 'btnCerrarModalC');
-    initModal('modalR', 'btnInfoR', 'closeR', 'btnCerrarModalR');
-    initModal('modalB', 'btnInfoB', 'closeB', 'btnCerrarModalB');
-    initModal('modalOS', 'btnInfoOS', 'closeOS', 'btnCerrarModalOS');
-    initModal('modalA', 'btnInfoA', 'closeA', 'btnCerrarModalA');
-    initModal('modalT1', 'btnInfoT1', 'closeT1', 'btnCerrarModalT1');
-    initModal('modalT2', 'btnInfoT2', 'closeT2', 'btnCerrarModalT2');
-    initModal('modalT3', 'btnInfoT3', 'closeT3', 'btnCerrarModalT3');
-    initModal('modalT4', 'btnInfoT4', 'closeT4', 'btnCerrarModalT4');
+    initModal('modalV', 'btnInfoV', 'closeV');
+    initModal('modalC', 'btnInfoC', 'closeC');
+    initModal('modalR', 'btnInfoR', 'closeR');
+    initModal('modalB', 'btnInfoB', 'closeB');
+    initModal('modalOS', 'btnInfoOS', 'closeOS');
+    initModal('modalA', 'btnInfoA', 'closeA');
+    initModal('modalT1', 'btnInfoT1', 'closeT1');
+    initModal('modalT2', 'btnInfoT2', 'closeT2');
+    initModal('modalT3', 'btnInfoT3', 'closeT3');
+    initModal('modalT4', 'btnInfoT4', 'closeT4');
     initModal('modalP', 'btnPagar', 'closeP');
+
+    // Configurar eventos para los botones de agregar al carrito
+    document.getElementById('btnCerrarModalS')?.addEventListener('click', function() {
+        const selecciones = obtenerSeleccionesActuales('S');
+        if (!selecciones) {
+            alert('Por favor selecciona masa, cobertura y topping antes de agregar al carrito');
+            return;
+        }
+
+        const producto = {
+            id: `S-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
+            tipo: 'combo-dona',
+            talla: 'S',
+            masa: selecciones.masa,
+            cobertura: selecciones.cobertura,
+            topping: selecciones.topping,
+            precio: 10000,
+            titulo: 'Donas Talla S',
+            descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
+            quantity: 1,
+            timestamp: Date.now()
+        };
+
+        agregarAlCarrito(producto);
+
+
+        
+// Evento para agregar Donas Talla M
+document.getElementById('btnCerrarModalM')?.addEventListener('click', function() {
+    const selecciones = obtenerSeleccionesActuales('M');
+    if (!selecciones) {
+        alert('Por favor selecciona masa, cobertura y topping antes de agregar al carrito');
+        return;
+    }
+
+    const producto = {
+        id: `M-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
+        tipo: 'combo-dona',
+        talla: 'M',
+        masa: selecciones.masa,
+        cobertura: selecciones.cobertura,
+        topping: selecciones.topping,
+        precio: 18000,
+        titulo: 'Donas Talla M',
+        descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
+        quantity: 1,
+        timestamp: Date.now()
+    };
+
+    agregarAlCarrito(producto);
+});
+
+// Evento para agregar Donas Talla L
+document.getElementById('btnCerrarModalL')?.addEventListener('click', function() {
+    const selecciones = obtenerSeleccionesActuales('L');
+    if (!selecciones) {
+        alert('Por favor selecciona masa, cobertura y topping antes de agregar al carrito');
+        return;
+    }
+
+    const producto = {
+        id: `L-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
+        tipo: 'combo-dona',
+        talla: 'L',
+        masa: selecciones.masa,
+        cobertura: selecciones.cobertura,
+        topping: selecciones.topping,
+        precio: 25000,
+        titulo: 'Donas Talla L',
+        descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
+        quantity: 1,
+        timestamp: Date.now()
+    };
+
+    agregarAlCarrito(producto);
+});
+
+// Evento para agregar Donas Talla XL
+document.getElementById('btnCerrarModalXL')?.addEventListener('click', function() {
+    const selecciones = obtenerSeleccionesActuales('XL');
+    if (!selecciones) {
+        alert('Por favor selecciona masa, cobertura y topping antes de agregar al carrito');
+        return;
+    }
+
+    const producto = {
+        id: `XL-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
+        tipo: 'combo-dona',
+        talla: 'XL',
+        masa: selecciones.masa,
+        cobertura: selecciones.cobertura,
+        topping: selecciones.topping,
+        precio: 32000,
+        titulo: 'Donas Talla XL',
+        descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
+        quantity: 1,
+        timestamp: Date.now()
+    };
+
+    agregarAlCarrito(producto);
+});
+    });
+
+    // Configurar eventos similares para los otros tamaños (M, L, XL)
+    // ...
 
     // Mostrar estado inicial del carrito
     showHTML();
@@ -323,204 +469,100 @@ window.addEventListener('click', function(event) {
 });
 
 
-// -----------------------------ajustes para el carrito carlexy-------------------------------
+// ...existing code...
 
-// Selección de elementos del DOM
-const totalPagarModal = document.getElementById('total-pagar-modal');
+document.getElementById('btnAgregarProducto')?.addEventListener('click', function(e) {
+    e.preventDefault();
 
-// Carrito en memoria (temporal) con localStorage
-allProducts = JSON.parse(localStorage.getItem('cart')) || [];
-
-// Función para guardar el carrito en localStorage
-function saveCartToStorage() {
-    localStorage.setItem('cart', JSON.stringify(allProducts));
-}
-
-// Función para actualizar el contador
-function updateCartCounter() {
-    if (countProducts) {
-        const totalItems = allProducts.reduce((total, product) => total + product.quantity, 0);
-        countProducts.textContent = totalItems;
-    }
-}
-
-// Función para actualizar el total
-function updateTotal() {
-    const total = allProducts.reduce((sum, product) => sum + (product.price * product.quantity), 0);
-    
-    if (valorTotal) {
-        valorTotal.textContent = `$${total.toLocaleString()}`;
-    }
-    
-    if (totalPagarModal) {
-        totalPagarModal.textContent = total.toLocaleString();
-    }
-}
-
-// Función para mostrar los productos en el carrito
-// (Eliminado: función duplicada, ya está definida correctamente más arriba)
-// Función para agregar producto al carrito
-function agregarProductoAlCarrito(size) {
-    const modal = document.getElementById(`modal${size}`);
-    if (!modal) return;
-
-    const titulo = modal.querySelector('h1')?.textContent || `Combo Talla ${size}`;
-    const priceElement = modal.querySelector('.precio');
-    let price = 0;
-
-    // Obtener selecciones de personalización
-    const masaSeleccionada = modal.querySelector('.opcion-seleccion:nth-child(1) .sabor-option.active')?.textContent.trim() || 'Vainilla';
-    const coberturaSeleccionada = modal.querySelector('.opcion-seleccion:nth-child(2) .sabor-option.active')?.textContent.trim() || 'Chocolate Blanco';
-    const toppingSeleccionado = modal.querySelector('.opcion-seleccion:nth-child(3) .sabor-option.active')?.textContent.trim() || 'Chispas';
-
-    if (priceElement) {
-        price = parseFloat(priceElement.textContent.replace('$', '').replace('.', ''));
-    } else {
-        // Precios por defecto según talla
-        const prices = { 'S': 10000, 'M': 20000, 'L': 30000, 'XL': 40000 };
-        price = prices[size] || 0;
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    if (cart.length === 0) {
+        alert('El carrito está vacío');
+        return;
     }
 
-    const productId = `${size}-${masaSeleccionada}-${coberturaSeleccionada}-${toppingSeleccionado}`.replace(/\s+/g, '-');
+    // Puedes pedir dirección y observaciones aquí si lo deseas
+    const direccion = prompt('¿A qué dirección deseas el envío?');
+    if (!direccion) return;
 
-    const infoProduct = {
-        id: productId,
-        quantity: 1,
-        titulo: titulo,
-        price: price,
-        size: size,
-        masa: masaSeleccionada,
-        cobertura: coberturaSeleccionada,
-        topping: toppingSeleccionado
-    };
-
-    const existingProduct = allProducts.find(item => item.id === productId);
-// Función para agregar producto al carrito
-function agregarProductoAlCarrito(size) {
-    const modal = document.getElementById(`modal${size}`);
-    if (!modal) return;
-
-    const titulo = modal.querySelector('h1')?.textContent || `Combo Talla ${size}`;
-    const priceElement = modal.querySelector('.precio');
-    let precio = 0;
-
-    // Obtener selecciones de personalización
-    const masaSeleccionada = modal.querySelector('.opcion-seleccion:nth-child(1) .sabor-option.active')?.textContent.trim() || 'Vainilla';
-    const coberturaSeleccionada = modal.querySelector('.opcion-seleccion:nth-child(2) .sabor-option.active')?.textContent.trim() || 'Chocolate Blanco';
-    const toppingSeleccionado = modal.querySelector('.opcion-seleccion:nth-child(3) .sabor-option.active')?.textContent.trim() || 'Chispas';
-
-    if (priceElement) {
-        precio = parseFloat(priceElement.textContent.replace('$', '').replace('.', ''));
-    } else {
-        // Precios por defecto según talla
-        const prices = { 'S': 10000, 'M': 20000, 'L': 30000, 'XL': 40000 };
-        precio = prices[size] || 0;
-    }
-
-    const productId = `${size}-${masaSeleccionada}-${coberturaSeleccionada}-${toppingSeleccionado}`.replace(/\s+/g, '-');
-
-    const descripcion = `Masa: ${masaSeleccionada} | Cobertura: ${coberturaSeleccionada} | Topping: ${toppingSeleccionado}`;
-
-    const infoProduct = {
-        id: productId,
-        quantity: 1,
-        titulo: titulo,
-        precio: precio,
-        talla: size,
-        masa: masaSeleccionada,
-        cobertura: coberturaSeleccionada,
-        topping: toppingSeleccionado,
-        descripcion: descripcion
-    };
-
-    const existingProduct = allProducts.find(item => item.id === productId);
-    if (existingProduct) {
-        existingProduct.quantity++;
-    } else {
-        allProducts.push(infoProduct);
-    }
-
-// (Eliminado: evento duplicado, ya está unificado arriba)
-        if (event.target === modal) {
-            modal.style.display = "none";
-        }
-    };
-
-// Inicialización del carrito al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
-    // Cargar carrito desde localStorage
-    const savedCart = localStorage.getItem('cart');
-// Evento para mostrar/ocultar el carrito
-if (btnCart && containerCartProducts) {
-    btnCart.addEventListener('click', (e) => {
-        e.stopPropagation();
-        containerCartProducts.classList.toggle('visible');
-    });
-
-    // Cerrar el carrito al hacer clic fuera
-    document.addEventListener('click', (event) => {
-        if (!containerCartProducts.contains(event.target)) {
-            containerCartProducts.classList.remove('visible');
-        }
-    });
-
-    // Prevenir que el clic dentro del carrito lo cierre
-    containerCartProducts.addEventListener('click', (e) => {
-        e.stopPropagation();
-    });
-}
-    // Configurar botón de cerrar modal de pago
-    const closeP = document.querySelector('.closeP');
-    if (closeP) {
-        closeP.addEventListener('click', () => {
-            document.getElementById('modalP').classList.add('hidden');
-        });
-    }
-    
-    // Configurar botón de comprar
-    const btnComprar = document.getElementById('btnAgregarProducto');
-    if (btnComprar) {
-        btnComprar.addEventListener('click', () => {
-            // Aquí puedes agregar lógica para procesar el pago
-            alert('Compra realizada con éxito!');
-            allProducts = [];
+    fetch('/procesar_compra/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ carrito: cart, direccion: direccion })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            localStorage.removeItem('cart');
             showHTML();
-            document.getElementById('modalP').classList.add('hidden');
-        });
-    }
 
-// Inicialización del carrito al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
-    // Mostrar el estado inicial del carrito
-    showHTML();
-    
-    // Configurar botón de pagar
-    const btnPagar = document.getElementById('btnPagar');
-    if (btnPagar) {
-        btnPagar.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('modalP').classList.remove('hidden');
-        });
-    }
-    
-    // Configurar botón de cerrar modal de pago
-    const closeP = document.querySelector('.closeP');
-    if (closeP) {
-        closeP.addEventListener('click', () => {
-            document.getElementById('modalP').classList.add('hidden');
-        });
-    }
-    
-    // Configurar botón de comprar
-    const btnComprar = document.getElementById('btnAgregarProducto');
-    if (btnComprar) {
-        btnComprar.addEventListener('click', () => {
-            // Aquí puedes agregar lógica para procesar el pago
-            alert('Compra realizada con éxito!');
-            allProducts = [];
-            showHTML();
-            document.getElementById('modalP').classList.add('hidden');
-        });
-    }
+            // Llenar la factura en el modal
+            const venta = data.venta;
+            let facturaHTML = `
+                <h3>Factura de Compra</h3>
+                <p><b>Fecha:</b> ${venta.fecha}</p>
+                <p><b>Dirección:</b> ${venta.direccion}</p>
+                <table style="width:100%;margin-bottom:10px;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;">Producto</th>
+                            <th>Cant.</th>
+                            <th>Unitario</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${venta.detalles.map(det => `
+                            <tr>
+                                <td>${det.producto}</td>
+                                <td style="text-align:center;">${det.cantidad}</td>
+                                <td style="text-align:right;">$${det.precio_unitario}</td>
+                                <td style="text-align:right;">$${det.subtotal}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <p><b>Subtotal:</b> $${venta.subtotal}</p>
+                <p><b>IVA (19%):</b> $${venta.iva}</p>
+                <p><b>Total:</b> $${venta.total}</p>
+            `;
+            document.querySelector('.infoTotalCarrito').innerHTML = facturaHTML;
+
+            // Mostrar el modal de compra exitosa
+            document.getElementById('modalCompraExitosa').style.display = 'flex';
+        } else {
+            alert('Error al procesar la compra: ' + (data.error || ''));
+        }
+    })
+    .catch(error => {
+        alert('Ocurrió un error al procesar la compra');
+        console.error(error);
+    });
 });
 
+// Función para obtener el CSRF token de la cookie
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+
+// ...existing code...
+// ...existing code...
+
+// Cerrar el modal de compra exitosa
+document.getElementById('cerrarModalCompra')?.addEventListener('click', function() {
+    document.getElementById('modalCompraExitosa').style.display = 'none';
+});
