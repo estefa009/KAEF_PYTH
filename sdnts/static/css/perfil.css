@@ -202,3 +202,48 @@ border-radius: 100px;
 .settings-content .content.active {
     display: block;
 }
+.card {
+    max-width: 800px;
+    margin: 2rem auto;
+    border: 2px solid #fff9c7;
+    border-radius: 100px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    background-color: #fff;
+}
+
+.encabezado-editar-perfil {
+    border-top-left-radius: 100px !important;
+    border-top-right-radius: 100px !important;
+    text-align: center;
+    padding: 1rem;
+    background-color: #fff9c7;
+}
+
+.encabezado-editar-perfil h3 {
+    font-family: 'Dunkin', sans-serif;
+    margin: 0;
+    font-weight: bold;
+    color: #4e4032;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+label {
+    font-weight: 600;
+    color: #4e4032;
+}
+
+input.form-control, 
+textarea.form-control {
+    border-radius: 100px;
+    border: 1px solid #ccc;
+}
+
+input.form-control:focus, 
+textarea.form-control:focus {
+    border-color: #f78fb3;
+    box-shadow: 0 0 5px rgba(247, 143, 179, 0.5);
+}
+
