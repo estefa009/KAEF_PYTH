@@ -25,6 +25,8 @@ from django.template.loader import render_to_string
 from django.utils.timezone import now
 from datetime import timedelta
 from django.contrib.auth import update_session_auth_hash
+from django.utils import timezone
+from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 # Context processors
@@ -389,15 +391,17 @@ def historial_envios(request):
     
     envios = Envio.objects.filter(cod_domi= request.user.domiciliario).order_by('fecha_entrega')
 
-    if fecha_desde:
-        envios = envios.filter(fecha_entrega__date__gte=fecha_desde)
-    if fecha_hasta:
-        envios = envios.filter(fecha_entrega__date__lte=fecha_hasta)
+    nuevos_envios = Envio.objects.filter(
+    cod_domi=usuario.domiciliario,
+    fecha_asignacion__gte=timezone.now() - timedelta(days=1)
+    ).order_by('-fecha_asignacion')
+
 
     return render(request, 'domiciliario/historial_envios.html', {
         'envios': envios,
         'fecha_desde': fecha_desde,
-        'fecha_hasta': fecha_hasta
+        'fecha_hasta': fecha_hasta,
+        'nuevos_envios': nuevos_envios,  # ✅ se pasa al template
     })
     
 @login_required

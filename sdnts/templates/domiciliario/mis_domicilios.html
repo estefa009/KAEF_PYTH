@@ -39,6 +39,11 @@
   <!-- Botón de notificaciones -->
           <button class="btn btn-outline-secondary position-relative" data-bs-toggle="modal" data-bs-target="#modalNotificaciones">
             <i class="bi bi-bell"></i>
+            {% if nuevos_envios %}
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ nuevos_envios|length }}
+              </span>
+            {% endif %}
           </button>
 
           <!-- Botón de perfil -->

@@ -12,6 +12,9 @@
     <link rel="stylesheet" href="{% static 'css/domiciliario.css' %}">
 </head>
 <body>
+    <!-- Bootstrap JS (necesario para el modal) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 
  <!-- Menú lateral -->
   <div class="menu-toggle" id="menuToggle">
@@ -33,13 +36,24 @@
      </h1>
      <h1>Bienvenid@ {{ user.nom_usua }}</h1>
       </form>
-      <div class="icons">
-        <h5>
-          <i id="noti" class="bi bi-bell"></i>
-          <i id="user" class="bi bi-person-circle"></i>
-          Domiciliario
-        </h5>
-      </div>
+      <div class="icons d-flex justify-content-end align-items-center gap-3 me-3">
+  <!-- Botón de notificaciones -->
+          <button class="btn btn-outline-secondary position-relative" data-bs-toggle="modal" data-bs-target="#modalNotificaciones">
+            <i class="bi bi-bell"></i>
+            {% if nuevos_envios %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ nuevos_envios|length }}
+                </span>
+            {% endif %}
+          </button>
+
+          <!-- Botón de perfil -->
+          <a href="{% url 'perfildomi' %}" class="btn btn-outline-primary">
+            <i class="bi bi-person-circle"></i>
+          </a>
+
+          <span>Domiciliario</span>
+        </div>
    </main>
   </nav>
 
@@ -106,5 +120,32 @@
             this.classList.toggle('open');
         });
     </script>
+
+ 
+    <!-- Modal de Notificaciones --> <!-- Modal de notificaciones -->
+<div class="modal fade" id="modalNotificaciones" tabindex="-1" aria-labelledby="notificacionesLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="notificacionesLabel">Nuevos Domicilios</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        {% if nuevos_envios %}
+          <ul class="list-group">
+            {% for envio in nuevos_envios %}
+              <li class="list-group-item">
+                <strong>Código:</strong> {{ envio.cod_asignacion }}<br>
+                <strong>Asignado:</strong> {{ envio.fecha_hora_asignada|date:"d/m/Y H:i" }}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>No tienes nuevos domicilios asignados.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
