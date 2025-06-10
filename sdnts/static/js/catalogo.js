@@ -440,9 +440,6 @@ document.getElementById('btnCerrarModalXL')?.addEventListener('click', function(
 });
     });
 
-    // Configurar eventos similares para los otros tamaños (M, L, XL)
-    // ...
-
     // Mostrar estado inicial del carrito
     showHTML();
 });
@@ -528,7 +525,7 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', functio
                 <p><b>IVA (19%):</b> $${venta.iva}</p>
                 <p><b>Total:</b> $${venta.total}</p>
             `;
-            document.querySelector('.infoTotalCarrito').innerHTML = facturaHTML;
+            document.querySelector('.cajita').innerHTML = facturaHTML;
 
             // Mostrar el modal de compra exitosa
             document.getElementById('modalCompraExitosa').style.display = 'flex';
@@ -558,8 +555,6 @@ function getCookie(name) {
     return cookieValue;
 }
 
-
-// ...existing code...
 // ...existing code...
 
 // Cerrar el modal de compra exitosa

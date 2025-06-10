@@ -63,40 +63,8 @@ urlpatterns = [
     path('perfildomi/', views.perfildomi, name='perfildomi'),
     path('editar_perfildomi/', views.editar_perfildomi, name='editar_perfildomi'),
 
-      # Dashboard
-    path('dashboard/', views.dashboard, name='dashboard'),
-    # Gestión de Ventas
-    path('ventas/', views.ventas, name='ventas'),
-    # Gestión de Producción
-    path('produccion/', views.produccion, name='produccion'),
-    # Gestión de Envíos
-    path('envios/', views.envios, name='envios'),
-    # Gestión de Proveedores
-    path('proveedores/', views.proveedores, name='proveedores'),
-    # Gestión de Inventario
-    path('entradas/', views.entradas, name='entradas'),
-    path('salidas/', views.salidas, name='salidas'),
-    # Gestión de Categorías
-    path('categorias/', views.categorias, name='categorias'),
-    # Gestión de Correos (comentada hasta crear el modelo)
-     path('correos/', views.correos, name='correos'),
-    # Carga de Datos
-    path('cargar-datos/', views.cargarDatos, name='cargar_datos'),
-    # Vistas adicionales
-    path('insumos/', views.insumos, name='insumos'),
-    path('productos/', views.productos, name='productos'),
-    path('clientes/', views.clientes, name='clientes'),
-    path('domiciliarios/', views.domiciliarios, name='domiciliarios'),
-    
-    path('reporte-usuarios-pdf/', views.reporte_usuarios_pdf, name='reporte_usuarios_pdf'),
-    path('guardar/', views.guardar_usuario, name='guardar_usuario'),
-    path('actualizar-usuario/', views.actualizar_usuario, name='actualizar_usuario'),
-    path('eliminar-usuario/<int:usuario_id>/', views.eliminar_usuario, name='eliminar_usuario'),
-    path('reporte-usuarios-excel/', views.reporte_usuarios_excel, name='reporte_usuarios_excel'),
-    
-    
     #administrador
-    path('cargarDatos/', views.cargar_datos, name='cargar_datos'),
+    path('cargarDatos/', views.cargarDatos, name='cargarDatos'),
     path('categorias_admin/', views.categorias_admin, name='categorias_admin'),
     path('correos_admin/', views.correos_admin, name='correos_admin'),
     path('dashboard_admin/', views.dashboard_admin, name='dashboard_admin'),
@@ -108,7 +76,13 @@ urlpatterns = [
     path('proveedores_admin/', views.proveedores_admin, name='proveedores_admin'),
     path('salidas_admin/', views.salidas_admin, name='salidas_admin'),
     path('ventas_admin/', views.ventas_admin, name='ventas_admin'),
-
+    path('reporte-usuarios-pdf/', views.reporte_usuarios_pdf, name='reporte_usuarios_pdf'),
+    path('guardar/', views.guardar_usuario, name='guardar_usuario'),
+    path('actualizar-usuario/', views.actualizar_usuario, name='actualizar_usuario'),
+    path('eliminar-usuario/<int:usuario_id>/', views.eliminar_usuario, name='eliminar_usuario'),
+    path('reporte-usuarios-excel/', views.reporte_usuarios_excel, name='reporte_usuarios_excel'),
+    
+    
 
 # ...existing code...
     path('procesar_compra/', views.procesar_compra, name='procesar_compra'),

@@ -1,5 +1,6 @@
 import base64
 from datetime import timezone
+from urllib import response
 import openpyxl
 from django.shortcuts import render,redirect
 from django.contrib.auth import logout
@@ -23,10 +24,9 @@ import matplotlib.pyplot as plt
 from django.http import HttpResponse
 from weasyprint import HTML
 from django.template.loader import render_to_string
-<<<<<<< HEAD
+
 from decimal import Decimal
 
-=======
 from django.utils.timezone import now
 from datetime import timedelta
 from django.contrib.auth import update_session_auth_hash
@@ -34,7 +34,6 @@ from django.utils import timezone
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
->>>>>>> 17d3359f597c0c11c7bb85cb964b4231d9b44e24
 # Context processors
 def nav_index(request):
     return render(request, 'includes/nav_index.html')
@@ -82,9 +81,9 @@ def login(request):
 
             # Redirección por rol
             if rol == 'ADMIN':
-                return redirect('dashboard')
+                return redirect('dashboard_admin')
             elif rol == 'CLIENTE':
-                return redirect('vistacliente')  # Asegúrate de que esta ruta exista
+                return redirect('vistacliente')  
             elif rol == 'DOMI':
                 return redirect('mis_domicilios')
             else:
@@ -388,13 +387,26 @@ def exportar_pdf(request):
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="historial_envios.pdf"'
-<<<<<<< HEAD
     
-    p = canvas.Canvas(response) # type: ignore
-=======
+    
+    
+def exportar_pdf(request):
+    usuario = request.user
+    fecha_desde = request.GET.get('desde')
+    fecha_hasta = request.GET.get('hasta')
+
+    envios = Envio.objects.filter(cod_domi=usuario.domiciliario).order_by('fecha_entrega')
+
+    if fecha_desde not in [None, '', 'None']:
+        envios = envios.filter(fecha_entrega__date__gte=fecha_desde)
+
+    if fecha_hasta not in [None, '', 'None']:
+        envios = envios.filter(fecha_entrega__date__lte=fecha_hasta)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="historial_envios.pdf"'
 
     p = canvas.Canvas(response)
->>>>>>> 17d3359f597c0c11c7bb85cb964b4231d9b44e24
     y = 800
     p.setFont("Helvetica-Bold", 14)
     p.drawString(100, y, "Historial de Envíos")
@@ -457,19 +469,19 @@ class NoCacheMiddleware:
         return response
 
 
-
 @login_required
 def mis_domicilios(request):
     try:
         domiciliario = request.user.domiciliario
-        envios = Envio.objects.filter(cod_domi=domiciliario, estado='PENDIENTE')
     except Domiciliario.DoesNotExist:
         messages.error(request, "No tienes un perfil de domiciliario asignado.")
-        envios = []
+        return render(request, 'domiciliario/mis_domicilios.html', {'envios': [], 'nuevos_envios': []})
+
+    envios = Envio.objects.filter(cod_domi=domiciliario, estado='PENDIENTE')
 
     recientes = now() - timedelta(days=1)
     nuevos_envios = Envio.objects.filter(
-        cod_domi=request.user.domiciliario,
+        cod_domi=domiciliario,
         fecha_asignacion__gte=recientes
     )
 
@@ -547,9 +559,10 @@ def editar_perfildomi(request):
     return render(request, 'domiciliario/editar_perfildomi.html', {'user': user})
 
 
+#administrador
 
 @login_required
-def dashboard(request):
+def dashboard_admin(request):
     # Datos para las tarjetas resumen
     total_usuarios = Usuario.objects.count()
     # ✅ Corregido: usar 'fecha_hora' en lugar de 'fecha'
@@ -562,77 +575,101 @@ def dashboard(request):
         'ventas_recientes': ventas_recientes,
         'produccion_reciente': produccion_reciente,
     }
-    return render(request, 'admin/dashboard.html', context)
+    return render(request, 'admin/dashboard_admin.html', context)
+
+
+@login_required
+def perfil_admin(request):
+    # Get the current user's profile
+    user = request.user
+    
+    if request.method == 'POST':
+        # Process form data if it's a POST request
+        form = UserProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            # Add success message
+            messages.success(request, 'Perfil actualizado correctamente')
+            return redirect('perfil_admin')
+    else:
+        # Display form with current user data
+        form = UserProfileForm(instance=user)
+    
+    context = {
+        'user': user,
+        'form': form,
+    }
+    
+    return render(request, 'admin/perfil_admin.html', context)
 
 # Vista de Ventas
 @login_required
-def ventas(request):
+def ventas_admin(request):
     # ✅ Corregido: usar 'fecha_hora' en lugar de 'fecha'
     ventas = Venta.objects.all().order_by('-fecha_hora')
     # ✅ Corregido: usar 'total' en lugar de 'monto'
     total_ventas = ventas.aggregate(sum('total'))['total__sum'] or 0
     
-    return render(request, 'admin/ventas.html', {
+    return render(request, 'admin/ventas_admin.html', {
         'ventas': ventas,
         'total_ventas': total_ventas
     })
 
 # Vista de Producción
 @login_required
-def produccion(request):
+def produccion_admin(request):
     # ✅ Corregido: usar 'fecha_inicio' en lugar de 'fecha'
     producciones = Produccion.objects.all().order_by('-fecha_inicio')
-    return render(request, 'admin/produccion.html', {'producciones': producciones})
+    return render(request, 'admin/produccion_admin.html', {'producciones': producciones})
 
 # Vista de Envíos
 @login_required
-def envios(request):
+def envios_admin(request):
     envios_pendientes = Envio.objects.filter(estado='PENDIENTE')
     # ✅ Corregido: usar 'ENTREGADO' en lugar de 'COMPLETADO'
     envios_completados = Envio.objects.filter(estado='ENTREGADO')
     
-    return render(request, 'admin/envios.html', {
+    return render(request, 'admin/envios_admin.html', {
         'envios_pendientes': envios_pendientes,
         'envios_completados': envios_completados
     })
 
 # Vista de Proveedores
 @login_required
-def proveedores(request):
+def proveedores_admin(request):
     proveedores = Proveedor.objects.all()
-    return render(request, 'admin/proveedores.html', {'proveedores': proveedores})
+    return render(request, 'admin/proveedores_admin.html', {'proveedores': proveedores})
 
 # Vista de Entradas (Inventario)
 @login_required
-def entradas(request):
+def entradas_admin(request):
     # ✅ Corregido: usar el modelo 'Entrada' directamente
     entradas = Entrada.objects.all().order_by('-fecha_hora_entrada')
-    return render(request, 'admin/entradas.html', {'entradas': entradas})
+    return render(request, 'admin/entradas_admin.html', {'entradas': entradas})
 
 # Vista de Salidas (Inventario)
 @login_required
-def salidas(request):
+def salidas_admin(request):
     # ✅ Corregido: usar el modelo 'Salida' directamente
     salidas = Salida.objects.all().order_by('-fecha_hora_salida')
-    return render(request, 'admin/salidas.html', {'salidas': salidas})
+    return render(request, 'admin/salidas_admin.html', {'salidas': salidas})
 
 # Vista de Categorías
 @login_required
-def categorias(request):
+def categorias_admin(request):
     # ✅ Corregido: usar 'CategoriaInsumo' en lugar de 'Categoria'
     categorias = CategoriaInsumo.objects.all()
-    return render(request, 'admin/categorias.html', {'categorias': categorias})
+    return render(request, 'admin/categorias_admin.html', {'categorias': categorias})
 
 # Vista de Correos - COMENTADA porque no tienes este modelo
 # Si necesitas esta funcionalidad, debes crear el modelo Correo
-"""
+
 @login_required
-def correos(request):
-    # ❌ El modelo 'Correo' no existe en tu models.py
-    # Necesitas crear este modelo o eliminar esta vista
+def correos_admin(request):
+    from .models import Correo  # Asegúrate de que este modelo exista
     correos_enviados = Correo.objects.all().order_by('-fecha_envio')
-    return render(request, 'admin/correos.html', {'correos': correos_enviados})
-"""
+    return render(request, 'admin/correos_admin.html', {'correos': correos_enviados})
+
 
 # Vista para Cargar Datos
 @login_required
@@ -652,36 +689,31 @@ def cargarDatos(request):
 # 🔥 VISTAS ADICIONALES QUE PODRÍAS NECESITAR
 
 @login_required
-def insumos(request):
+def insumos_admin(request):
     """Vista para gestionar insumos"""
     from .models import Insumo
     insumos = Insumo.objects.select_related('cod_categoria').all()
-    return render(request, 'admin/insumos.html', {'insumos': insumos})
+    return render(request, 'admin/insumos_admin.html', {'insumos': insumos})
 
 @login_required
-def productos(request):
+def productos_admin(request):
     """Vista para gestionar productos"""
     productos = Producto.objects.all()
-    return render(request, 'admin/productos.html', {'productos': productos})
+    return render(request, 'admin/productos_admin.html', {'productos': productos})
 
 @login_required
-def clientes(request):
+def clientes_admin(request):
     """Vista para gestionar clientes"""
     from .models import Cliente
     clientes = Cliente.objects.select_related('cod_usua').all()
-    return render(request, 'admin/clientes.html', {'clientes': clientes})
+    return render(request, 'admin/clientes_admin.html', {'clientes': clientes})
 
 @login_required
-def domiciliarios(request):
+def domiciliarios_admin(request):
     """Vista para gestionar domiciliarios"""
     from .models import Domiciliario
     domiciliarios = Domiciliario.objects.select_related('cod_usua').all()
-    return render(request, 'admin/domiciliarios.html', {'domiciliarios': domiciliarios})
-
-def correos(request):
-    """Vista para mostrar la página de correos"""
-    return render(request, 'admin/correos.html')
-
+    return render(request, 'admin/domiciliarios_admin.html', {'domiciliarios': domiciliarios})
 
 
 def reporte_usuarios_pdf(request):
@@ -784,46 +816,6 @@ def actualizar_usuario(request):
 def eliminar_usuario(request, cod_usuario):
       usuario = get_object_or_404(Usuario, pk=cod_usuario)
       usuario.delete()
-<<<<<<< HEAD
       return redirect(request.META.get('HTTP_REFERER', '/'))
-=======
       return redirect(request.META.get('HTTP_REFERER', '/')) 
   
-#administrador
-
-def cargar_datos(request):
-    return render(request, 'admin/cargarDatos.html')
-
-def categorias_admin(request):
-    return render(request, 'admin/categorias_admin.html')
-
-def correos_admin(request):
-    return render(request, 'admin/correos_admin.html')
-
-def dashboard_admin(request):
-    return render(request, 'admin/dashboard_admin.html')
-
-def entradas_admin(request):
-    return render(request, 'admin/entradas_admin.html')
-
-def envios_admin(request):
-    return render(request, 'admin/envios_admin.html')
-
-def insumos_admin(request):
-    return render(request, 'admin/insumos_admin.html')
-
-def perfil_admin(request):
-    return render(request, 'admin/perfil_admin.html')
-
-def produccion_admin(request):
-    return render(request, 'admin/produccion_admin.html')
-
-def proveedores_admin(request):
-    return render(request, 'admin/proveedores_admin.html')
-
-def salidas_admin(request):
-    return render(request, 'admin/salidas_admin.html')
-
-def ventas_admin(request):
-    return render(request, 'admin/ventas_admin.html')
->>>>>>> 17d3359f597c0c11c7bb85cb964b4231d9b44e24

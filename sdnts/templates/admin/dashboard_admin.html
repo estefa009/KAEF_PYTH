@@ -15,14 +15,7 @@
 </head>
 
 <body>
-<!-- Insertar botón de menú -->
-<button id="menuToggle" class="menu-toggle">
-    <i class="bi bi-list"></i>
-</button>
-
-<!-- Insertar menú nav -->
-{% include "includes/_menu.html" %}
-
+    {% include 'includes/nav_admin.html' %}
 <main>
     {% if usuarioLogueado %}
         <h4><p>Bienvenid@ {{ usuarioLogueado.nomUsua }}</p></h4>
@@ -45,7 +38,7 @@
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
                 <li><span class="dropdown-header">Administrador</span></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'admin_perfil' %}">Perfil</a></li>
+                <li><a class="dropdown-item" href="{% url 'perfil_admin' %}">Perfil</a></li>
                 <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
             </ul>
         </li>
@@ -213,6 +206,5 @@
 </script>
 
 <!-- Insertar scripts -->
-{% include "fragments/navs.html" with fragment="menu_js" %}
 </body>
 </html>
