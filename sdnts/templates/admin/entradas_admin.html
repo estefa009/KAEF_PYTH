@@ -19,10 +19,10 @@
 <body>
 
 <!-- Insertar botón de menú -->
-{% include 'fragments/navs/menu_button.html' %}
+{% include "includes/_menu.html" %}
 
 <!-- Insertar menú nav -->
-{% include 'fragments/navs/menu_nav.html' %}
+{% include "includes/_menu.html" %}
 
 <main>
     {% if usuario_logueado %}
@@ -111,7 +111,7 @@
 </script>
 
 <!-- Insertar scripts -->
-{% include 'fragments/navs/menu_js.html' %}
+<script src="{% static 'js/menu.js' %}" defer></script>
 
 </body>
 </html>

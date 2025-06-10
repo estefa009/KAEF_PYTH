@@ -33,10 +33,13 @@
 </head>
 <body>
 <!-- Botón de menú -->
-{% include 'fragments/navs.html' with section='menu_button' %}
+<button id="menuToggle" class="menu-toggle">
+    <i class="bi bi-list"></i>
+</button>
+
 
 <!-- Menú nav -->
-{% include 'fragments/navs.html' with section='menu_nav' %}
+{% include "includes/_menu.html" %}
 
 <main>
     {% if usuarioLogueado %}

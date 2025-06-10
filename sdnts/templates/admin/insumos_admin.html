@@ -19,8 +19,11 @@
 <body>
 
 <!-- Botón de menú y menú nav -->
-{% include "fragments/navs/menu_button.html" %}
-{% include "fragments/navs/menu_nav.html" %}
+<button id="menuToggle" class="menu-toggle">
+    <i class="bi bi-list"></i>
+</button>
+
+{% include "includes/_menu.html" %}
 
 <main>
     {% if usuarioLogueado %}

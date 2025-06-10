@@ -20,10 +20,13 @@
 
 <body>
 <!-- Insertar botón de menú -->
-{% include "fragments/navs/menu_button.html" %}
+<button id="menuToggle" class="menu-toggle">
+    <i class="bi bi-list"></i>
+</button>
+
 
 <!-- Insertar menú nav -->
-{% include "fragments/navs/menu_nav.html" %}
+{% include "includes/_menu.html" %}
 
 <main>
     <h4>

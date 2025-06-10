@@ -16,10 +16,12 @@
 
 <body>
 <!-- Insertar botón de menú -->
-{% include "fragments/navs.html" with fragment="menu_button" %}
+<button id="menuToggle" class="menu-toggle">
+    <i class="bi bi-list"></i>
+</button>
 
 <!-- Insertar menú nav -->
-{% include "fragments/navs.html" with fragment="menu_nav" %}
+{% include "includes/_menu.html" %}
 
 <main>
     {% if usuarioLogueado %}
