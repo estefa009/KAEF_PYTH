@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'kaef_final.middleware.NoCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'kaef_final.urls'
@@ -60,7 +61,7 @@ ROOT_URLCONF = 'kaef_final.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [BASE_DIR / 'sdnts' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

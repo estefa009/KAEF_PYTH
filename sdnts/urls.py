@@ -15,6 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
+from django.http import HttpResponse
 from . import views
 from .views import (
     CustomPasswordResetView,
@@ -54,11 +55,14 @@ urlpatterns = [
     path('eliminar_del_carrito/<int:item_id>/', views.eliminar_del_carrito, name='eliminar_del_carrito'),
     path('ver_carrito/', views.ver_carrito, name='ver_carrito'),
     path('actualizar_carrito/', views.actualizar_carrito, name='actualizar_carrito'),
-    #Domiciliario
+     #Domiciliario
     path('mis_domicilios/', views.mis_domicilios, name='mis_domicilios'),
     path('historial_envios/', views.historial_envios, name='historial_envios'),
     path('exportar-pdf/', views.exportar_pdf, name='exportar_pdf'),
     path('exportar-excel/', views.exportar_excel, name='exportar_excel'),
+    path('perfildomi/', views.perfildomi, name='perfildomi'),
+    path('editar_perfildomi/', views.editar_perfildomi, name='editar_perfildomi'),
+
       # Dashboard
     path('dashboard/', views.dashboard, name='dashboard'),
     # Gestión de Ventas
@@ -89,6 +93,22 @@ urlpatterns = [
     path('actualizar-usuario/', views.actualizar_usuario, name='actualizar_usuario'),
     path('eliminar-usuario/<int:usuario_id>/', views.eliminar_usuario, name='eliminar_usuario'),
     path('reporte-usuarios-excel/', views.reporte_usuarios_excel, name='reporte_usuarios_excel'),
+    
+    
+    #administrador
+    path('cargarDatos/', views.cargar_datos, name='cargar_datos'),
+    path('categorias_admin/', views.categorias_admin, name='categorias_admin'),
+    path('correos_admin/', views.correos_admin, name='correos_admin'),
+    path('dashboard_admin/', views.dashboard_admin, name='dashboard_admin'),
+    path('entradas_admin/', views.entradas_admin, name='entradas_admin'),
+    path('envios_admin/', views.envios_admin, name='envios_admin'),
+    path('insumos_admin/', views.insumos_admin, name='insumos_admin'),
+    path('perfil_admin/', views.perfil_admin, name='perfil_admin'),
+    path('produccion_admin/', views.produccion_admin, name='produccion_admin'),
+    path('proveedores_admin/', views.proveedores_admin, name='proveedores_admin'),
+    path('salidas_admin/', views.salidas_admin, name='salidas_admin'),
+    path('ventas_admin/', views.ventas_admin, name='ventas_admin'),
+
 
 # ...existing code...
     path('procesar_compra/', views.procesar_compra, name='procesar_compra'),

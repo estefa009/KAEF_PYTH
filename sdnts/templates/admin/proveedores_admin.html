@@ -1,0 +1,206 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proveedores</title>
+    <link rel="icon" type="image/ico" href="{% static 'icon/2.ico' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{% static 'css/proveedores.css' %}">
+    <link rel="stylesheet" href="{% static 'css/menu.css' %}">
+</head>
+
+<body>
+<!-- Insertar botón de menú -->
+<button id="menuToggle" class="menu-toggle">
+    <i class="bi bi-list"></i>
+</button>
+
+
+<!-- Insertar menú nav -->
+{% include "includes/_menu.html" %}
+
+<main>
+    <h4>
+        {% if usuarioLogueado %}
+            <p>Bienvenid@ {{ usuarioLogueado.nomUsua }}</p>
+        {% endif %}
+    </h4>
+    <!-- Barra de búsqueda -->
+    <form id="searchForm" class="search-form">
+        <label style="margin-left: 300px;">
+            <input type="text" id="buscar" placeholder="Buscar..">
+            <button type="submit" style="border: none; background: none;"><i class="bi bi-search"></i></button>
+        </label>
+    </form>
+
+    <!-- Menú de usuario -->
+    <div class="d-flex align-items-center gap-3" style="margin-left: auto; margin-right: 40px;">
+        <li class="nav-item dropdown list-unstyled">
+            <a href="#" id="adminDropdown" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle" style="font-size: 30px; color: #333333"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
+                <li><span class="dropdown-header">Administrador</span></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'perfil' %}">Perfil</a></li>
+                <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
+            </ul>
+        </li>
+    </div>
+</main>
+
+<!-- Tabla de proveedores -->
+<div class="table_proveedores">
+    <br>
+    <center>
+        <h5><b>PROVEEDORES</b></h5>
+    </center>
+
+    <div class="container mt-4">
+        <!-- Botón para agregar proveedor -->
+        <div class="action-buttons mb-4 text-center">
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAgregarProveedor">
+                Agregar proveedor <i class="bi bi-plus-circle"></i>
+            </button>
+        </div>
+
+        <!-- Tabla de proveedores -->
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">Cod</th>
+                    <th scope="col">Nombre del Proveedor</th>
+                    <th scope="col">Teléfono y/o Celular</th>
+                    <th scope="col">Novedad</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for proveedor in proveedores %}
+                <tr>
+                    <td>{{ proveedor.codProveedor }}</td>
+                    <td>{{ proveedor.nomProveedor }}</td>
+                    <td>{{ proveedor.telefonoProveedor }}</td>
+                    <td>{{ proveedor.novedadProveedor }}</td>
+                    <td>
+                        <button class="btn btn-warning" title="Editar"
+                                onclick="openModalEditar('{{ proveedor.codProveedor }}', '{{ proveedor.nomProveedor }}', '{{ proveedor.telefonoProveedor }}', '{{ proveedor.novedadProveedor }}')">
+                            <i class="bi bi-pencil-fill"></i>
+                        </button>
+                        <button class="btn btn-danger ms-2" title="Eliminar"
+                                onclick="confirmDelete('{{ proveedor.codProveedor }}')">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No hay proveedores disponibles</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para agregar proveedor -->
+<div class="modal fade" id="modalAgregarProveedor" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Agregar Proveedor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formAgregarProveedor" action="{% url 'agregar_proveedor' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="nombre-proveedor" class="col-form-label">Nombre del Proveedor:</label>
+                        <input type="text" class="form-control" id="nombre-proveedor" name="nomProveedor" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="telefono-proveedor" class="col-form-label">Teléfono:</label>
+                        <input type="number" class="form-control" id="telefono-proveedor" name="telefonoProveedor">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="novedad-proveedor" class="col-form-label">Novedad:</label>
+                        <input type="text" class="form-control" id="novedad-proveedor" name="novedadProveedor" required>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Registrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar proveedor -->
+<div class="modal fade" id="modalEditarProveedor" tabindex="-1" aria-labelledby="modalEditarProveedorLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEditarProveedorLabel">Editar Proveedor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarProveedor" action="{% url 'editar_proveedor' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" id="editarCodProveedor" name="codProveedor">
+                    <div class="mb-3">
+                        <label for="editarNombreProveedor" class="form-label">Nombre del Proveedor</label>
+                        <input type="text" class="form-control" id="editarNombreProveedor" name="nomProveedor" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editarTelefono" class="form-label">Teléfono</label>
+                        <input type="number" class="form-control" id="editarTelefono" name="telefonoProveedor" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editarNovedad" class="form-label">Novedad</label>
+                        <input type="text" class="form-control" id="editarNovedad" name="novedadProveedor" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Actualizar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Función para abrir el modal de edición con datos
+    function openModalEditar(codProveedor, nomProveedor, telefonoProveedor, novedadProveedor) {
+        document.getElementById('editarCodProveedor').value = codProveedor;
+        document.getElementById('editarNombreProveedor').value = nomProveedor;
+        document.getElementById('editarTelefono').value = telefonoProveedor;
+        document.getElementById('editarNovedad').value = novedadProveedor;
+
+        var modalEditar = new bootstrap.Modal(document.getElementById('modalEditarProveedor'));
+        modalEditar.show();
+    }
+
+    // Función para confirmar eliminación
+    function confirmDelete(codProveedor) {
+        if (confirm("¿Estás seguro de que deseas eliminar este proveedor?")) {
+            window.location.href = "{% url 'eliminar_proveedor' 0 %}".replace('0', codProveedor);
+        }
+    }
+</script>
+
+<!-- Insertar scripts -->
+{% include 'fragments/navs/menu_js.html' %}
+</body>
+</html>

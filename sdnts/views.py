@@ -23,8 +23,18 @@ import matplotlib.pyplot as plt
 from django.http import HttpResponse
 from weasyprint import HTML
 from django.template.loader import render_to_string
+<<<<<<< HEAD
 from decimal import Decimal
 
+=======
+from django.utils.timezone import now
+from datetime import timedelta
+from django.contrib.auth import update_session_auth_hash
+from django.utils import timezone
+from datetime import timedelta
+
+from django.contrib.auth import get_user_model
+>>>>>>> 17d3359f597c0c11c7bb85cb964b4231d9b44e24
 # Context processors
 def nav_index(request):
     return render(request, 'includes/nav_index.html')
@@ -368,38 +378,108 @@ def exportar_pdf(request):
     fecha_desde = request.GET.get('desde')
     fecha_hasta = request.GET.get('hasta')
 
-    envios = Envio.objects.filter(domiciliario__usuario=usuario)
-    if fecha_desde:
-        envios = envios.filter(fecha_hora_entrega__date__gte=fecha_desde)
-    if fecha_hasta:
-        envios = envios.filter(fecha_hora_entrega__date__lte=fecha_hasta)
+    envios = Envio.objects.filter(cod_domi=usuario.domiciliario).order_by('fecha_entrega')
+
+    if fecha_desde not in [None, '', 'None']:
+        envios = envios.filter(fecha_entrega__date__gte=fecha_desde)
+
+    if fecha_hasta not in [None, '', 'None']:
+        envios = envios.filter(fecha_entrega__date__lte=fecha_hasta)
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="historial_envios.pdf"'
+<<<<<<< HEAD
     
     p = canvas.Canvas(response) # type: ignore
+=======
+
+    p = canvas.Canvas(response)
+>>>>>>> 17d3359f597c0c11c7bb85cb964b4231d9b44e24
     y = 800
+    p.setFont("Helvetica-Bold", 14)
     p.drawString(100, y, "Historial de Envíos")
     y -= 30
+
+    p.setFont("Helvetica", 10)
     for envio in envios:
-        p.drawString(100, y, f"{envio.cod_envio} | {envio.fecha_hora_entrega} | {envio.tarifa} | {envio.estado}")
+        fecha_str = envio.fecha_entrega.strftime("%Y-%m-%d %H:%M") if envio.fecha_entrega else "Sin entregar"
+        p.drawString(100, y, f"{envio.cod_envio} | {fecha_str} | {envio.tarifa_envio} | {envio.estado}")
         y -= 20
         if y < 50:
             p.showPage()
             y = 800
+            p.setFont("Helvetica", 10)
+
     p.save()
     return response
+
+
+def exportar_excel(request):
+    usuario = request.user
+    fecha_desde = request.GET.get('desde')
+    fecha_hasta = request.GET.get('hasta')
+
+    envios = Envio.objects.filter(cod_domi=usuario.domiciliario)
+
+    if fecha_desde not in [None, '', 'None']:
+        envios = envios.filter(fecha_entrega__date__gte=fecha_desde)
+
+    if fecha_hasta not in [None, '', 'None']:
+        envios = envios.filter(fecha_entrega__date__lte=fecha_hasta)
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.append(["Código", "Fecha de Entrega", "Tarifa", "Estado"])
+
+    for envio in envios:
+        ws.append([
+            envio.cod_envio,
+            envio.fecha_entrega.strftime("%Y-%m-%d %H:%M") if envio.fecha_entrega else "Sin entregar",
+            envio.tarifa_envio,
+            envio.estado
+        ])
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="historial_envios.xlsx"'
+    wb.save(response)
+    return response
+
+
+class NoCacheMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
+        return response
+
+
+
 @login_required
 def mis_domicilios(request):
     try:
-        domiciliario = request.user.domiciliario  # Obtener el domiciliario vinculado al usuario
-        envios = Envio.objects.filter(cod_domi=request.user.domiciliario, estado='PENDIENTE')  # O el estado que desees filtrar
+        domiciliario = request.user.domiciliario
+        envios = Envio.objects.filter(cod_domi=domiciliario, estado='PENDIENTE')
     except Domiciliario.DoesNotExist:
         messages.error(request, "No tienes un perfil de domiciliario asignado.")
         envios = []
 
-    return render(request, 'domiciliario/mis_domicilios.html', {'envios': envios})
-   
+    recientes = now() - timedelta(days=1)
+    nuevos_envios = Envio.objects.filter(
+        cod_domi=request.user.domiciliario,
+        fecha_asignacion__gte=recientes
+    )
+
+    context = {
+        'envios': envios,
+        'nuevos_envios': nuevos_envios,
+    }
+
+    return render(request, 'domiciliario/mis_domicilios.html', context)
+ 
 @login_required
 def historial_envios(request):
     usuario = request.user  # Asegúrate de usar autenticación
@@ -408,17 +488,63 @@ def historial_envios(request):
     
     envios = Envio.objects.filter(cod_domi= request.user.domiciliario).order_by('fecha_entrega')
 
-    if fecha_desde:
-        envios = envios.filter(fecha_entrega__date__gte=fecha_desde)
-    if fecha_hasta:
-        envios = envios.filter(fecha_entrega__date__lte=fecha_hasta)
+    nuevos_envios = Envio.objects.filter(
+    cod_domi=usuario.domiciliario,
+    fecha_asignacion__gte=timezone.now() - timedelta(days=1)
+    ).order_by('-fecha_asignacion')
+
 
     return render(request, 'domiciliario/historial_envios.html', {
         'envios': envios,
         'fecha_desde': fecha_desde,
-        'fecha_hasta': fecha_hasta
+        'fecha_hasta': fecha_hasta,
+        'nuevos_envios': nuevos_envios,  # ✅ se pasa al template
     })
     
+@login_required
+def perfildomi(request):
+    user = request.user
+    return render(request, 'domiciliario/perfildomi.html', {'user': user})
+
+
+User = get_user_model()
+
+@login_required
+def editar_perfildomi(request):
+    user = request.user
+
+    if request.method == 'POST':
+        nom_usua = request.POST.get('nom_usua', user.nom_usua)
+        apell_usua = request.POST.get('apell_usua', user.apell_usua)
+        tele_usua = request.POST.get('tele_usua', user.tele_usua)
+        email = request.POST.get('email', user.email)
+        password = request.POST.get('password')
+        password2 = request.POST.get('confirm_password')
+
+        # Validación: verificar si el email ya existe y no es el del usuario actual
+        if User.objects.filter(email=email).exclude(pk=user.pk).exists():
+            messages.error(request, 'El correo electrónico ya está en uso.')
+            return redirect('perfildomi')
+
+        # Validación: confirmar contraseña si se escribe
+        if password:
+            if password != password2:
+                messages.error(request, 'Las contraseñas no coinciden.')
+                return redirect('perfildomi')
+            user.set_password(password)
+            update_session_auth_hash(request, user)
+
+        # Guardar datos
+        user.nom_usua = nom_usua
+        user.apell_usua = apell_usua
+        user.tele_usua = tele_usua
+        user.email = email
+        user.save()
+
+        messages.success(request, 'Perfil actualizado correctamente.')
+        return redirect('perfildomi')
+
+    return render(request, 'domiciliario/editar_perfildomi.html', {'user': user})
 
 
 
@@ -658,4 +784,46 @@ def actualizar_usuario(request):
 def eliminar_usuario(request, cod_usuario):
       usuario = get_object_or_404(Usuario, pk=cod_usuario)
       usuario.delete()
+<<<<<<< HEAD
       return redirect(request.META.get('HTTP_REFERER', '/'))
+=======
+      return redirect(request.META.get('HTTP_REFERER', '/')) 
+  
+#administrador
+
+def cargar_datos(request):
+    return render(request, 'admin/cargarDatos.html')
+
+def categorias_admin(request):
+    return render(request, 'admin/categorias_admin.html')
+
+def correos_admin(request):
+    return render(request, 'admin/correos_admin.html')
+
+def dashboard_admin(request):
+    return render(request, 'admin/dashboard_admin.html')
+
+def entradas_admin(request):
+    return render(request, 'admin/entradas_admin.html')
+
+def envios_admin(request):
+    return render(request, 'admin/envios_admin.html')
+
+def insumos_admin(request):
+    return render(request, 'admin/insumos_admin.html')
+
+def perfil_admin(request):
+    return render(request, 'admin/perfil_admin.html')
+
+def produccion_admin(request):
+    return render(request, 'admin/produccion_admin.html')
+
+def proveedores_admin(request):
+    return render(request, 'admin/proveedores_admin.html')
+
+def salidas_admin(request):
+    return render(request, 'admin/salidas_admin.html')
+
+def ventas_admin(request):
+    return render(request, 'admin/ventas_admin.html')
+>>>>>>> 17d3359f597c0c11c7bb85cb964b4231d9b44e24
