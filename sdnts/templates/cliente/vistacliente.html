@@ -71,9 +71,35 @@
             window.location.href = "{% url 'catalogocliente' %}";
         }
     </script>
-    <div class="InicioSesion shadow">
-     
-    </div>
+    <!-- Login -->
+<div class="InicioSesion shadow">
+    <h1>¿Ya tienes <span class="cuenta">CUENTA?</span></h1>
+    <h2>Inicia Sesión</h2>
+    <br>
+    <form action="{% url 'login' %}" method="post" id="loginForm">
+        {% csrf_token %}
+        {% if error %}
+        <div class="alert alert-danger">
+            <p>{{ error }}</p>
+        </div>
+        {% endif %}
+        <div class="row">
+            <div class="col-5">
+                <input type="text" name="email" class="form-control shadow" placeholder="Correo" required maxlength="50">
+            </div>
+            <div class="col-5">
+                <input type="password" name="password" class="form-control shadow" placeholder="Contraseña" required maxlength="50">
+            </div>
+            <div>
+                <button type="submit" class="btn2 btn form mx-2 shadow">INICIAR SESIÓN</button>
+            </div>
+            <div class="forgot">
+<a href="{% url 'password_reset' %}" class=" btn-link ">¿Olvidaste tu contraseña?</a>
+            </div>
+        </div>
+    </form>
+</div>
+
     <div class="RedesSociales">
         <h1>Síguenos en nuestras redes sociales</h1>
         <h2>¡CONÓCENOS!</h2>
