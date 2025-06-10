@@ -400,12 +400,16 @@ def historial_envios(request):
         'fecha_hasta': fecha_hasta
     })
     
+@login_required
+def perfildomi(request):
+    user = request.user
+    return render(request, 'domiciliario/perfildomi.html', {'user': user})
 
 
 User = get_user_model()
 
 @login_required
-def perfildomi(request):
+def editar_perfildomi(request):
     user = request.user
 
     if request.method == 'POST':
@@ -439,7 +443,7 @@ def perfildomi(request):
         messages.success(request, 'Perfil actualizado correctamente.')
         return redirect('perfildomi')
 
-    return render(request, 'domiciliario/perfildomi.html', {'user': user})
+    return render(request, 'domiciliario/editar_perfildomi.html', {'user': user})
 
 
 

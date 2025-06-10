@@ -61,6 +61,8 @@ urlpatterns = [
     path('exportar-pdf/', views.exportar_pdf, name='exportar_pdf'),
     path('exportar-excel/', views.exportar_excel, name='exportar_excel'),
     path('perfildomi/', views.perfildomi, name='perfildomi'),
+    path('editar_perfildomi/', views.editar_perfildomi, name='editar_perfildomi'),
+
       # Dashboard
     path('dashboard/', views.dashboard, name='dashboard'),
     # Gestión de Ventas
