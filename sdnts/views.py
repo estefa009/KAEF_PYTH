@@ -22,6 +22,11 @@ import matplotlib.pyplot as plt
 from django.http import HttpResponse
 from weasyprint import HTML
 from django.template.loader import render_to_string
+from django.utils.timezone import now
+from datetime import timedelta
+from django.contrib.auth import update_session_auth_hash
+
+from django.contrib.auth import get_user_model
 # Context processors
 def nav_index(request):
     return render(request, 'includes/nav_index.html')
@@ -357,14 +362,25 @@ class NoCacheMiddleware:
 @login_required
 def mis_domicilios(request):
     try:
-        domiciliario = request.user.domiciliario  # Obtener el domiciliario vinculado al usuario
-        envios = Envio.objects.filter(cod_domi=request.user.domiciliario, estado='PENDIENTE')  # O el estado que desees filtrar
+        domiciliario = request.user.domiciliario
+        envios = Envio.objects.filter(cod_domi=domiciliario, estado='PENDIENTE')
     except Domiciliario.DoesNotExist:
         messages.error(request, "No tienes un perfil de domiciliario asignado.")
         envios = []
 
-    return render(request, 'domiciliario/mis_domicilios.html', {'envios': envios})
-   
+    recientes = now() - timedelta(days=1)
+    nuevos_envios = Envio.objects.filter(
+        cod_domi=request.user.domiciliario,
+        fecha_asignacion__gte=recientes
+    )
+
+    context = {
+        'envios': envios,
+        'nuevos_envios': nuevos_envios,
+    }
+
+    return render(request, 'domiciliario/mis_domicilios.html', context)
+ 
 @login_required
 def historial_envios(request):
     usuario = request.user  # Asegúrate de usar autenticación
@@ -384,22 +400,50 @@ def historial_envios(request):
         'fecha_hasta': fecha_hasta
     })
     
-##def perfildomi(request):
-    domiciliario = request.user.domiciliario  # o como obtengas el domiciliario
-    usuario = request.user  # usuario autenticado
-
-    try:
-        domiciliario = usuario.domiciliario  # acceso al modelo Cliente relacionado
-    except:
-        domiciliario = None  # por si no es un cliente (es admin u otro)
-
-    contexto = {
-        'usuario': usuario,
-        'domiciliario': domiciliario,
-    }
-    return render(request, 'perfil_domi.html', {'domiciliario': domiciliario})
+@login_required
+def perfildomi(request):
+    user = request.user
+    return render(request, 'domiciliario/perfildomi.html', {'user': user})
 
 
+User = get_user_model()
+
+@login_required
+def editar_perfildomi(request):
+    user = request.user
+
+    if request.method == 'POST':
+        nom_usua = request.POST.get('nom_usua', user.nom_usua)
+        apell_usua = request.POST.get('apell_usua', user.apell_usua)
+        tele_usua = request.POST.get('tele_usua', user.tele_usua)
+        email = request.POST.get('email', user.email)
+        password = request.POST.get('password')
+        password2 = request.POST.get('confirm_password')
+
+        # Validación: verificar si el email ya existe y no es el del usuario actual
+        if User.objects.filter(email=email).exclude(pk=user.pk).exists():
+            messages.error(request, 'El correo electrónico ya está en uso.')
+            return redirect('perfildomi')
+
+        # Validación: confirmar contraseña si se escribe
+        if password:
+            if password != password2:
+                messages.error(request, 'Las contraseñas no coinciden.')
+                return redirect('perfildomi')
+            user.set_password(password)
+            update_session_auth_hash(request, user)
+
+        # Guardar datos
+        user.nom_usua = nom_usua
+        user.apell_usua = apell_usua
+        user.tele_usua = tele_usua
+        user.email = email
+        user.save()
+
+        messages.success(request, 'Perfil actualizado correctamente.')
+        return redirect('perfildomi')
+
+    return render(request, 'domiciliario/editar_perfildomi.html', {'user': user})
 
 
 
