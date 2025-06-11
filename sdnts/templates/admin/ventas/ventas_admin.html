@@ -151,9 +151,9 @@
                             <th>Opciones</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="tablaVentas">
                         {% for venta in ventas %}
-                        <tr>
+                        <tr data-estado="{{ venta.estado }}">
                             <td>{{ venta.cod_venta }}</td>
                             <td>{{ venta.nombre_cliente }}</td>
                             <td>{{ venta.fecha_hora|date:"Y-m-d H:i" }}</td>
@@ -218,6 +218,22 @@
         </div>
     </div>
 </div>
+    <script>
+    function filtrarVentas() {
+        const estadoSeleccionado = document.getElementById('filtroEstado').value;
+        const filas = document.querySelectorAll('#tablaVentas tr');
+
+        filas.forEach(fila => {
+            const estado = fila.getAttribute('data-estado');
+
+            if (!estadoSeleccionado || estado === estadoSeleccionado) {
+                fila.style.display = '';
+            } else {
+                fila.style.display = 'none';
+            }
+        });
+    }
+</script>
 
 </body>
 </html>
