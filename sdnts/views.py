@@ -939,6 +939,7 @@ def agregar_venta_completa(request):
         'detalle_formset': detalle_formset,
         'combinacion_formset': combinacion_formset,
         'pago_form': pago_form,
+        'productos': Producto.objects.all(), 
     })
 
 
