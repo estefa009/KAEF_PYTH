@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sdnts.apps.SdntsConfig', 
+    'django_extensions',
     # Importante usar SaintsConfig'
     
  

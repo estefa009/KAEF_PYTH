@@ -407,7 +407,6 @@ class Salida(models.Model):
     def __str__(self):
         return f"Salida #{self.cod_salida} - {self.cod_insumo.nomb_insumo}"
 
-
 class Envio(models.Model):
     """
     Modelo para registrar envíos de pedidos
