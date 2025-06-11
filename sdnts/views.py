@@ -701,10 +701,52 @@ def ventas_admin(request):
     ventas = Venta.objects.all().order_by('-fecha_hora')
     total_ventas = ventas.aggregate(Sum('total'))['total__sum'] or 0
     
-    return render(request, 'admin/ventas_admin.html', {
+    return render(request, 'admin/ventas/ventas_admin.html', {
         'ventas': ventas,
         'total_ventas': total_ventas
     })
+    
+from .forms import VentaForm
+
+from django.shortcuts import render, redirect
+from .forms import VentaForm, DetalleVentaFormSet, PagoForm
+from .models import Venta
+
+def agregar_venta_completa(request):
+    if request.method == 'POST':
+        venta_form = VentaForm(request.POST)
+        detalle_formset = DetalleVentaFormSet(request.POST)
+        pago_form = PagoForm(request.POST)
+
+        if venta_form.is_valid() and detalle_formset.is_valid() and pago_form.is_valid():
+            venta = venta_form.save()
+            detalles = detalle_formset.save(commit=False)
+            for detalle in detalles:
+                detalle.cod_venta = venta
+                detalle.save()
+
+            pago = pago_form.save(commit=False)
+            pago.cod_venta = venta
+            pago.save()
+
+            return redirect('ventas_admin')  # o donde desees redirigir
+    else:
+        venta_form = VentaForm()
+        detalle_formset = DetalleVentaFormSet()
+        pago_form = PagoForm()
+
+    context = {
+        'venta_form': venta_form,
+        'detalle_formset': detalle_formset,
+        'pago_form': pago_form,
+    }
+    return render(request, 'admin/ventas/agregar_venta_completa.html', context)
+
+
+
+
+
+
 
 # Vista de Producción
 @login_required
