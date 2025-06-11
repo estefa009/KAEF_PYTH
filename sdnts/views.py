@@ -8,7 +8,7 @@ from django.utils.html import strip_tags
 import openpyxl
 from django.shortcuts import render,redirect
 from django.contrib.auth import logout
-from sdnts.models import CategoriaInsumo, DetalleVenta, Entrada, Envio, Produccion, Proveedor, Salida, Usuario,Producto, Carrito, CarritoItem, Venta,Domiciliario
+from sdnts.models import CategoriaInsumo, DetalleVenta, Entrada, Envio, Produccion, Proveedor, Salida, Usuario,Producto, Carrito, CarritoItem, Venta,Domiciliario,Cliente,Pago
 from django.contrib.auth import views as auth_views
 from django.urls import reverse, reverse_lazy
 import json
@@ -51,6 +51,20 @@ def nav_admin(request):
 def nav_user(request):
     return render(request, 'includes/nav_user.html')
 
+
+# --- FUNCION NORMALIZAR PARA MAPEOS DE NOMBRES ---
+def normalizar(nombre):
+    if not nombre:
+        return ''
+    import unicodedata
+    nombre = nombre.lower().strip()
+    nombre = ''.join(
+        c for c in unicodedata.normalize('NFD', nombre)
+        if unicodedata.category(c) != 'Mn'
+    )
+    nombre = nombre.replace('-', ' ').replace('_', ' ')
+    nombre = nombre.replace('m&m', 'mm')
+    return nombre
 
 # Create your views here.
 def index(request):
@@ -420,10 +434,31 @@ def procesar_compra(request):
 
             # 2. Crear los detalles de venta y combinaciones
             COBERTURA_MAP = {
-                "Chocolate Blanco": "Choc Blanco",
-                "Chocolate Oscuro": "Choc Oscuro",
-                "Arequipe": "Arequipe",
-                # Agrega aquí todos los nombres posibles
+                normalizar("Chocolate Blanco"): "Choc. Blanco",
+                normalizar("Choc Blanco"): "Choc. Blanco",
+                normalizar("Choc. Blanco"): "Choc. Blanco",
+                normalizar("choc-blanco"): "Choc. Blanco",
+                normalizar("Chocolate Oscuro"): "Choc. Oscuro",
+                normalizar("Choc Oscuro"): "Choc. Oscuro",
+                normalizar("Choc. Oscuro"): "Choc. Oscuro",
+                normalizar("choc-oscuro"): "Choc. Oscuro",
+                normalizar("Arequipe"): "Arequipe",
+                # Agrega aquí todos los nombres posibles y sus variantes normalizadas
+            }
+            MASA_MAP = {
+                normalizar("Vainilla"): "Vainilla",
+                normalizar("Chocolate"): "Chocolate",
+                normalizar("Red Velvet"): "Red Velvet",
+                # Agrega aquí todos los nombres posibles y sus variantes normalizadas
+            }
+            TOPPING_MAP = {
+                normalizar("Chispas"): "Chispas",
+                normalizar("Oreo"): "Oreo",
+                normalizar("M&M"): "M&M",
+                normalizar("mm"): "M&M",
+                normalizar("Chips"): "Chips",
+                normalizar("Ninguno"): None,
+                # Agrega aquí todos los nombres posibles y sus variantes normalizadas
             }
             for item in carrito:
                 producto = Producto.objects.filter(cod_producto=item['cod_producto']).first()
@@ -439,51 +474,42 @@ def procesar_compra(request):
                 )
                 print('DetalleVenta creado para producto:', producto)
                 # Guardar la combinación personalizada
+                masa_nombre = cobertura_nombre = topping_nombre = None
                 try:
-                    import unicodedata
-                    def normalizar(s):
-                        if not s:
-                            return ''
-                        s = s.strip().lower().replace(' ', '')
-                        s = ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
-                        return s
                     # --- MASA ---
                     masa_nombre = item['masa']['nombre']
-                    masa = SaborMasa.objects.filter(nombre__iexact=masa_nombre).first()
+                    masa_nombre_norm = normalizar(masa_nombre)
+                    masa_nombre_db = MASA_MAP.get(masa_nombre_norm, masa_nombre)
+                    masa = SaborMasa.objects.filter(nombre__iexact=masa_nombre_db).first()
                     if not masa:
-                        masa = SaborMasa.objects.filter(nombre__icontains=masa_nombre).first()
+                        masa = SaborMasa.objects.filter(nombre__icontains=masa_nombre_db).first()
                     if not masa:
-                        print('No se encontró SaborMasa para:', masa_nombre)
+                        print('No se encontró SaborMasa para:', masa_nombre, '| Normalizado:', masa_nombre_norm)
                         print('Nombres válidos en BD:', list(SaborMasa.objects.values_list('nombre', flat=True)))
                         raise Exception(f'SaborMasa no encontrado para "{masa_nombre}"')
                     # --- COBERTURA ---
                     cobertura_nombre = item['cobertura']['nombre']
-                    COBERTURA_MAP = {
-                        normalizar('Chocolate Blanco'): 'Choc Blanco',
-                        normalizar('Chocolate Oscuro'): 'Choc Oscuro',
-                        normalizar('Arequipe'): 'Arequipe',
-                        # Agrega aquí todos los nombres posibles
-                    }
                     cobertura_nombre_norm = normalizar(cobertura_nombre)
-                    cobertura_nombre_db = COBERTURA_MAP.get(cobertura_nombre_norm)
-                    cobertura = None
-                    if cobertura_nombre_db:
-                        cobertura = Glaseado.objects.filter(nombre__iexact=cobertura_nombre_db).first()
+                    cobertura_nombre_db = COBERTURA_MAP.get(cobertura_nombre_norm, cobertura_nombre)
+                    print(f'Buscando Glaseado en BD: "{cobertura_nombre_db}" (original: "{cobertura_nombre}", normalizado: "{cobertura_nombre_norm}")')
+                    cobertura = Glaseado.objects.filter(nombre__iexact=cobertura_nombre_db).first()
                     if not cobertura:
-                        cobertura = Glaseado.objects.filter(nombre__icontains=cobertura_nombre).first()
+                        cobertura = Glaseado.objects.filter(nombre__icontains=cobertura_nombre_db).first()
                     if not cobertura:
-                        print('No se encontró Glaseado para:', cobertura_nombre)
+                        print('No se encontró Glaseado para:', cobertura_nombre, '| Normalizado:', cobertura_nombre_norm)
                         print('Nombres válidos en BD:', list(Glaseado.objects.values_list('nombre', flat=True)))
                         raise Exception(f'Glaseado no encontrado para "{cobertura_nombre}"')
                     # --- TOPPING ---
                     topping = None
                     topping_nombre = item['topping']['nombre']
-                    if topping_nombre and topping_nombre.lower() != 'ninguno':
-                        topping = Topping.objects.filter(nombre__iexact=topping_nombre).first()
+                    topping_nombre_norm = normalizar(topping_nombre)
+                    topping_nombre_db = TOPPING_MAP.get(topping_nombre_norm, topping_nombre)
+                    if topping_nombre_db and topping_nombre_db.lower() != 'ninguno':
+                        topping = Topping.objects.filter(nombre__iexact=topping_nombre_db).first()
                         if not topping:
-                            topping = Topping.objects.filter(nombre__icontains=topping_nombre).first()
+                            topping = Topping.objects.filter(nombre__icontains=topping_nombre_db).first()
                         if not topping:
-                            print('No se encontró Topping para:', topping_nombre)
+                            print('No se encontró Topping para:', topping_nombre, '| Normalizado:', topping_nombre_norm)
                             print('Nombres válidos en BD:', list(Topping.objects.values_list('nombre', flat=True)))
                             raise Exception(f'Topping no encontrado para "{topping_nombre}"')
                     CombinacionProducto.objects.create(
@@ -495,7 +521,7 @@ def procesar_compra(request):
                     )
                     print('CombinacionProducto creada')
                 except Exception as e:
-                    print('Error creando CombinacionProducto:', e)
+                    print(f'Error creando CombinacionProducto para producto {producto} (masa: {masa_nombre}, cobertura: {cobertura_nombre}, topping: {topping_nombre}):', e)
 
             # 3. Crear el pago
             Pago.objects.create(
@@ -982,9 +1008,6 @@ def reporte_usuarios_pdf(request):
     roles = ['ADMIN', 'CLIENTE', 'DOMI']
     conteo_roles = [Usuario.objects.filter(rol=rol).count() for rol in roles]
 
-    # Generar gráfico con matplotlib
-    plt.figure(figsize=(6, 4))
-    plt.bar(roles, conteo_roles, color=['red', 'blue', 'green'])
     plt.title('Usuarios por Rol')
     plt.xlabel('Rol')
     plt.ylabel('Cantidad')
@@ -1078,5 +1101,5 @@ def eliminar_usuario(request, cod_usuario):
       usuario = get_object_or_404(Usuario, pk=cod_usuario)
       usuario.delete()
       return redirect(request.META.get('HTTP_REFERER', '/'))
-      return redirect(request.META.get('HTTP_REFERER', '/')) 
-  
+      return redirect(request.META.get('HTTP_REFERER', '/'))
+
