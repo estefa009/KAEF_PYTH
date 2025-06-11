@@ -897,10 +897,81 @@ def ventas_admin(request):
     ventas = Venta.objects.all().order_by('-fecha_hora')
     total_ventas = ventas.aggregate(Sum('total'))['total__sum'] or 0
     
-    return render(request, 'admin/ventas_admin.html', {
+    return render(request, 'admin/ventas/ventas_admin.html', {
         'ventas': ventas,
         'total_ventas': total_ventas
     })
+    
+# views.py
+from django.shortcuts import render, redirect
+from django.forms import modelformset_factory
+from .models import Venta, DetalleVenta, Pago, CombinacionProducto
+from .forms import VentaForm, DetalleVentaForm, PagoForm, CombinacionProductoForm
+from django.db import transaction
+from  decimal import Decimal
+def agregar_venta_completa(request):
+    DetalleFormSet = modelformset_factory(DetalleVenta, form=DetalleVentaForm, extra=1)
+    CombinacionFormSet = modelformset_factory(CombinacionProducto, form=CombinacionProductoForm, extra=1)
+
+    if request.method == 'POST':
+        venta_form = VentaForm(request.POST)
+        detalle_formset = DetalleFormSet(request.POST, prefix='detalle')
+        combinacion_formset = CombinacionFormSet(request.POST, prefix='combo')
+        pago_form = PagoForm(request.POST)
+
+        if venta_form.is_valid() and detalle_formset.is_valid() and pago_form.is_valid() and combinacion_formset.is_valid():
+            with transaction.atomic():
+                venta = venta_form.save(commit=False)
+
+                # Calcular totales
+                subtotal = sum([
+                    form.cleaned_data['precio_unitario'] * form.cleaned_data['cantidad']
+                    for form in detalle_formset
+                ])
+                iva = subtotal * Decimal (0.19)
+                total = subtotal + iva
+
+                venta.subtotal = subtotal
+                venta.iva = iva
+                venta.total = total
+                venta.save()
+
+                for form in detalle_formset:
+                    detalle = form.save(commit=False)
+                    detalle.cod_venta = venta
+                    detalle.save()
+
+                for form, detalle_form in zip(combinacion_formset, detalle_formset):
+                    combinacion = form.save(commit=False)
+                    combinacion.cod_venta = venta
+                    combinacion.cod_producto = detalle_form.cleaned_data['cod_producto']
+                    combinacion.save()
+
+                pago = pago_form.save(commit=False)
+                pago.cod_venta = venta
+                pago.monto_total = total
+                pago.save()
+
+            return redirect('ventas_admin')
+
+    else:
+        venta_form = VentaForm()
+        detalle_formset = DetalleFormSet(queryset=DetalleVenta.objects.none(), prefix='detalle')
+        combinacion_formset = CombinacionFormSet(queryset=CombinacionProducto.objects.none(), prefix='combo')
+        pago_form = PagoForm()
+
+    return render(request, 'admin/ventas/agregar_venta_completa.html', {
+        'venta_form': venta_form,
+        'detalle_formset': detalle_formset,
+        'combinacion_formset': combinacion_formset,
+        'pago_form': pago_form,
+    })
+
+
+
+
+
+
 
 # Vista de Producción
 @login_required

@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Usuario, Cliente
+from .models import Usuario, Cliente,  Venta
 
 class RegistroUsuarioForm(UserCreationForm):
     password1 = forms.CharField(
@@ -143,3 +143,30 @@ class CambiarContrasenaForm(PasswordChangeForm):
         label='Confirmar nueva contraseña',
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
     )
+    
+# forms.py
+from django import forms
+from .models import Venta, DetalleVenta, Pago, CombinacionProducto
+
+class VentaForm(forms.ModelForm):
+    class Meta:
+        model = Venta
+        exclude = ['subtotal', 'iva', 'total']
+
+class DetalleVentaForm(forms.ModelForm):
+    class Meta:
+        model = DetalleVenta
+        fields = ['cod_producto', 'cantidad', 'precio_unitario', 'fecha_entrega']
+        widgets = {
+            'fecha_entrega': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
+
+class CombinacionProductoForm(forms.ModelForm):
+    class Meta:
+        model = CombinacionProducto
+        fields = ['cod_sabor_masa_1', 'cod_glaseado_1', 'cod_topping_1']
+
+class PagoForm(forms.ModelForm):
+    class Meta:
+        model = Pago
+        exclude = ['cod_venta', 'estado_pago', 'transaccion_id']
