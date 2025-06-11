@@ -15,8 +15,8 @@ const colores = {
         'red-velvet': '#952d30'
     },
     cobertura: {
-        'chocolate-blanco': '#f0e0c0',
-        'chocolate-oscuro': '#5C4033',
+        'choc-blanco': '#f0e0c0',
+        'choc-oscuro': '#5C4033',
         'arequipe': '#D4A76A'
     },
     toppings: {
@@ -347,7 +347,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Toma los datos del botón
-        const cod_producto = this.dataset.codProducto;
+        const cod_producto = Number(this.dataset.codProducto);
         const precio = parseFloat(this.dataset.precio);
 
         const producto = {
@@ -376,15 +376,18 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        const cod_producto = Number(this.dataset.codProducto);
+        const precio = parseFloat(this.dataset.precio);
+
         const producto = {
             id: `M-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
-            cod_producto: "{{producto.cod_producto}}", // <-- este valor debe venir del backend
+            cod_producto: cod_producto,
             tipo: 'combo-dona',
             talla: 'M',
             masa: selecciones.masa,
             cobertura: selecciones.cobertura,
             topping: selecciones.topping,
-            precio: 16806.72,
+            precio: precio,
             titulo: 'Donas Talla M',
             descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
             quantity: 1,
@@ -402,15 +405,18 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        const cod_producto = Number(this.dataset.codProducto);
+        const precio = parseFloat(this.dataset.precio);
+
         const producto = {
             id: `L-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
-            cod_producto: "{{producto.cod_producto}}", // <-- este valor debe venir del backend
+            cod_producto: cod_producto,
             tipo: 'combo-dona',
             talla: 'L',
             masa: selecciones.masa,
             cobertura: selecciones.cobertura,
             topping: selecciones.topping,
-            precio: 25210.08,
+            precio: precio,
             titulo: 'Donas Talla L',
             descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
             quantity: 1,
@@ -427,15 +433,18 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        const cod_producto = Number(this.dataset.codProducto);
+        const precio = parseFloat(this.dataset.precio);
+
         const producto = {
             id: `XL-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
-            cod_producto: "{{producto.cod_producto}}", // <-- este valor debe venir del backend
+            cod_producto: cod_producto,
             tipo: 'combo-dona',
             talla: 'XL',
             masa: selecciones.masa,
             cobertura: selecciones.cobertura,
             topping: selecciones.topping,
-            precio: 33613.45,
+            precio: precio,
             titulo: 'Donas Talla XL',
             descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
             quantity: 1,
@@ -556,24 +565,67 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', functio
         fechaEntrega = prompt(`La fecha debe ser al menos ${minDateStr}.\nPor favor ingresa una fecha válida para la entrega (AAAA-MM-DD):`);
         if (!fechaEntrega) return;
     }
+    // Obtener método de pago seleccionado
+    const metodoPagoSeleccionado = document.querySelector('input[name="metodo_pago"]:checked')?.value;
+    // Obtener número de referencia según método de pago
+    let referenciaPago = '';
+    if (metodoPagoSeleccionado === 'NEQUI') {
+        referenciaPago = document.querySelector('#contenedorNequi .nroReferencia')?.value.trim();
+    } else if (metodoPagoSeleccionado === 'DAVIPLATA') {
+        referenciaPago = document.querySelector('#contenedorDavi .nroReferencia')?.value.trim();
+    }
 
+    // Validar campos de pago
+    if (!metodoPagoSeleccionado) {
+        alert('Debes seleccionar un método de pago.');
+        return;
+    }
+    if (!referenciaPago || referenciaPago.length < 4) {
+        alert('Debes digitar un número de referencia válido (mínimo 4 dígitos).');
+        return;
+    }
     // Ahora puedes usar direccion y fechaEntrega
+   const payload = {
+    carrito: cart,
+    direccion: direccion,
+    fecha_entrega: fechaEntrega,
+    metodo_pago: metodoPagoSeleccionado,
+    transaccion_id: referenciaPago
+};
+    console.log('Enviando fetch a /procesar_compra/ con:', payload);
+    alert('Enviando datos al backend. Revisa consola para detalles.');
+    
+    // Validar método de pago y referencia
+    if (!payload.metodo_pago || !payload.transaccion_id) {
+        alert('Falta seleccionar método de pago o referencia de pago.');
+        return;
+    }
+    
     fetch('/procesar_compra/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': getCookie('csrftoken')
         },
-        body: JSON.stringify({
-            carrito: cart,
-            direccion: direccion,
-            fecha_entrega: fechaEntrega, // <-- agrega esto
-            metodo_pago: metodoPagoSeleccionado,
-            transaccion_id: referenciaPago
-        })
+        body: JSON.stringify(payload)
     })
-        .then(response => response.json())
+        .then(async response => {
+            console.log('Respuesta recibida del backend:', response);
+            if (!response.ok) {
+                let text = await response.text();
+                alert('Respuesta HTTP no OK: ' + response.status + '\n' + text);
+                throw new Error('HTTP ' + response.status + ': ' + text);
+            }
+            try {
+                return await response.json();
+            } catch (e) {
+                alert('La respuesta no es JSON válido: ' + e);
+                throw e;
+            }
+        })
         .then(data => {
+            console.log('Respuesta JSON del backend:', data);
+            alert('Respuesta del backend: ' + JSON.stringify(data));
             if (data.success) {
                 localStorage.removeItem('cart');
                 showHTML();
@@ -618,8 +670,9 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', functio
             }
         })
         .catch(error => {
-            alert('Ocurrió un error al procesar la compra');
-            console.error(error);
+            alert('Ocurrió un error al procesar la compra: ' + error);
+            document.body.insertAdjacentHTML('beforeend', `<div style="color:red; background:#fff3cd; border:1px solid #f5c6cb; padding:10px; position:fixed; top:10px; right:10px; z-index:9999;">Error: ${error}</div>`);
+            console.error('Error en fetch:', error);
         });
 });
 

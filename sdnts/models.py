@@ -292,6 +292,7 @@ class DetalleVenta(models.Model):
         on_delete=models.CASCADE,
         related_name='detalles_venta'
     )
+
     cantidad = models.IntegerField('cantidad', default=1)
     precio_unitario = models.DecimalField('precio unitario', max_digits=10, decimal_places=2)
     fecha_entrega = models.DateTimeField('fecha de entrega', default=timezone.now)  # <-- Obligatorio
@@ -591,7 +592,7 @@ class CarritoItem(models.Model):
     topping_seleccionado = models.CharField(max_length=50, blank=True, null=True)
     
     def subtotal(self):
-        return self.producto.precio * self.cantidad
+        return self.producto.prec_pro * self.cantidad
     
     def __str__(self):
         return f"{self.cantidad} x {self.producto.nombre}"

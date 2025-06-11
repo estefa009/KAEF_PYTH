@@ -52,13 +52,21 @@
                     <button class="botonPagar shadow" id="btnPagar">PAGAR</button>
                     <div id="modalP" class="modal hidden">
                         <div class="modal-contentP">    
-                            <div class="miacolucci">
+                            <div class="miacolucci">  <!-- DIVA -->
                                 <div class="metodoPago">
                                     <h1 id="modal-title">Método de Pago:</h1>
-                                    <div class="nequi-container shadow">
+                                    <div class="opciones-metodo-pago" style="margin-bottom: 15px;">
+                                        <label style="margin-right: 20px;">
+                                            <input type="radio" name="metodo_pago" value="NEQUI" id="radioNequi" checked> Nequi
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="metodo_pago" value="DAVIPLATA" id="radioDavi"> Daviplata
+                                        </label>
+                                    </div>
+                                    <div id="contenedorNequi" class="nequi-container shadow">
                                         <div class="formas">
                                             <h1>N. de referencia:</h1>
-                                            <input type="text" name="txtCorreo" class="nroReferencia shadow" placeholder="Digita el N. de tu pago" required maxlength="10">
+                                            <input type="text" name="txtReferenciaNequi" class="nroReferencia shadow" placeholder="Digita el N. de tu pago" required maxlength="10">
                                             <h2>(Click al logo para info Nequi)</h2>
                                         </div>
                                         <div class="logo-nequi" onclick="openModal('modalNequiSpecific')">
@@ -76,10 +84,10 @@
                                             <img class="nequiQR" src="{% static 'Image/nequiQR.jpg' %}">
                                         </div>
                                     </div>
-                                    <div class="davi-container shadow">
+                                    <div id="contenedorDavi" class="davi-container shadow" style="display:none;">
                                         <div class="formas">
                                             <h1>N. de referencia:</h1>
-                                            <input type="text" name="txtCorreo" class="nroReferencia shadow" placeholder="Digita el N. de tu pago" required maxlength="10">
+                                            <input type="text" name="txtReferenciaDavi" class="nroReferencia shadow" placeholder="Digita el N. de tu pago" required maxlength="10">
                                             <h2>(Click al logo para info Davi)</h2>
                                         </div>
                                         <div class="logo-davi" onclick="openModal('modalDaviSpecific')">
@@ -140,6 +148,24 @@ document.getElementById('okCompraExitosa')?.addEventListener('click', function()
     document.getElementById('modalCompraExitosa').style.display = 'none';
     location.reload();
 });
+
+// Mostrar/ocultar contenedores según el método de pago seleccionado
+function actualizarMetodoPago() {
+    const radioNequi = document.getElementById('radioNequi');
+    const radioDavi = document.getElementById('radioDavi');
+    const contenedorNequi = document.getElementById('contenedorNequi');
+    const contenedorDavi = document.getElementById('contenedorDavi');
+    if (radioNequi.checked) {
+        contenedorNequi.style.display = '';
+        contenedorDavi.style.display = 'none';
+    } else if (radioDavi.checked) {
+        contenedorNequi.style.display = 'none';
+        contenedorDavi.style.display = '';
+    }
+}
+document.getElementById('radioNequi').addEventListener('change', actualizarMetodoPago);
+document.getElementById('radioDavi').addEventListener('change', actualizarMetodoPago);
+document.addEventListener('DOMContentLoaded', actualizarMetodoPago);
 </script>
                         </div>
                     </div>
