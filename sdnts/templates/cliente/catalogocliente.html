@@ -753,3 +753,32 @@
     <script src="{% static 'js/catalogo.js' %}"></script>
 </body>
 </html>
+
+<!-- Modal para Dirección de Entrega -->
+<div id="modalDireccion" class="modal hidden">
+  <div class="modal-content modal-content-small">
+    <span class="close" id="closeDireccion">&times;</span>
+    <div class="modal-form">
+      <h2>Dirección de entrega</h2>
+      <input type="text" id="inputDireccion" placeholder="Ingresa tu dirección" autocomplete="street-address" />
+      <div class="modal-form-buttons">
+        <button id="confirmDireccion" class="boton">Confirmar</button>
+        <button id="cancelDireccion" class="boton boton-cancelar">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal para Fecha de Entrega -->
+<div id="modalFecha" class="modal hidden">
+  <div class="modal-content modal-content-small">
+    <span class="close" id="closeFecha">&times;</span>
+    <div class="modal-form">
+      <h2>Fecha de entrega</h2>
+      <input type="date" id="inputFecha" min="{{ today|date:'Y-m-d' }}" />
+      <div class="modal-form-buttons">
+        <button id="confirmFecha" class="boton">Confirmar</button>
+        <button id="cancelFecha" class="boton boton-cancelar">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>

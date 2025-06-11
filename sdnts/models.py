@@ -562,29 +562,6 @@ class CombinacionProducto(models.Model):
         null=True
     )
 
-    # Segunda combinación (opcional)
-    cod_sabor_masa_2 = models.ForeignKey(
-        SaborMasa,
-        on_delete=models.CASCADE,
-        related_name='combinaciones_secundarias',
-        blank=True,
-        null=True
-    )
-    cod_glaseado_2 = models.ForeignKey(
-        Glaseado,
-        on_delete=models.CASCADE,
-        related_name='combinaciones_secundarias',
-        blank=True,
-        null=True
-    )
-    cod_topping_2 = models.ForeignKey(
-        Topping,
-        on_delete=models.SET_NULL,
-        related_name='combinaciones_secundarias',
-        blank=True,
-        null=True
-    )
-
     class Meta:
         verbose_name = 'Combinación de Producto'
         verbose_name_plural = 'Combinaciones de Productos'

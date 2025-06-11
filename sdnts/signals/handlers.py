@@ -68,18 +68,6 @@ def validar_combinacion_producto(sender, instance, **kwargs):
     Valida reglas de combinaciones según tamaño
     """
     producto = instance.cod_producto
-    
-    if producto.tamano in ['XS', 'S'] and any([
-        instance.cod_sabor_masa_2,
-        instance.cod_glaseado_2,
-        instance.cod_topping_2
-    ]):
-        raise ValidationError("Solo tallas M y L permiten combinaciones múltiples")
-    
-    if producto.tamano in ['M', 'L'] and not any([
-        instance.cod_sabor_masa_2,
-        instance.cod_glaseado_2,
-        instance.cod_topping_1,
-        instance.cod_topping_2
-    ]):
-        raise ValidationError("Tallas M y L deben tener al menos una combinación múltiple")
+    # Elimina validaciones de campos eliminados
+    # Si necesitas reglas por tamaño, actualízalas aquí según los campos actuales
+    pass

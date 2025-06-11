@@ -540,7 +540,87 @@ document.getElementById('equis')?.addEventListener('click', function () {
     document.getElementById('modalP').style.display = 'none';
 });
 
-document.getElementById('btnAgregarProducto')?.addEventListener('click', function (e) {
+// Helpers to show modals and get user input as Promise
+function getDireccionFromModal() {
+    return new Promise((resolve, reject) => {
+        const modal = document.getElementById('modalDireccion');
+        const input = document.getElementById('inputDireccion');
+        const confirm = document.getElementById('confirmDireccion');
+        const cancel = document.getElementById('cancelDireccion');
+        const close = document.getElementById('closeDireccion');
+
+        function cleanup() {
+            confirm.removeEventListener('click', onConfirm);
+            cancel.removeEventListener('click', onCancel);
+            close.removeEventListener('click', onCancel);
+            modal.classList.add('hidden');
+        }
+        function onConfirm(e) {
+            e.preventDefault();
+            if (input.value.trim()) {
+                cleanup();
+                resolve(input.value.trim());
+            } else {
+                input.focus();
+                input.classList.add('input-error');
+            }
+        }
+        function onCancel(e) {
+            e.preventDefault();
+            cleanup();
+            resolve(null);
+        }
+        input.classList.remove('input-error');
+        input.value = '';
+        modal.classList.remove('hidden');
+        input.focus();
+        confirm.addEventListener('click', onConfirm);
+        cancel.addEventListener('click', onCancel);
+        close.addEventListener('click', onCancel);
+    });
+}
+
+function getFechaFromModal(minDateStr) {
+    return new Promise((resolve, reject) => {
+        const modal = document.getElementById('modalFecha');
+        const input = document.getElementById('inputFecha');
+        const confirm = document.getElementById('confirmFecha');
+        const cancel = document.getElementById('cancelFecha');
+        const close = document.getElementById('closeFecha');
+
+        function cleanup() {
+            confirm.removeEventListener('click', onConfirm);
+            cancel.removeEventListener('click', onCancel);
+            close.removeEventListener('click', onCancel);
+            modal.classList.add('hidden');
+        }
+        function onConfirm(e) {
+            e.preventDefault();
+            if (input.value && input.value >= minDateStr) {
+                cleanup();
+                resolve(input.value);
+            } else {
+                input.focus();
+                input.classList.add('input-error');
+            }
+        }
+        function onCancel(e) {
+            e.preventDefault();
+            cleanup();
+            resolve(null);
+        }
+        input.classList.remove('input-error');
+        input.value = '';
+        input.setAttribute('min', minDateStr);
+        modal.classList.remove('hidden');
+        input.focus();
+        confirm.addEventListener('click', onConfirm);
+        cancel.addEventListener('click', onCancel);
+        close.addEventListener('click', onCancel);
+    });
+}
+
+document.getElementById('btnAgregarProducto')?.addEventListener('click', async function (e) {
     e.preventDefault();
 
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -549,7 +629,8 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', functio
         return;
     }
 
-    const direccion = prompt('¿A qué dirección deseas el envío?');
+    // Get address from modal
+    const direccion = await getDireccionFromModal();
     if (!direccion) return;
 
     // Calcular la fecha mínima (hoy + 3 días)
@@ -557,14 +638,10 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', functio
     const minDate = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + 3);
     const minDateStr = minDate.toISOString().split('T')[0];
 
-    let fechaEntrega = prompt(`¿Qué fecha deseas para la entrega? (Formato: AAAA-MM-DD)\nLa fecha mínima de entrega es: ${minDateStr}`);
+    // Get date from modal
+    let fechaEntrega = await getFechaFromModal(minDateStr);
     if (!fechaEntrega) return;
 
-    // Validar que la fecha sea válida y >= minDate
-    while (fechaEntrega < minDateStr) {
-        fechaEntrega = prompt(`La fecha debe ser al menos ${minDateStr}.\nPor favor ingresa una fecha válida para la entrega (AAAA-MM-DD):`);
-        if (!fechaEntrega) return;
-    }
     // Obtener método de pago seleccionado
     const metodoPagoSeleccionado = document.querySelector('input[name="metodo_pago"]:checked')?.value;
     // Obtener número de referencia según método de pago
@@ -691,8 +768,6 @@ function getCookie(name) {
     }
     return cookieValue;
 }
-
-// ...existing code...
 
 // Cerrar el modal de compra exitosa
 document.getElementById('cerrarModalCompra')?.addEventListener('click', function () {

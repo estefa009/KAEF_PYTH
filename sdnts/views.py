@@ -434,10 +434,12 @@ def procesar_compra(request):
 
             # 2. Crear los detalles de venta y combinaciones
             COBERTURA_MAP = {
-                normalizar("Chocolate Blanco"): "Choc. Blanco",
+                normalizar("Choco Blanco"): "Choc. Blanco",
                 normalizar("Choc Blanco"): "Choc. Blanco",
                 normalizar("Choc. Blanco"): "Choc. Blanco",
                 normalizar("choc-blanco"): "Choc. Blanco",
+                normalizar("Chocolate Blanco"): "Choc. Blanco",  # <-- Agregado
+                normalizar("chocolate blanco"): "Choc. Blanco",  # <-- Agregado
                 normalizar("Chocolate Oscuro"): "Choc. Oscuro",
                 normalizar("Choc Oscuro"): "Choc. Oscuro",
                 normalizar("Choc. Oscuro"): "Choc. Oscuro",

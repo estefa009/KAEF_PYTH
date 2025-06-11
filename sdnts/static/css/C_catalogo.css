@@ -1140,26 +1140,81 @@ border-radius: 100px;
     border-radius: 100px;
 }
 
-
-
-
-
-/* Estilos para los detalles del producto en el carrito */
-.detalles-producto-carrito {
-    padding: 0 15px 10px 15px;
-    font-size: 0.8em;
-    color: #666;
-    border-bottom: 1px solid #eee;
+/* Modales personalizados para dirección y fecha de entrega */
+.modal-content-small {
+    width: 350px;
+    max-width: 90vw;
+    border-radius: 40px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    position: relative;
 }
-
-.detalles-producto-carrito small {
-    display: inline-block;
-    margin: 2px 0;
+.modal-form {
+    padding: 32px 32px 24px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
 }
-
-.cart-product {
+.modal-form h2 {
+    font-family: "Dunkin";
+    color: #4e4032;
+    font-size: 28px;
     margin-bottom: 10px;
-    border-radius: 5px;
-    background: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.modal-form input[type="text"],
+.modal-form input[type="date"] {
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 30px;
+    border: 1.5px solid #ffc0cb;
+    font-size: 18px;
+    font-family: inherit;
+    margin-bottom: 10px;
+    background: #fff9f9;
+    color: #4e4032;
+    outline: none;
+    transition: border 0.2s;
+}
+.modal-form input[type="text"]:focus,
+.modal-form input[type="date"]:focus {
+    border: 2px solid #fc6998;
+}
+.modal-form-buttons {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    justify-content: flex-end;
+}
+.boton-cancelar {
+    background: #fff9f9;
+    color: #4e4032;
+    border: 2px solid #ffc0cb;
+}
+.boton-cancelar:hover {
+    background: #ffc0cb;
+    color: #fff;
+}
+#modalDireccion .close, #modalFecha .close {
+    position: absolute;
+    top: 18px;
+    right: 28px;
+    font-size: 24px;
+    color: #4e4032;
+    cursor: pointer;
+    z-index: 10;
+    border-radius: 50%;
+    background: #fff9f9;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+#modalDireccion .close:hover, #modalFecha .close:hover {
+    background: #ffc0cb;
+    color: #fff;
 }
