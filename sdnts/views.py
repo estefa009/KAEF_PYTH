@@ -40,9 +40,7 @@ from datetime import timedelta
 
 
 from django.contrib.auth import get_user_model
-# Si quieres guardar la combinación personalizada:
-from .models import SaborMasa, Glaseado, Topping, CombinacionProducto
-            
+
 # Context processors
 def nav_index(request):
     return render(request, 'includes/nav_index.html')
@@ -118,6 +116,21 @@ def registro(request):
     return render(request, 'auth/registro.html', {'form': form})
 
 
+@login_required
+def agregar_usuario(request):
+    if request.method == 'POST':
+        form = UsuarioForm(request.POST)  # Este formulario SÍ tiene campo 'rol'
+        if form.is_valid():
+            usuario = form.save()
+            enviar_correo_bienvenida_admin(usuario)
+            messages.success(request, "Usuario agregado exitosamente.")
+            return redirect('dashboard_admin')
+        else:
+         messages.error(request, 'Corrige los errores en el formulario.')
+    else: 
+        form = UsuarioForm()
+    return render(request, 'usuario/agregar_usuario.html', {'form': form})
+
 
 class CustomPasswordResetView(auth_views.PasswordResetView):
     template_name = 'auth/password_reset.html'
@@ -192,18 +205,9 @@ def logout_view(request):
 @login_required    
 def vistacliente(request):
     return render(request, 'cliente/vistacliente.html') 
-
+@login_required
 def catalogocliente(request):
-    masas = SaborMasa.objects.all()
-    coberturas = Glaseado.objects.all()
-    toppings = Topping.objects.all()
-    # ...otros contextos...
-    return render(request, 'cliente/catalogocliente.html', {
-        'masas': masas,
-        'coberturas': coberturas,
-        'toppings': toppings,
-        # ...otros contextos...
-    })
+    return render(request, 'cliente/catalogocliente.html')
 
 @login_required
 def contactanoscliente(request):
@@ -256,6 +260,22 @@ def editar_perfil(request):
         'editando': editando  # Solo para Opción 2
     })
     
+@login_required
+def agregar_usuario(request):
+    if request.method == 'POST':
+        form = UsuarioForm(request.POST)
+        if form.is_valid():
+            usuario = form.save(commit=False)
+            usuario.set_password(form.cleaned_data['password1'])
+            usuario.save()
+            messages.success(request, 'Usuario agregado exitosamente.')
+            return redirect('dashboard_admin')
+        else:
+            messages.error(request, 'Corrige los errores en el formulario.')
+    else:
+        form = UsuarioForm()
+    return render(request, 'usuarios/agregar_usuario.html', {'form': form})
+
 @login_required
 def agregar_al_carrito(request):
     if request.method == 'POST':
@@ -335,104 +355,93 @@ def actualizar_carrito(request):
     
     return JsonResponse({'success': False})
 
-
 from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-import json
-from .models import Venta, DetalleVenta, Producto, Cliente, Pago, SaborMasa, Glaseado, Topping, CombinacionProducto
 from django.utils import timezone
+from django.http import JsonResponse
 
+@login_required
 @csrf_exempt
 def procesar_compra(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        carrito = data.get('carrito', [])
-        direccion = data.get('direccion', '')
-        fecha_entrega = data.get('fecha_entrega')  # <-- corregido aquí
-        metodo_pago = data.get('metodo_pago', 'NEQUI')
-        transaccion_id = data.get('transaccion_id', '')
+        try:
+            data = json.loads(request.body)
+            carrito = data.get('carrito', [])
+            direccion = data.get('direccion', '')  # Puedes pedirla en el modal
+            observaciones = data.get('observaciones', '')
+        except Exception:
+            return JsonResponse({'success': False, 'error': 'Datos inválidos'}, status=400)
 
-        user = request.user if request.user.is_authenticated else None
-        cliente = Cliente.objects.get(cod_usua=user)
+        if not carrito:
+            return JsonResponse({'success': False, 'error': 'Carrito vacío'}, status=400)
 
-        subtotal = sum(item['precio'] * item['quantity'] for item in carrito)
-        iva = subtotal * 0.19
+        try:
+            cliente = request.user.cliente
+        except Exception:
+            return JsonResponse({'success': False, 'error': 'No es cliente'}, status=400)
+
+        subtotal = Decimal('0.00')
+        detalles = []
+
+        for item in carrito:
+            # Busca el producto por nombre y tamaño
+            talla = item.get('talla')
+            nombre = item.get('titulo')
+            cantidad = int(item.get('quantity', 1))
+            precio_unitario = Decimal(str(item.get('precio', 0)))
+            try:
+                producto = Producto.objects.get(nomb_pro=nombre, tamano=talla)
+            except Producto.DoesNotExist:
+                continue
+
+            detalles.append({
+                'producto': producto,
+                'cantidad': cantidad,
+                'precio_unitario': precio_unitario,
+            })
+            subtotal += precio_unitario * cantidad
+
+        iva = subtotal * Decimal('0.19')
         total = subtotal + iva
 
-        # 1. Crear la venta
         venta = Venta.objects.create(
             cod_cliente=cliente,
             subtotal=subtotal,
             iva=iva,
             total=total,
             direccion_entrega=direccion,
-            fecha_entrega=fecha_entrega,
-            fecha_hora=timezone.now()
+            observaciones=observaciones
         )
 
-        # 2. Crear los detalles de venta
-        for item in carrito:
-            producto = Producto.objects.filter(cod_producto=item['cod_producto']).first()
-            if not producto:
-                continue
-
+        for det in detalles:
             DetalleVenta.objects.create(
                 cod_venta=venta,
-                cod_producto=producto,
-                cantidad=item['quantity'],
-                precio_unitario=item['precio'],
-                fecha_entrega=fecha_entrega  # <-- agrega esto
+                cod_producto=det['producto'],
+                cantidad=det['cantidad'],
+                precio_unitario=det['precio_unitario']
             )
-
-            # Guardar la combinación personalizada
-            try:
-                masa = SaborMasa.objects.get(nombre__iexact=item['masa']['nombre'])
-                cobertura = Glaseado.objects.get(nombre__iexact=item['cobertura']['nombre'])
-                topping = Topping.objects.get(nombre__iexact=item['topping']['nombre'])
-                CombinacionProducto.objects.create(
-                    cod_venta=venta,
-                    cod_producto=producto,
-                    cod_sabor_masa_1=masa,
-                    cod_glaseado_1=cobertura,
-                    cod_topping_1=topping
-                )
-            except Exception:
-                pass
-
-        # 3. Crear el pago
-        Pago.objects.create(
-            cod_venta=venta,
-            metodo_pago=metodo_pago,
-            monto_total=total,
-            fecha_hora_pago=timezone.now(),
-            estado_pago='PENDIENTE',
-            transaccion_id=transaccion_id
-        )
-
-        # 4. Preparar detalles para la respuesta
-        detalles = DetalleVenta.objects.filter(cod_venta=venta)
-        detalle_list = []
-        for d in detalles:
-            detalle_list.append({
-                'producto': d.cod_producto.nomb_pro,
-                'cantidad': d.cantidad,
-                'precio_unitario': float(d.precio_unitario),
-                'subtotal': float(d.precio_unitario) * d.cantidad
-            })
 
         return JsonResponse({
             'success': True,
             'venta': {
-                'fecha': venta.fecha_hora.strftime('%d/%m/%Y %H:%M:%S'),
+                'id': venta.cod_venta,
+                'fecha': venta.fecha_hora.strftime('%Y-%m-%d %H:%M'),
+                'subtotal': str(subtotal),
+                'iva': str(iva),
+                'total': str(total),
                 'direccion': venta.direccion_entrega,
-                'subtotal': float(venta.subtotal),
-                'iva': float(venta.iva),
-                'total': float(venta.total),
-                'detalles': detalle_list
+                'detalles': [
+                    {
+                        'producto': str(det['producto']),
+                        'cantidad': det['cantidad'],
+                        'precio_unitario': str(det['precio_unitario']),
+                        'subtotal': str(det['precio_unitario'] * det['cantidad'])
+                    }
+                    for det in detalles
+                ]
             }
         })
-    return JsonResponse({'success': False, 'error': 'Método no permitido'})
 
+    return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
 
 @login_required
 def exportar_excel(request):
@@ -910,5 +919,5 @@ def eliminar_usuario(request, cod_usuario):
       usuario = get_object_or_404(Usuario, pk=cod_usuario)
       usuario.delete()
       return redirect(request.META.get('HTTP_REFERER', '/'))
-      return redirect(request.META.get('HTTP_REFERER', '/'))
-
+      return redirect(request.META.get('HTTP_REFERER', '/')) 
+  
