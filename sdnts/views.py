@@ -18,7 +18,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .forms import CargarDatosForm, PerfilAdminForm, CambiarContrasenaForm,UsuarioForm # Asume que tienes este formulario creado
+from .forms import CargarDatosForm, PerfilAdminForm, CambiarContrasenaForm, RegistroUsuarioForm,UsuarioForm # Asume que tienes este formulario creado
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from sdnts.models import SaborMasa, Glaseado, Topping, CombinacionProducto, Usuario
@@ -103,16 +103,30 @@ def login(request):
 
 def registro(request):
     if request.method == 'POST':
-        form = UsuarioForm(request.POST)
+        form = RegistroUsuarioForm(request.POST)  # Este formulario NO tiene campo 'rol'
         if form.is_valid():
-            usuario = form.save()  # Guarda el usuario y lo asigna a la variable
-            enviar_correo_bienvenida(usuario)  # Envía el correo al usuario recién creado
-            return redirect('login')  # Redirecciona al login
+            usuario = form.save(commit=False)
+            usuario.rol = 'CLIENTE'  # Asigna el rol por defecto
+            usuario.save()
+            enviar_correo_bienvenida(usuario)
+            return redirect('login')
     else:
-        form = UsuarioForm()
-    
+        form = RegistroUsuarioForm()
     return render(request, 'auth/registro.html', {'form': form})
 
+
+@login_required
+def agregar_usuario(request):
+    if request.method == 'POST':
+        form = UsuarioForm(request.POST)  # Este formulario SÍ tiene campo 'rol'
+        if form.is_valid():
+            usuario = form.save()
+            enviar_correo_bienvenida_admin(usuario)
+            messages.success(request, "Usuario agregado exitosamente.")
+            return redirect('dashboard_admin')
+    else:
+        form = UsuarioForm()
+    return render(request, 'usuario/agregar_usuario.html', {'form': form})
 
 
 class CustomPasswordResetView(auth_views.PasswordResetView):
@@ -156,7 +170,31 @@ def enviar_correo_bienvenida(usuario):
         html_message=mensaje_html
     )
     
-  
+def enviar_correo_bienvenida_admin(usuario):
+    asunto = '¡Bienvenido a StefasDonuts!'
+    mensaje_html = f'''
+    <h2>Hola {usuario.nom_usua}!</h2>
+    <p>Te damos la bienvenida a <strong>StefasDonuts</strong>.</p>
+    <p>Tus datos son:</p>
+    <ul>
+        <li><strong>Usuario:</strong> {usuario.nom_usua}</li>
+        <li><strong>Email:</strong> {usuario.email}</li>
+        <li><strong>Rol asignado:</strong> {usuario.rol}</li>
+    </ul>
+    <p>Puedes iniciar sesión aquí: 
+        <a href="http://127.0.0.1:8000{reverse('login')}">Iniciar sesión</a>
+    </p>
+    '''
+    mensaje_texto = strip_tags(mensaje_html)
+    send_mail(
+        asunto,
+        mensaje_texto,
+        settings.DEFAULT_FROM_EMAIL,
+        [usuario.email],
+        html_message=mensaje_html
+    )
+    
+    
 @login_required   
 def logout_view(request):
     logout(request)

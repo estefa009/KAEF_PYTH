@@ -2,7 +2,47 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import Usuario, Cliente
 
+class RegistroUsuarioForm(UserCreationForm):
+    password1 = forms.CharField(
+        label='Contraseña',
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Contraseña',
+            'class': 'form-control shadow'
+        })
+    )
+    password2 = forms.CharField(
+        label='Confirmar Contraseña',
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Confirmar Contraseña',
+            'class': 'form-control shadow'
+        })
+    )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.label = ''
+
+    class Meta:
+        model = Usuario
+        fields = ['email', 'nom_usua', 'apell_usua', 'tele_usua']
+        labels = {
+            'email': 'Correo Electrónico',
+            'nom_usua': 'Nombre',
+            'apell_usua': 'Apellido',
+            'tele_usua': 'Teléfono',
+        }
+        widgets = {
+            'email': forms.EmailInput(attrs={'placeholder': 'Correo Electrónico', 'class': 'form-control shadow'}),
+            'nom_usua': forms.TextInput(attrs={'placeholder': 'Nombre', 'class': 'form-control shadow'}),
+            'apell_usua': forms.TextInput(attrs={'placeholder': 'Apellido', 'class': 'form-control shadow'}),
+            'tele_usua': forms.TextInput(attrs={'placeholder': 'Teléfono', 'class': 'form-control shadow'}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        return cleaned_data
+    
 class UsuarioForm(UserCreationForm):
     password1 = forms.CharField(
         label='Contraseña',
