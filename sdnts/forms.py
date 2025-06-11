@@ -164,7 +164,23 @@ class DetalleVentaForm(forms.ModelForm):
 class CombinacionProductoForm(forms.ModelForm):
     class Meta:
         model = CombinacionProducto
-        fields = ['cod_sabor_masa_1', 'cod_glaseado_1', 'cod_topping_1']
+        fields = [
+            'cod_producto', 
+            'cod_sabor_masa_1', 'cod_glaseado_1', 'cod_topping_1',
+            'cod_sabor_masa_2', 'cod_glaseado_2', 'cod_topping_2'
+        ]
+        widgets = {
+            'cod_sabor_masa_2': forms.Select(attrs={'class': 'form-control'}),
+            'cod_glaseado_2': forms.Select(attrs={'class': 'form-control'}),
+            'cod_topping_2': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Hacemos opcionales los campos de la segunda combinación
+        self.fields['cod_sabor_masa_2'].required = False
+        self.fields['cod_glaseado_2'].required = False
+        self.fields['cod_topping_2'].required = False
 
 class PagoForm(forms.ModelForm):
     class Meta:
