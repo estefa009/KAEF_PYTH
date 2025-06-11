@@ -40,9 +40,7 @@ from datetime import timedelta
 
 
 from django.contrib.auth import get_user_model
-# Si quieres guardar la combinación personalizada:
-from .models import SaborMasa, Glaseado, Topping, CombinacionProducto
-            
+
 # Context processors
 def nav_index(request):
     return render(request, 'includes/nav_index.html')
@@ -127,7 +125,9 @@ def agregar_usuario(request):
             enviar_correo_bienvenida_admin(usuario)
             messages.success(request, "Usuario agregado exitosamente.")
             return redirect('dashboard_admin')
-    else:
+        else:
+         messages.error(request, 'Corrige los errores en el formulario.')
+    else: 
         form = UsuarioForm()
     return render(request, 'usuario/agregar_usuario.html', {'form': form})
 
@@ -205,7 +205,7 @@ def logout_view(request):
 @login_required    
 def vistacliente(request):
     return render(request, 'cliente/vistacliente.html') 
-
+@login_required
 def catalogocliente(request):
     masas = SaborMasa.objects.all()
     coberturas = Glaseado.objects.all()
@@ -227,6 +227,7 @@ def catalogocliente(request):
         'producto_xl': producto_xl,
         # ...otros contextos...
     })
+    return render(request, 'cliente/catalogocliente.html')
 
 @login_required
 def contactanoscliente(request):
@@ -374,13 +375,11 @@ def actualizar_carrito(request):
     
     return JsonResponse({'success': False})
 
-
 from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-import json
-from .models import Venta, DetalleVenta, Producto, Cliente, Pago, SaborMasa, Glaseado, Topping, CombinacionProducto
 from django.utils import timezone
+from django.http import JsonResponse
 
+@login_required
 @csrf_exempt
 def procesar_compra(request):
     import traceback
@@ -535,8 +534,84 @@ def procesar_compra(request):
             print('Error en procesar_compra:', e)
             traceback.print_exc()
             return JsonResponse({'success': False, 'error': str(e)})
-    return JsonResponse({'success': False, 'error': 'Método no permitido'})
+            return JsonResponse({'success': False, 'error': 'Método no permitido'})
+            carrito = data.get('carrito', [])
+            direccion = data.get('direccion', '')  # Puedes pedirla en el modal
+            observaciones = data.get('observaciones', '')
+        except Exception:
+            return JsonResponse({'success': False, 'error': 'Datos inválidos'}, status=400)
 
+        if not carrito:
+            return JsonResponse({'success': False, 'error': 'Carrito vacío'}, status=400)
+
+        try:
+            cliente = request.user.cliente
+        except Exception:
+            return JsonResponse({'success': False, 'error': 'No es cliente'}, status=400)
+
+        subtotal = Decimal('0.00')
+        detalles = []
+
+        for item in carrito:
+            # Busca el producto por nombre y tamaño
+            talla = item.get('talla')
+            nombre = item.get('titulo')
+            cantidad = int(item.get('quantity', 1))
+            precio_unitario = Decimal(str(item.get('precio', 0)))
+            try:
+                producto = Producto.objects.get(nomb_pro=nombre, tamano=talla)
+            except Producto.DoesNotExist:
+                continue
+
+            detalles.append({
+                'producto': producto,
+                'cantidad': cantidad,
+                'precio_unitario': precio_unitario,
+            })
+            subtotal += precio_unitario * cantidad
+
+        iva = subtotal * Decimal('0.19')
+        total = subtotal + iva
+
+        venta = Venta.objects.create(
+            cod_cliente=cliente,
+            subtotal=subtotal,
+            iva=iva,
+            total=total,
+            direccion_entrega=direccion,
+            observaciones=observaciones
+        )
+
+        for det in detalles:
+            DetalleVenta.objects.create(
+                cod_venta=venta,
+                cod_producto=det['producto'],
+                cantidad=det['cantidad'],
+                precio_unitario=det['precio_unitario']
+            )
+
+        return JsonResponse({
+            'success': True,
+            'venta': {
+                'id': venta.cod_venta,
+                'fecha': venta.fecha_hora.strftime('%Y-%m-%d %H:%M'),
+                'subtotal': str(subtotal),
+                'iva': str(iva),
+                'total': str(total),
+                'direccion': venta.direccion_entrega,
+                'detalles': [
+                    {
+                        'producto': str(det['producto']),
+                        'cantidad': det['cantidad'],
+                        'precio_unitario': str(det['precio_unitario']),
+                        'subtotal': str(det['precio_unitario'] * det['cantidad'])
+                    }
+                    for det in detalles
+                ]
+            }
+        })
+
+    return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
 
 @login_required
 def exportar_excel(request):
@@ -737,16 +812,22 @@ def dashboard_admin(request):
     total_usuarios = Usuario.objects.count()
     ventas_recientes = Venta.objects.order_by('-fecha_hora')[:5]
     produccion_reciente = Produccion.objects.order_by('-fecha_inicio')[:3]
-    
-    # Agregar los usuarios al contexto
-    usuarios = Usuario.objects.all()
-    
+
+    rol = request.GET.get('rol')  # Captura el rol desde el formulario
+
+    if rol:
+        usuarios = Usuario.objects.filter(rol=rol)
+    else:
+        usuarios = Usuario.objects.all()
+
     context = {
         'total_usuarios': total_usuarios,
         'ventas_recientes': ventas_recientes,
         'produccion_reciente': produccion_reciente,
-        'usuarios': usuarios,  # 👈 esto es lo que faltaba
+        'usuarios': usuarios,
+        'rol_actual': rol,  # para mantener el filtro seleccionado
     }
+
     return render(request, 'admin/dashboard_admin.html', context)
 
 
@@ -997,5 +1078,5 @@ def eliminar_usuario(request, cod_usuario):
       usuario = get_object_or_404(Usuario, pk=cod_usuario)
       usuario.delete()
       return redirect(request.META.get('HTTP_REFERER', '/'))
-      return redirect(request.META.get('HTTP_REFERER', '/'))
-
+      return redirect(request.META.get('HTTP_REFERER', '/')) 
+  

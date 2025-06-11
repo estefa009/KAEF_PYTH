@@ -1,12 +1,29 @@
 {% load static %}
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="container mt-4">
     <h2>Agregar Usuario</h2>
-    <form method="POST" action=""{% url 'agregar_usuario' %}"">
+    <form method="POST" action="{% url 'agregar_usuario' %}">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary">Guardar</button>
         <a href="{% url 'dashboard_admin' %}" class="btn btn-secondary">Cancelar</a>
     </form>
+    
+
 </div>
+
+<script>
+    {% if messages %}
+        {% for message in messages %}
+            Swal.fire({
+                icon: '{% if message.tags == "success" %}success{% elif message.tags == "error" %}error{% else %}info{% endif %}',
+                title: '{{ message }}',
+                showConfirmButton: false,
+                timer: 2500
+            });
+        {% endfor %}
+    {% endif %}
+</script>
 {% endblock %}
