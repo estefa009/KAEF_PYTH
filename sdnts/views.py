@@ -1,12 +1,16 @@
+#from .forms import UserProfileForm  # Agrega esta línea al inicio del archivo o antes de la vista
 import base64
 from datetime import timezone
-from urllib import response
+from django.core.mail import send_mail
+from django.conf import settings
+from django.urls import reverse
+from django.utils.html import strip_tags
 import openpyxl
 from django.shortcuts import render,redirect
 from django.contrib.auth import logout
 from sdnts.models import CategoriaInsumo, DetalleVenta, Entrada, Envio, Produccion, Proveedor, Salida, Usuario,Producto, Carrito, CarritoItem, Venta,Domiciliario
 from django.contrib.auth import views as auth_views
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 import json
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
@@ -14,7 +18,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .forms import CargarDatosForm, PerfilAdminForm, CambiarContrasenaForm,UsuarioForm # Asume que tienes este formulario creado
+from .forms import CargarDatosForm, PerfilAdminForm, CambiarContrasenaForm, RegistroUsuarioForm,UsuarioForm # Asume que tienes este formulario creado
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from sdnts.models import SaborMasa, Glaseado, Topping, CombinacionProducto, Usuario
@@ -36,6 +40,7 @@ from datetime import timedelta
 
 
 from django.contrib.auth import get_user_model
+
 # Context processors
 def nav_index(request):
     return render(request, 'includes/nav_index.html')
@@ -99,16 +104,30 @@ def login(request):
 
 def registro(request):
     if request.method == 'POST':
-        form = UsuarioForm(request.POST)
+        form = RegistroUsuarioForm(request.POST)  # Este formulario NO tiene campo 'rol'
         if form.is_valid():
-            form.save()
-            return redirect('login')  # o a donde necesites
+            usuario = form.save(commit=False)
+            usuario.rol = 'CLIENTE'  # Asigna el rol por defecto
+            usuario.save()
+            enviar_correo_bienvenida(usuario)
+            return redirect('login')
     else:
-        form = UsuarioForm()
-    
+        form = RegistroUsuarioForm()
     return render(request, 'auth/registro.html', {'form': form})
 
 
+@login_required
+def agregar_usuario(request):
+    if request.method == 'POST':
+        form = UsuarioForm(request.POST)  # Este formulario SÍ tiene campo 'rol'
+        if form.is_valid():
+            usuario = form.save()
+            enviar_correo_bienvenida_admin(usuario)
+            messages.success(request, "Usuario agregado exitosamente.")
+            return redirect('dashboard_admin')
+    else:
+        form = UsuarioForm()
+    return render(request, 'usuario/agregar_usuario.html', {'form': form})
 
 
 class CustomPasswordResetView(auth_views.PasswordResetView):
@@ -126,8 +145,57 @@ class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
 class CustomPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
     template_name = 'auth/password_reset.html'
     extra_context = {'etapa': 'completado'}
+        
     
-  
+def enviar_correo_bienvenida(usuario):
+    asunto = '¡Bienvenido a StefasDonuts!'
+    mensaje_html = f'''
+    <h2>Hola {usuario.nom_usua}!</h2>
+    <p>Te damos la bienvenida a <strong>StefasDonutsm</strong>.</p>
+    <p>Tus datos son:</p>
+    <ul>
+        <li><strong>Usuario:</strong> {usuario.nom_usua}</li>
+        <li><strong>Email:</strong> {usuario.email}</li>
+    </ul>
+    <p>Puedes iniciar sesión aquí: 
+        <a href="http://127.0.0.1:8000/{reverse('login')}">Iniciar sesión</a>
+    </p>
+    '''
+    mensaje_texto = strip_tags(mensaje_html)  # Por si el cliente de correo no soporta HTML
+
+    send_mail(
+        asunto,
+        mensaje_texto,
+        settings.DEFAULT_FROM_EMAIL,
+        [usuario.email],
+        html_message=mensaje_html
+    )
+    
+def enviar_correo_bienvenida_admin(usuario):
+    asunto = '¡Bienvenido a StefasDonuts!'
+    mensaje_html = f'''
+    <h2>Hola {usuario.nom_usua}!</h2>
+    <p>Te damos la bienvenida a <strong>StefasDonuts</strong>.</p>
+    <p>Tus datos son:</p>
+    <ul>
+        <li><strong>Usuario:</strong> {usuario.nom_usua}</li>
+        <li><strong>Email:</strong> {usuario.email}</li>
+        <li><strong>Rol asignado:</strong> {usuario.rol}</li>
+    </ul>
+    <p>Puedes iniciar sesión aquí: 
+        <a href="http://127.0.0.1:8000{reverse('login')}">Iniciar sesión</a>
+    </p>
+    '''
+    mensaje_texto = strip_tags(mensaje_html)
+    send_mail(
+        asunto,
+        mensaje_texto,
+        settings.DEFAULT_FROM_EMAIL,
+        [usuario.email],
+        html_message=mensaje_html
+    )
+    
+    
 @login_required   
 def logout_view(request):
     logout(request)
