@@ -8,7 +8,7 @@ from django.utils.html import strip_tags
 import openpyxl
 from django.shortcuts import render,redirect
 from django.contrib.auth import logout
-from sdnts.models import CategoriaInsumo, DetalleVenta, Entrada, Envio, Produccion, Proveedor, Salida, Usuario,Producto, Carrito, CarritoItem, Venta,Domiciliario
+from sdnts.models import CategoriaInsumo, DetalleVenta, Entrada, Envio, Produccion, Proveedor, Salida, Usuario,Producto, Carrito, CarritoItem, Venta,Domiciliario, Administrador, Cliente
 from django.contrib.auth import views as auth_views
 from django.urls import reverse, reverse_lazy
 import json
@@ -115,19 +115,6 @@ def registro(request):
         form = RegistroUsuarioForm()
     return render(request, 'auth/registro.html', {'form': form})
 
-
-@login_required
-def agregar_usuario(request):
-    if request.method == 'POST':
-        form = UsuarioForm(request.POST)  # Este formulario SÍ tiene campo 'rol'
-        if form.is_valid():
-            usuario = form.save()
-            enviar_correo_bienvenida_admin(usuario)
-            messages.success(request, "Usuario agregado exitosamente.")
-            return redirect('dashboard_admin')
-    else:
-        form = UsuarioForm()
-    return render(request, 'usuario/agregar_usuario.html', {'form': form})
 
 
 class CustomPasswordResetView(auth_views.PasswordResetView):
@@ -258,22 +245,6 @@ def editar_perfil(request):
         'editando': editando  # Solo para Opción 2
     })
     
-@login_required
-def agregar_usuario(request):
-    if request.method == 'POST':
-        form = UsuarioForm(request.POST)
-        if form.is_valid():
-            usuario = form.save(commit=False)
-            usuario.set_password(form.cleaned_data['password1'])
-            usuario.save()
-            messages.success(request, 'Usuario agregado exitosamente.')
-            return redirect('dashboard_admin')
-        else:
-            messages.error(request, 'Corrige los errores en el formulario.')
-    else:
-        form = UsuarioForm()
-    return render(request, 'usuarios/agregar_usuario.html', {'form': form})
-
 @login_required
 def agregar_al_carrito(request):
     if request.method == 'POST':
@@ -627,29 +598,46 @@ def agregar_usuario(request):
     if request.method == 'POST':
         form = UsuarioForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Usuario agregado exitosamente.")
-            return redirect('dashboard_admin')  # Redirige al dashboard admin
+            usuario = form.save()
+            rol = usuario.rol
+
+            if rol == 'ADMIN':
+                Administrador.objects.create(cod_usua=usuario, estado_admin='ACTIVO')
+            elif rol == 'CLIENTE':
+                Cliente.objects.create(cod_usua=usuario, direc_cliente='Sin dirección')
+            elif rol == 'DOMI':
+                Domiciliario.objects.create(cod_usua=usuario, disponibilidad=True)
+
+            messages.success(request, 'Usuario creado correctamente')
+            return redirect('dashboard_admin')
+        else:
+            messages.error(request, 'Error al crear el usuario')
     else:
         form = UsuarioForm()
 
-    return render(request, 'usuario/agregar_usuario.html', {'form': form})
+    return render(request, 'admin/agregar_usuario.html', {'form': form})
 
 @login_required
 def dashboard_admin(request):
     total_usuarios = Usuario.objects.count()
     ventas_recientes = Venta.objects.order_by('-fecha_hora')[:5]
     produccion_reciente = Produccion.objects.order_by('-fecha_inicio')[:3]
-    
-    # Agregar los usuarios al contexto
-    usuarios = Usuario.objects.all()
-    
+
+    rol = request.GET.get('rol')  # Captura el rol desde el formulario
+
+    if rol:
+        usuarios = Usuario.objects.filter(rol=rol)
+    else:
+        usuarios = Usuario.objects.all()
+
     context = {
         'total_usuarios': total_usuarios,
         'ventas_recientes': ventas_recientes,
         'produccion_reciente': produccion_reciente,
-        'usuarios': usuarios,  # 👈 esto es lo que faltaba
+        'usuarios': usuarios,
+        'rol_actual': rol,  # para mantener el filtro seleccionado
     }
+
     return render(request, 'admin/dashboard_admin.html', context)
 
 

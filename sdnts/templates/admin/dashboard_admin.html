@@ -69,6 +69,19 @@
                 <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
             </a>
 
+            <form method="GET" class="mb-3 d-flex align-items-center">
+                <label for="rol" class="me-2">Filtrar por rol:</label>
+                <select name="rol" id="rol" class="form-select me-2" style="width: auto;">
+                    <option value="">Todos</option>
+                    <option value="Administrador" {% if request.GET.rol == "Administrador" %}selected{% endif %}>Administrador</option>
+                    <option value="Cliente" {% if request.GET.rol == "Cliente" %}selected{% endif %}>Cliente</option>
+                    <option value="Domiciliario" {% if request.GET.rol == "Domiciliario" %}selected{% endif %}>Domiciliario</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Aplicar</button>
+            </form>
+
+
+
             <!-- Tabla de usuarios -->
             <div class="table-responsive">
                 <table class="table">
@@ -84,7 +97,8 @@
                                 <td>{{ usuario.nom_usua }}</td>
                                 <td>{{ usuario.apell_usua }}</td>
                                 <td>{{ usuario.email }}</td>
-                                <td>{{ usuario.rol }}</td>
+                                <td>{{ usuario.get_rol_display }}</td>
+
                                 <td>
                                     <a href="{% url 'editar_usuario' cod_usuario=usuario.cod_usuario %}" class="btn btn-rosa me-2">
                                         <i class="bi bi-pencil"></i> Editar
