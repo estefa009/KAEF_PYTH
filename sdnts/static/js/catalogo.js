@@ -87,13 +87,14 @@ function initModal(modalId, openButtonId, closeButtonClass, addToCartBtnId = nul
         }
     });
 
-      // Configurar selección de sabores para modales de combos
+    // Configurar selección de sabores para modales de combos
     if (size && ['S', 'M', 'L', 'XL'].includes(size)) {
         // Inicializar la vista previa con valores por defecto
         setTimeout(() => {
             configurarSeleccionSabores(modal, size);
             actualizarVistaPrevia(size); // Actualizar vista previa al abrir el modal
-        }, 100);}
+        }, 100);
+    }
 }
 
 function obtenerSeleccionesActuales(talla) {
@@ -102,7 +103,7 @@ function obtenerSeleccionesActuales(talla) {
         console.error('Modal no encontrado para talla:', talla);
         return null;
     }
-    
+
     // Buscar las opciones activas de manera más robusta
     const opcionesSeleccion = modal.querySelectorAll('.opcion-seleccion');
     let masaActive, coberturaActive, toppingActive;
@@ -119,7 +120,7 @@ function obtenerSeleccionesActuales(talla) {
     });
 
     if (!masaActive || !coberturaActive || !toppingActive) {
-        console.error('No se encontraron todas las selecciones:', {masaActive, coberturaActive, toppingActive});
+        console.error('No se encontraron todas las selecciones:', { masaActive, coberturaActive, toppingActive });
         return null;
     }
 
@@ -142,20 +143,20 @@ function obtenerSeleccionesActuales(talla) {
 function configurarSeleccionSabores(modal, size) {
     // Configurar eventos para los botones de selección de sabores
     const saborOptions = modal.querySelectorAll('.sabor-option');
-    
+
     saborOptions.forEach(option => {
-        option.addEventListener('click', function() {
+        option.addEventListener('click', function () {
             // Encontrar el contenedor padre de opciones
             const optionsContainer = this.closest('.sabor-options');
-            
+
             // Remover clase active de todos los hermanos
             optionsContainer.querySelectorAll('.sabor-option').forEach(el => {
                 el.classList.remove('active');
             });
-            
+
             // Agregar clase active al seleccionado
             this.classList.add('active');
-            
+
             // Actualizar vista previa
             actualizarVistaPrevia(size);
         });
@@ -185,15 +186,15 @@ function actualizarVistaPrevia(size) {
         console.log(`Actualizando cobertura ${size} a color:`, colorCobertura);
     }
 
-     // Actualizar topping - PARTE CORREGIDA
+    // Actualizar topping - PARTE CORREGIDA
     const toppingElement = document.getElementById(`dona-topping-${size}`);
     if (toppingElement) {
         const toppingValue = selecciones.topping.valor;
-        
+
         // Resetear estilos primero
         toppingElement.style.backgroundImage = 'none';
         toppingElement.style.backgroundColor = 'transparent';
-        
+
         if (toppingValue !== 'ninguno') {
             // Verificar si la imagen existe en el objeto colores
             if (colores.toppings[toppingValue]) {
@@ -218,7 +219,7 @@ function agregarAlCarrito(producto) {
     }
 
     // Verificar si el producto ya está en el carrito
-    const index = allProducts.findIndex(p => 
+    const index = allProducts.findIndex(p =>
         p.tipo === producto.tipo &&
         p.talla === producto.talla &&
         p.masa.valor === producto.masa.valor &&
@@ -238,10 +239,10 @@ function agregarAlCarrito(producto) {
 
     // Actualizar localStorage
     localStorage.setItem('cart', JSON.stringify(allProducts));
-    
+
     // Actualizar la vista
     showHTML();
-    
+
     // Mostrar notificación con detalles
     alert(`¡Agregado al carrito!\n${producto.titulo}\n${producto.descripcion}`);
 }
@@ -318,13 +319,13 @@ if (btnCart && containerCartProducts) {
 }
 
 // Inicialización cuando el DOM está listo
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Modales de combos
     initModal('modalS', 'btnAgregar', 'closeS', 'btnCerrarModalS', 'S');
     initModal('modalM', 'btnAgregarM', 'closeM', 'btnCerrarModalM', 'M');
     initModal('modalL', 'btnAgregarL', 'closeL', 'btnCerrarModalL', 'L');
     initModal('modalXL', 'btnAgregarXL', 'closeXL', 'btnCerrarModalXL', 'XL');
-    
+
     // Modales de información
     initModal('modalV', 'btnInfoV', 'closeV');
     initModal('modalC', 'btnInfoC', 'closeC');
@@ -339,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initModal('modalP', 'btnPagar', 'closeP');
 
     // Configurar eventos para los botones de agregar al carrito
-    document.getElementById('btnCerrarModalS')?.addEventListener('click', function() {
+    document.getElementById('btnCerrarModalS')?.addEventListener('click', function () {
         const selecciones = obtenerSeleccionesActuales('S');
         if (!selecciones) {
             alert('Por favor selecciona masa, cobertura y topping antes de agregar al carrito');
@@ -348,12 +349,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const producto = {
             id: `S-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
+            cod_producto: "{{producto.cod_producto}}", // <-- este valor debe venir del backend
             tipo: 'combo-dona',
             talla: 'S',
             masa: selecciones.masa,
             cobertura: selecciones.cobertura,
             topping: selecciones.topping,
-            precio: 10000,
+            precio: 8403,
             titulo: 'Donas Talla S',
             descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
             quantity: 1,
@@ -363,81 +365,83 @@ document.addEventListener('DOMContentLoaded', function() {
         agregarAlCarrito(producto);
 
 
-        
-// Evento para agregar Donas Talla M
-document.getElementById('btnCerrarModalM')?.addEventListener('click', function() {
-    const selecciones = obtenerSeleccionesActuales('M');
-    if (!selecciones) {
-        alert('Por favor selecciona masa, cobertura y topping antes de agregar al carrito');
-        return;
-    }
 
-    const producto = {
-        id: `M-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
-        tipo: 'combo-dona',
-        talla: 'M',
-        masa: selecciones.masa,
-        cobertura: selecciones.cobertura,
-        topping: selecciones.topping,
-        precio: 18000,
-        titulo: 'Donas Talla M',
-        descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
-        quantity: 1,
-        timestamp: Date.now()
-    };
+        // Evento para agregar Donas Talla M
+        document.getElementById('btnCerrarModalM')?.addEventListener('click', function () {
+            const selecciones = obtenerSeleccionesActuales('M');
+            if (!selecciones) {
+                alert('Por favor selecciona masa, cobertura y topping antes de agregar al carrito');
+                return;
+            }
 
-    agregarAlCarrito(producto);
-});
+            const producto = {
+                id: `M-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
+                cod_producto: "{{producto.cod_producto}}", // <-- este valor debe venir del backend
+                tipo: 'combo-dona',
+                talla: 'M',
+                masa: selecciones.masa,
+                cobertura: selecciones.cobertura,
+                topping: selecciones.topping,
+                precio: 16806,
+                titulo: 'Donas Talla M',
+                descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
+                quantity: 1,
+                timestamp: Date.now()
+            };
 
-// Evento para agregar Donas Talla L
-document.getElementById('btnCerrarModalL')?.addEventListener('click', function() {
-    const selecciones = obtenerSeleccionesActuales('L');
-    if (!selecciones) {
-        alert('Por favor selecciona masa, cobertura y topping antes de agregar al carrito');
-        return;
-    }
+            agregarAlCarrito(producto);
+        });
 
-    const producto = {
-        id: `L-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
-        tipo: 'combo-dona',
-        talla: 'L',
-        masa: selecciones.masa,
-        cobertura: selecciones.cobertura,
-        topping: selecciones.topping,
-        precio: 25000,
-        titulo: 'Donas Talla L',
-        descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
-        quantity: 1,
-        timestamp: Date.now()
-    };
+        // Evento para agregar Donas Talla L
+        document.getElementById('btnCerrarModalL')?.addEventListener('click', function () {
+            const selecciones = obtenerSeleccionesActuales('L');
+            if (!selecciones) {
+                alert('Por favor selecciona masa, cobertura y topping antes de agregar al carrito');
+                return;
+            }
 
-    agregarAlCarrito(producto);
-});
+            const producto = {
+                id: `L-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
+                cod_producto: "{{producto.cod_producto}}", // <-- este valor debe venir del backend
+                tipo: 'combo-dona',
+                talla: 'L',
+                masa: selecciones.masa,
+                cobertura: selecciones.cobertura,
+                topping: selecciones.topping,
+                precio: 25210,
+                titulo: 'Donas Talla L',
+                descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
+                quantity: 1,
+                timestamp: Date.now()
+            };
+            agregarAlCarrito(producto);
+        });
 
-// Evento para agregar Donas Talla XL
-document.getElementById('btnCerrarModalXL')?.addEventListener('click', function() {
-    const selecciones = obtenerSeleccionesActuales('XL');
-    if (!selecciones) {
-        alert('Por favor selecciona masa, cobertura y topping antes de agregar al carrito');
-        return;
-    }
+        // Evento para agregar Donas Talla XL
+        document.getElementById('btnCerrarModalXL')?.addEventListener('click', function () {
+            const selecciones = obtenerSeleccionesActuales('XL');
+            if (!selecciones) {
+                alert('Por favor selecciona masa, cobertura y topping antes de agregar al carrito');
+                return;
+            }
 
-    const producto = {
-        id: `XL-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
-        tipo: 'combo-dona',
-        talla: 'XL',
-        masa: selecciones.masa,
-        cobertura: selecciones.cobertura,
-        topping: selecciones.topping,
-        precio: 32000,
-        titulo: 'Donas Talla XL',
-        descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
-        quantity: 1,
-        timestamp: Date.now()
-    };
+            const producto = {
+                id: `XL-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
+                cod_producto: "{{producto.cod_producto}}", // <-- este valor debe venir del backend
+                tipo: 'combo-dona',
+                talla: 'XL',
+                masa: selecciones.masa,
+                cobertura: selecciones.cobertura,
+                topping: selecciones.topping,
+                precio: 33613,
+                titulo: 'Donas Talla XL',
+                descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
+                quantity: 1,
+                timestamp: Date.now()
+            };
 
-    agregarAlCarrito(producto);
-});
+            agregarAlCarrito(producto);
+        });
     });
 
     // Mostrar estado inicial del carrito
@@ -456,7 +460,7 @@ function closeModal(modalId) {
 }
 
 // Cerrar modales al hacer clic fuera
-window.addEventListener('click', function(event) {
+window.addEventListener('click', function (event) {
     const modals = document.querySelectorAll(".modal-nequi, .modal-davi");
     modals.forEach(modal => {
         if (event.target === modal) {
@@ -467,8 +471,49 @@ window.addEventListener('click', function(event) {
 
 
 // ...existing code...
+document.getElementById('btnPagar')?.addEventListener('click', function () {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let subtotal = cart.reduce((acc, item) => acc + item.precio * item.quantity, 0);
+    let iva = subtotal * 0.19;
+    let total = subtotal + iva;
 
-document.getElementById('btnAgregarProducto')?.addEventListener('click', function(e) {
+ // Factura con estilos Bootstrap tipo lista alineada
+let productosHTML = `
+    <div class="list-group mb-3">
+        ${cart.map(item => `
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>${item.titulo}</strong>
+                    <div class="text-muted small">${item.descripcion || ''}</div>
+                </div>
+                <div class="text-right">
+                    <div><b>Cant:</b> ${item.quantity}</div>
+                    <div><b>Unitario:</b> $${item.precio.toFixed(2)}</div>
+                    <div><b>Subtotal:</b> $${(item.precio * item.quantity).toFixed(2)}</div>
+                </div>
+            </div>
+        `).join('')}
+    </div>
+    <div class="text-right">
+        <b>Subtotal:</b> $${subtotal.toFixed(2)}<br>
+        <b>IVA (19%):</b> $${iva.toFixed(2)}<br>
+        <b>Total:</b> $${total.toFixed(2)}
+    </div>
+`;
+
+    document.querySelector('.productosPagar .cajita').innerHTML = productosHTML;
+    document.getElementById('total-pagar-modal').textContent = total.toFixed(2);
+
+    document.getElementById('modalP').classList.remove('hidden');
+    document.getElementById('modalP').style.display = 'flex';
+});
+
+// Cerrar el modal de pago (puedes tener un botón o la X)
+document.getElementById('equis')?.addEventListener('click', function () {
+    document.getElementById('modalP').style.display = 'none';
+});
+
+document.getElementById('btnAgregarProducto')?.addEventListener('click', function (e) {
     e.preventDefault();
 
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -477,7 +522,6 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', functio
         return;
     }
 
-    // Puedes pedir dirección y observaciones aquí si lo deseas
     const direccion = prompt('¿A qué dirección deseas el envío?');
     if (!direccion) return;
 
@@ -487,47 +531,53 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', functio
             'Content-Type': 'application/json',
             'X-CSRFToken': getCookie('csrftoken')
         },
-        body: JSON.stringify({ carrito: cart, direccion: direccion })
+        body: JSON.stringify({
+            carrito: cart,
+            direccion: direccion,
+            metodo_pago: metodoPagoSeleccionado, // 'NEQUI' o 'DAVIPLATA'
+            transaccion_id: referenciaPago // el número de referencia que ingresa el usuario
+        })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             localStorage.removeItem('cart');
             showHTML();
+            document.getElementById('modalP').style.display = 'none';
 
-            // Llenar la factura en el modal
+            // Factura final con estilos Bootstrap
             const venta = data.venta;
             let facturaHTML = `
                 <h3>Factura de Compra</h3>
                 <p><b>Fecha:</b> ${venta.fecha}</p>
                 <p><b>Dirección:</b> ${venta.direccion}</p>
-                <table style="width:100%;margin-bottom:10px;">
-                    <thead>
+                <table class="table table-bordered table-sm" style="margin-bottom:10px;">
+                    <thead class="thead-light">
                         <tr>
                             <th style="text-align:left;">Producto</th>
-                            <th>Cant.</th>
-                            <th>Unitario</th>
-                            <th>Subtotal</th>
+                            <th class="text-center">Cant.</th>
+                            <th class="text-right">Unitario</th>
+                            <th class="text-right">Subtotal</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${venta.detalles.map(det => `
                             <tr>
                                 <td>${det.producto}</td>
-                                <td style="text-align:center;">${det.cantidad}</td>
-                                <td style="text-align:right;">$${det.precio_unitario}</td>
-                                <td style="text-align:right;">$${det.subtotal}</td>
+                                <td class="text-center">${det.cantidad}</td>
+                                <td class="text-right">$${det.precio_unitario.toFixed(2)}</td>
+                                <td class="text-right">$${det.subtotal.toFixed(2)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
-                <p><b>Subtotal:</b> $${venta.subtotal}</p>
-                <p><b>IVA (19%):</b> $${venta.iva}</p>
-                <p><b>Total:</b> $${venta.total}</p>
+                <div class="text-right">
+                    <b>Subtotal:</b> $${venta.subtotal.toFixed(2)}<br>
+                    <b>IVA (19%):</b> $${venta.iva.toFixed(2)}<br>
+                    <b>Total:</b> $${venta.total.toFixed(2)}
+                </div>
             `;
-            document.querySelector('.infoTotalCarrito').innerHTML = facturaHTML;
-
-            // Mostrar el modal de compra exitosa
+            document.querySelector('#modalCompraExitosa .infoTotalCarrito').innerHTML = facturaHTML;
             document.getElementById('modalCompraExitosa').style.display = 'flex';
         } else {
             alert('Error al procesar la compra: ' + (data.error || ''));
@@ -558,6 +608,9 @@ function getCookie(name) {
 // ...existing code...
 
 // Cerrar el modal de compra exitosa
-document.getElementById('cerrarModalCompra')?.addEventListener('click', function() {
+document.getElementById('cerrarModalCompra')?.addEventListener('click', function () {
+    document.getElementById('modalCompraExitosa').style.display = 'none';
+});
+document.getElementById('okCompraExitosa')?.addEventListener('click', function () {
     document.getElementById('modalCompraExitosa').style.display = 'none';
 });
