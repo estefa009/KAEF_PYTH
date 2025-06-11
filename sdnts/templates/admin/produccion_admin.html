@@ -32,37 +32,22 @@
     </style>
 </head>
 <body>
-<!-- Botón de menú -->
-<button id="menuToggle" class="menu-toggle">
-    <i class="bi bi-list"></i>
-</button>
-
-
-<!-- Menú nav -->
-{% include "includes/_menu.html" %}
+    {% include "includes/nav_admin.html" %}
 
 <main>
-    {% if usuarioLogueado %}
-        <h4><p>Bienvenid@ {{ usuarioLogueado.nomUsua }}</p></h4>
-    {% endif %}
+        <h4><p>Bienvenid@ {{ user.nom_usua }} {{ user.apell_usua }}</p></h4>
 
-    <form id="searchForm" class="search-form">
-        <label style="margin-left: 300px;">
-            <input type="text" id="buscar" placeholder="Buscar..">
-            <button type="submit" style="border: none; background: none;"><i class="bi bi-search"></i></button>
-        </label>
-    </form>
 
     <!-- Menú de usuario -->
     <div class="d-flex align-items-center gap-3" style="margin-left: auto; margin-right: 40px;">
-        <li class="nav-item dropdown list-unstyled">
-            <a href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-person-circle" style="font-size: 30px; color: #333333"></i>
-            </a>
+            <li class="nav-item dropdown list-unstyled">
+                <a href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-circle" style="font-size: 30px; color: #333333"></i>
+                </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
-                <li><span class="dropdown-header">Administrador</span></li>
+                <li><span class="dropdown-header">Administrador  {{ user.nom_usua }}</span></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'perfil' %}">Perfil</a></li>
+                <li><a class="dropdown-item" href="{% url 'perfil_admin' %}">Perfil</a></li>
                 <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
             </ul>
         </li>
@@ -105,28 +90,31 @@
         <tbody>
             {% for produccion in producciones %}
             <tr>
-                <td>{{ produccion.id }}</td>
-                <td>{{ produccion.venta_id }}</td>
+                <td>{{ produccion.cod_produccion }}</td>
+                <td>{{ produccion.cod_venta.cod_venta }}</td>
                 <td>{{ produccion.fecha_inicio|date:"d/m/Y H:i" }}</td>
                 <td>
                     {% if produccion.fecha_fin %}
                         {{ produccion.fecha_fin|date:"d/m/Y H:i" }}
                     {% else %}
-                        -
+                        {% if produccion.estado == 'EN_PROCESO' %} En proceso
+                        {% elif produccion.estado == 'PENDIENTE' %} Pendiente
+                        {% else %} - {% endif %}
                     {% endif %}
                 </td>
+
                 <td>
                     <span class="status-badge 
                         {% if produccion.estado == 'PENDIENTE' %}status-pending
                         {% elif produccion.estado == 'EN_PROCESO' %}status-in-progress
-                        {% elif produccion.estado == 'COMPLETADA' %}status-completed
+                        {% elif produccion.estado == 'FINALIZADO' %}status-completed
                         {% else %}status-cancelled{% endif %}">
                         {{ produccion.estado }}
                     </span>
                 </td>
                 <td>{{ produccion.observaciones|default:"Sin observaciones" }}</td>
                 <td>
-                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                     <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
                             data-bs-target="#editarProduccionModal"
                             data-id="{{ produccion.id }}"
                             data-venta-id="{{ produccion.venta_id }}"
@@ -138,10 +126,21 @@
                             data-id="{{ produccion.id }}">
                         <i class="bi bi-arrow-repeat"></i>
                     </button>
+                    
+                    {% if produccion.estado == "FINALIZADO" %}
+                    <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal"
+                            data-bs-target="#asignarEnvioModal"
+                            data-id="{{ produccion.id }}">
+                        <i class="bi bi-truck"></i>
+                    </button>
+                    {% endif %}
+                    
                     <button class="btn btn-sm btn-outline-danger"
                             onclick="confirmDelete({{ produccion.id }})">
                         <i class="bi bi-trash"></i>
                     </button>
+                
+
                 </td>
             </tr>
             {% endfor %}
@@ -150,28 +149,117 @@
 </div>
 
 <!-- Modales -->
-{% include 'produccion/modals.html' %}
+    <!-- Modal: Registrar Producción -->
+<div class="modal fade" id="registrarProduccionModal" tabindex="-1" aria-labelledby="registrarProduccionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="post" action="{% url 'crear_produccion' %}">
+      {% csrf_token %}
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Registrar Producción</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="venta_id" class="form-label">Venta</label>
+            <select name="cod_venta" id="venta_id" class="form-select" required>
+              {% for venta in ventas_disponibles %}
+                <option value="{{ venta.cod_venta }}">#{{ venta.cod_venta }} - {{ venta.cliente.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="observaciones" class="form-label">Observaciones</label>
+            <textarea name="observaciones" class="form-control" rows="3" placeholder="Opcional"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-pink">Guardar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- Modal: Editar Producción -->
+<div class="modal fade" id="editarProduccionModal" tabindex="-1" aria-labelledby="editarProduccionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="post" action="{% url 'editar_produccion' %}">
+      {% csrf_token %}
+      <input type="hidden" name="cod_produccion" id="editProduccionId">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Producción</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="editObservaciones" class="form-label">Observaciones</label>
+            <textarea name="observaciones" id="editObservaciones" class="form-control" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-outline-primary">Actualizar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- Modal: Cambiar Estado -->
+<div class="modal fade" id="estadoModal" tabindex="-1" aria-labelledby="estadoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="post" action="{% url 'cambiar_estado_produccion' %}">
+      {% csrf_token %}
+      <input type="hidden" name="cod_produccion" id="estadoProduccionId">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Cambiar Estado</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <label for="estadoNuevo" class="form-label">Nuevo Estado</label>
+          <select name="estado" id="estadoNuevo" class="form-select">
+            <option value="PENDIENTE">Pendiente</option>
+            <option value="EN_PROCESO">En proceso</option>
+            <option value="FINALIZADO">Finalizado</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-outline-success">Cambiar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- Modal: Asignar Envío -->
+<div class="modal fade" id="asignarEnvioModal" tabindex="-1" aria-labelledby="asignarEnvioModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="post" action="{% url 'asignar_envio' %}">
+      {% csrf_token %}
+      <input type="hidden" name="cod_produccion" id="envioProduccionId">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Asignar Envío</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <label for="domiciliario_id" class="form-label">Domiciliario</label>
+          <select name="domiciliario_id" id="domiciliario_id" class="form-select" required>
+            {% for dom in domiciliarios %}
+              <option value="{{ dom.cod_domiciliario }}">{{ dom.nombre }} - {{ dom.telefono }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-outline-dark">Asignar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
 
 <!-- Scripts -->
 <script>
-    function searchTable() {
-        const input = document.getElementById('tableSearch');
-        const filter = input.value.toUpperCase();
-        const table = document.querySelector('.table');
-        const tr = table.getElementsByTagName('tr');
-
-        for (let i = 1; i < tr.length; i++) {
-            let found = false;
-            const td = tr[i].getElementsByTagName('td');
-            for (let j = 0; j < td.length; j++) {
-                if (td[j].innerHTML.toUpperCase().indexOf(filter) > -1) {
-                    found = true;
-                    break;
-                }
-            }
-            tr[i].style.display = found ? '' : 'none';
-        }
-    }
 
     document.getElementById('editarProduccionModal').addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
@@ -190,9 +278,16 @@
             window.location.href = `/produccion/delete/${id}`;
         }
     }
+
+    const envioModal = document.getElementById('asignarEnvioModal');
+    envioModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        document.getElementById('envioProduccionId').value = button.getAttribute('data-id');
+    });
+
+    
 </script>
 
 <!-- Scripts de menú -->
-{% include 'fragments/navs.html' with section='menu_js' %}
 </body>
 </html>

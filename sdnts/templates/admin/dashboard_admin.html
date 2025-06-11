@@ -11,6 +11,25 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="{% static 'css/admin.css' %}">
     <link rel="stylesheet" href="{% static 'css/menu.css' %}">
+<style>
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .status-pending { background-color: #FFF3CD; color: #856404; }
+        .status-in-progress { background-color: #CCE5FF; color: #004085; }
+        .status-completed { background-color: #D4EDDA; color: #155724; }
+        .status-cancelled { background-color: #F8D7DA; color: #721C24; }
+        .btn-pink {
+            background-color: #ff69b4;
+            color: white;
+        }
+        .btn-pink:hover {
+            background-color: #ff1493;
+            color: white;
+        }
+    </style>
 </head>
 
 <body>
@@ -19,16 +38,18 @@
         <h4><p>Bienvenid@ {{ user.nom_usua }} {{ user.apell_usua }}</p></h4>
 
                     <!-- Menú de usuario (dropdown) -->
-        <div class="dropdown ms-auto me-4 mt-3">
-            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-person-circle"></i> Admin
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
-                <li><span class="dropdown-header">Administrador</span></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'perfil_admin' %}">Perfil</a></li>
-                <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
-            </ul>
+        <div class="d-flex align-items-center gap-3" style="margin-left: auto; margin-right: 40px;">
+            <li class="nav-item dropdown list-unstyled">
+                <a href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-circle" style="font-size: 30px; color: #333333"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
+                    <li><span class="dropdown-header">Administrador {{ user.nom_usua }}</span></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'perfil_admin' %}">Perfil</a></li>
+                    <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
+                </ul>
+            </li>
         </div>
 
     </main>

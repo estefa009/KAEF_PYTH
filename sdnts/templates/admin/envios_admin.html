@@ -11,53 +11,56 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{% static 'css/envios.css' %}">
     <link rel="stylesheet" href="{% static 'css/menu.css' %}">
+<style>
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .status-pending { background-color: #FFF3CD; color: #856404; }
+        .status-in-progress { background-color: #CCE5FF; color: #004085; }
+        .status-completed { background-color: #D4EDDA; color: #155724; }
+        .status-cancelled { background-color: #F8D7DA; color: #721C24; }
+        .btn-pink {
+            background-color: #ff69b4;
+            color: white;
+        }
+        .btn-pink:hover {
+            background-color: #ff1493;
+            color: white;
+        }
+    </style>
+
 </head>
 <body>
 
 <!-- Menú -->
-{% include "includes/_menu.html" %}
+{% include "includes/nav_admin.html" %}
+    <main>
+        <h4><p>Bienvenid@ {{ user.nom_usua }} {{ user.apell_usua }}</p></h4>
 
-<main>
-    {% if usuarioLogueado %}
-        <h4>
-            <p>Bienvenid@ {{ usuarioLogueado.nomUsua }}</p>
-        </h4>
-    {% endif %}
+                    <!-- Menú de usuario (dropdown) -->
+        <div class="d-flex align-items-center gap-3" style="margin-left: auto; margin-right: 40px;">
+            <li class="nav-item dropdown list-unstyled">
+                <a href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-circle" style="font-size: 30px; color: #333333"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
+                    <li><span class="dropdown-header">Administrador {{ user.nom_usua }}</span></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'perfil_admin' %}">Perfil</a></li>
+                    <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
+                </ul>
+            </li>
+        </div>
 
-    <!-- Barra de búsqueda -->
-    <form id="searchForm" class="search-form">
-        <label style="margin-left: 300px;">
-            <input type="text" id="buscar" placeholder="Buscar..">
-            <button type="submit" style="border: none; background: none;"><i class="bi bi-search"></i></button>
-        </label>
-    </form>
-
-    <!-- Menú de usuario -->
-    <div class="d-flex align-items-center gap-3" style="margin-left: auto; margin-right: 40px;">
-        <li class="nav-item dropdown list-unstyled">
-            <a href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-person-circle" style="font-size: 30px; color: #333333"></i>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
-                <li><span class="dropdown-header">Administrador</span></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'perfil_admin' %}">Perfil</a></li>
-                <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
-            </ul>
-        </li>
-    </div>
-</main>
+    </main>
 
 <!-- Tabla de envíos -->
 <div class="table_envios">
     <br>
     <h4 class="ptable"><b>ENVÍOS</b></h4>
 
-    <!-- Barra de búsqueda y botones -->
-    <input type="text" class="buscador_tab" id="tableSearch" placeholder="Buscar...">
-    <button type="button" style="border: none; background: none;" class="boton-buscador mt-4" onclick="searchTable()">
-        <i class="bi bi-search"></i>
-    </button>
 
     <button style="border-radius: 20px" id="downloadPdf" class="btn btn-outline-danger mt-3">
         <i class="bi bi-file-earmark-pdf"></i>
@@ -119,6 +122,8 @@
     </table>
 </div>
 
+
+<!-- Modal Notificaciones 
 <!-- Modal Agregar Envío (puedes completarlo con tu formulario de Django) -->
 <div class="modal fade" id="modalAgregarEnvio" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -138,82 +143,11 @@
     </div>
 </div>
 
-<!-- Modal Editar Envío -->
-<div class="modal fade" id="modalEditarEnvio" tabindex="-1" aria-labelledby="modalEditarEnvioLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="{% url 'editar_envio' %}" method="post">
-                {% csrf_token %}
-                <div class="modal-header">
-                    <h5 class="modal-title">Editar Asignación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="edit_cod_asignacion" name="cod_asignacion">
-                    <div class="mb-3">
-                        <label for="edit_cod_admin" class="form-label">Código de Administrador</label>
-                        <input type="text" id="edit_cod_admin" name="cod_admin" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_cod_domi" class="form-label">Código de Domiciliario</label>
-                        <input type="text" id="edit_cod_domi" name="cod_domi" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_cod_producto" class="form-label">Código del Producto</label>
-                        <input type="number" id="edit_cod_producto" name="cod_producto" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_fecha_hora_asignada" class="form-label">Fecha Asignada</label>
-                        <input type="date" id="edit_fecha_hora_asignada" name="fecha_hora_asignada" class="form-control" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Actualizar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
-<!-- Scripts -->
-<script>
-    function confirmDelete(codAsignacion) {
-        if (confirm("¿Estás seguro de que deseas eliminar esta Asignación?")) {
-            window.location.href = "/envios/delete/" + codAsignacion + "/";
-        }
-    }
 
-    function editEnvio(codAsignacion, codAdmin, codDomi, codProducto, fechaHoraAsignada) {
-        document.getElementById('edit_cod_asignacion').value = codAsignacion;
-        document.getElementById('edit_cod_admin').value = codAdmin;
-        document.getElementById('edit_cod_domi').value = codDomi;
-        document.getElementById('edit_cod_producto').value = codProducto;
-        document.getElementById('edit_fecha_hora_asignada').value = fechaHoraAsignada;
-    }
 
-    function searchTable() {
-        const input = document.getElementById('tableSearch');
-        const filter = input.value.toUpperCase();
-        const table = document.querySelector('.table_envios table');
-        const tr = table.getElementsByTagName('tr');
-
-        for (let i = 1; i < tr.length; i++) {
-            let found = false;
-            const td = tr[i].getElementsByTagName('td');
-            for (let j = 0; j < td.length - 1; j++) {
-                if (td[j].textContent.toUpperCase().indexOf(filter) > -1) {
-                    found = true;
-                    break;
-                }
-            }
-            tr[i].style.display = found ? '' : 'none';
-        }
-    }
-</script>
-
-<!-- Scripts adicionales -->
-{% include "fragments/navs_js.html" %}
 
 </body>
 </html>
+
+

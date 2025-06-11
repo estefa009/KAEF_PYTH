@@ -24,6 +24,7 @@ from django.http import HttpResponse
 from weasyprint import HTML
 from django.template.loader import render_to_string
 from reportlab.pdfgen import canvas
+from django.db.models import Sum
 
 from decimal import Decimal
 
@@ -192,23 +193,18 @@ def editar_perfil(request):
 @login_required
 def agregar_usuario(request):
     if request.method == 'POST':
-        email = request.POST.get("email")
-        if Usuario.objects.filter(email=email).exists():
-            messages.error(request, "Ya existe un usuario con ese correo.")
+        form = UsuarioForm(request.POST)
+        if form.is_valid():
+            usuario = form.save(commit=False)
+            usuario.set_password(form.cleaned_data['password1'])
+            usuario.save()
+            messages.success(request, 'Usuario agregado exitosamente.')
             return redirect('dashboard_admin')
-
-        password = request.POST.get("passw_usua")
-        usuario = Usuario(
-            email=email,
-            nom_usua=request.POST.get("nom_usua"),
-            apell_usua=request.POST.get("apell_usua"),
-            tele_usua=request.POST.get("tele_usua"),
-            rol=request.POST.get("rol"),
-        )
-        usuario.set_password(password)
-        usuario.save()
-        messages.success(request, "Usuario agregado exitosamente.")
-        return redirect('dashboard_admin')
+        else:
+            messages.error(request, 'Corrige los errores en el formulario.')
+    else:
+        form = UsuarioForm()
+    return render(request, 'usuarios/agregar_usuario.html', {'form': form})
 
 @login_required
 def agregar_al_carrito(request):
@@ -565,7 +561,7 @@ def agregar_usuario(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Usuario agregado exitosamente.")
-            return redirect('admin/dashboard_admin')  # Redirige al dashboard admin
+            return redirect('dashboard_admin')  # Redirige al dashboard admin
     else:
         form = UsuarioForm()
 
@@ -626,10 +622,8 @@ def editarperfil_admin(request):
 # Vista de Ventas
 @login_required
 def ventas_admin(request):
-    # ✅ Corregido: usar 'fecha_hora' en lugar de 'fecha'
     ventas = Venta.objects.all().order_by('-fecha_hora')
-    # ✅ Corregido: usar 'total' en lugar de 'monto'
-    total_ventas = ventas.aggregate(sum('total'))['total__sum'] or 0
+    total_ventas = ventas.aggregate(Sum('total'))['total__sum'] or 0
     
     return render(request, 'admin/ventas_admin.html', {
         'ventas': ventas,

@@ -50,7 +50,7 @@
 
 
 <!-- Insertar menú nav -->
-{% include "includes/_menu.html" %}
+{% include "includes/nav_admin.html" %}
 
 <main>
     <h4>
@@ -76,7 +76,7 @@
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
                 <li><span class="dropdown-header">Administrador</span></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'admin_perfil' %}">Perfil</a></li>
+                <li><a class="dropdown-item" href="{% url 'perfil_admin' %}">Perfil</a></li>
                 <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
             </ul>
         </li>
@@ -356,7 +356,7 @@
                 <h5 class="modal-title">Registrar Nueva Venta</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{% url 'guardar_venta' %}" method="post">
+            <form action="{% url 'ventas_admin' %}" method="post">
                 {% csrf_token %}
                 <div class="modal-body">
                     <div class="row">
