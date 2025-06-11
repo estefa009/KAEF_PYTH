@@ -149,6 +149,7 @@ def contactanoscliente(request):
 def nosotroscliente(request):
     return render(request, 'cliente/nosotroscliente.html')
 
+@login_required
 def perfilcliente(request):
     usuario = request.user  # usuario autenticado
     try:
@@ -267,6 +268,7 @@ def ver_carrito(request):
         carrito = Carrito.objects.filter(session_key=session_key, completado=False).first() if session_key else None
     
     return render(request, 'includes/carrito.html', {'carrito': carrito})
+
 
 def actualizar_carrito(request):
     if request.method == 'POST':
@@ -399,23 +401,6 @@ def exportar_excel(request):
     wb.save(response)
     return response
 
-@login_required
-def exportar_pdf(request):
-    usuario = request.user
-    fecha_desde = request.GET.get('desde')
-    fecha_hasta = request.GET.get('hasta')
-
-    envios = Envio.objects.filter(cod_domi=usuario.domiciliario).order_by('fecha_entrega')
-
-    if fecha_desde not in [None, '', 'None']:
-        envios = envios.filter(fecha_entrega__date__gte=fecha_desde)
-
-    if fecha_hasta not in [None, '', 'None']:
-        envios = envios.filter(fecha_entrega__date__lte=fecha_hasta)
-
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="historial_envios.pdf"'
-    
     
 @login_required    
 def exportar_pdf(request):
@@ -453,36 +438,6 @@ def exportar_pdf(request):
     p.save()
     return response
 
-
-def exportar_excel(request):
-    usuario = request.user
-    fecha_desde = request.GET.get('desde')
-    fecha_hasta = request.GET.get('hasta')
-
-    envios = Envio.objects.filter(cod_domi=usuario.domiciliario)
-
-    if fecha_desde not in [None, '', 'None']:
-        envios = envios.filter(fecha_entrega__date__gte=fecha_desde)
-
-    if fecha_hasta not in [None, '', 'None']:
-        envios = envios.filter(fecha_entrega__date__lte=fecha_hasta)
-
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.append(["Código", "Fecha de Entrega", "Tarifa", "Estado"])
-
-    for envio in envios:
-        ws.append([
-            envio.cod_envio,
-            envio.fecha_entrega.strftime("%Y-%m-%d %H:%M") if envio.fecha_entrega else "Sin entregar",
-            envio.tarifa_envio,
-            envio.estado
-        ])
-
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename="historial_envios.xlsx"'
-    wb.save(response)
-    return response
 
 
 class NoCacheMiddleware:
