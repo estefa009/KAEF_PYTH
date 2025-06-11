@@ -72,6 +72,12 @@ urlpatterns = [
     path('envios_admin/', views.envios_admin, name='envios_admin'),
     path('insumos_admin/', views.insumos_admin, name='insumos_admin'),
     path('perfil_admin/', views.perfil_admin, name='perfil_admin'),
+    path('editarperfil_admin/', views.editarperfil_admin, name='editarperfil_admin'),
+    path('usuario/editar/<int:cod_usuario>/', views.editar_usuario, name='editar_usuario'),
+    path('agregar_usuario/', views.agregar_usuario, name='agregar_usuario'),
+
+    path('eliminar_usuario/<int:cod_usuario>/', views.eliminar_usuario, name='eliminar_usuario'),
+
     path('produccion_admin/', views.produccion_admin, name='produccion_admin'),
     path('proveedores_admin/', views.proveedores_admin, name='proveedores_admin'),
     path('salidas_admin/', views.salidas_admin, name='salidas_admin'),

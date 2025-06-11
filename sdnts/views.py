@@ -5,7 +5,6 @@ import openpyxl
 from django.shortcuts import render,redirect
 from django.contrib.auth import logout
 from sdnts.models import CategoriaInsumo, DetalleVenta, Entrada, Envio, Produccion, Proveedor, Salida, Usuario,Producto, Carrito, CarritoItem, Venta,Domiciliario
-from .forms import UsuarioForm, PerfilForm  # El punto (.) indica que es desde la misma app
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 import json
@@ -15,15 +14,16 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .forms import CargarDatosForm  # Asume que tienes este formulario creado
+from .forms import CargarDatosForm, PerfilAdminForm, CambiarContrasenaForm,UsuarioForm # Asume que tienes este formulario creado
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
-from sdnts.models import SaborMasa, Glaseado, Topping, CombinacionProducto
+from sdnts.models import SaborMasa, Glaseado, Topping, CombinacionProducto, Usuario
 import io
 import matplotlib.pyplot as plt
 from django.http import HttpResponse
 from weasyprint import HTML
 from django.template.loader import render_to_string
+from reportlab.pdfgen import canvas
 
 from decimal import Decimal
 
@@ -32,6 +32,7 @@ from datetime import timedelta
 from django.contrib.auth import update_session_auth_hash
 from django.utils import timezone
 from datetime import timedelta
+
 
 from django.contrib.auth import get_user_model
 # Context processors
@@ -63,6 +64,7 @@ def nosotros(request):
     
     return render(request, 'index/nosotros.html')
 
+
 def login(request):
     if request.method == 'POST':
         email = request.POST['email']
@@ -92,6 +94,7 @@ def login(request):
             return render(request, 'auth/login.html', {'error': 'Credenciales inválidas'})
     
     return render(request, 'auth/login.html')
+
 
 def registro(request):
     if request.method == 'POST':
@@ -123,17 +126,19 @@ class CustomPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
     template_name = 'auth/password_reset.html'
     extra_context = {'etapa': 'completado'}
     
-    
+  
+@login_required   
 def logout_view(request):
     logout(request)
     return redirect('login') 
-    
+@login_required    
 def vistacliente(request):
     return render(request, 'cliente/vistacliente.html') 
-
+@login_required
 def catalogocliente(request):
     return render(request, 'cliente/catalogocliente.html')
 
+@login_required
 def contactanoscliente(request):
     context = {
         'direccion': 'Cra 13 # 6510, Bogotá, Colombia',
@@ -182,8 +187,29 @@ def editar_perfil(request):
         'user': request.user,
         'editando': editando  # Solo para Opción 2
     })
+    
+@login_required
+def agregar_usuario(request):
+    if request.method == 'POST':
+        email = request.POST.get("email")
+        if Usuario.objects.filter(email=email).exists():
+            messages.error(request, "Ya existe un usuario con ese correo.")
+            return redirect('dashboard_admin')
 
+        password = request.POST.get("passw_usua")
+        usuario = Usuario(
+            email=email,
+            nom_usua=request.POST.get("nom_usua"),
+            apell_usua=request.POST.get("apell_usua"),
+            tele_usua=request.POST.get("tele_usua"),
+            rol=request.POST.get("rol"),
+        )
+        usuario.set_password(password)
+        usuario.save()
+        messages.success(request, "Usuario agregado exitosamente.")
+        return redirect('dashboard_admin')
 
+@login_required
 def agregar_al_carrito(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -349,6 +375,7 @@ def procesar_compra(request):
 
     return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
 
+@login_required
 def exportar_excel(request):
     usuario = request.user
     fecha_desde = request.GET.get('desde')
@@ -372,6 +399,7 @@ def exportar_excel(request):
     wb.save(response)
     return response
 
+@login_required
 def exportar_pdf(request):
     usuario = request.user
     fecha_desde = request.GET.get('desde')
@@ -389,7 +417,7 @@ def exportar_pdf(request):
     response['Content-Disposition'] = 'attachment; filename="historial_envios.pdf"'
     
     
-    
+@login_required    
 def exportar_pdf(request):
     usuario = request.user
     fecha_desde = request.GET.get('desde')
@@ -560,48 +588,86 @@ def editar_perfildomi(request):
 
 
 #administrador
+@login_required
+def editar_usuario(request, cod_usuario):
+    usuario = get_object_or_404(Usuario, cod_usuario=cod_usuario)
+
+    if request.method == 'POST':
+        form = UsuarioForm(request.POST, instance=usuario)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Usuario actualizado correctamente.")
+            return redirect('dashboard_admin')  # Redirige al dashboard admin
+    else:
+        form = UsuarioForm(instance=usuario)
+
+    return render(request, 'usuario/editar_usuario.html', {'form': form, 'usuario': usuario})
+
+@login_required
+def agregar_usuario(request):
+    if request.method == 'POST':
+        form = UsuarioForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Usuario agregado exitosamente.")
+            return redirect('admin/dashboard_admin')  # Redirige al dashboard admin
+    else:
+        form = UsuarioForm()
+
+    return render(request, 'usuario/agregar_usuario.html', {'form': form})
 
 @login_required
 def dashboard_admin(request):
-    # Datos para las tarjetas resumen
     total_usuarios = Usuario.objects.count()
-    # ✅ Corregido: usar 'fecha_hora' en lugar de 'fecha'
     ventas_recientes = Venta.objects.order_by('-fecha_hora')[:5]
-    # ✅ Corregido: usar 'fecha_inicio' en lugar de 'fecha'
     produccion_reciente = Produccion.objects.order_by('-fecha_inicio')[:3]
+    
+    # Agregar los usuarios al contexto
+    usuarios = Usuario.objects.all()
     
     context = {
         'total_usuarios': total_usuarios,
         'ventas_recientes': ventas_recientes,
         'produccion_reciente': produccion_reciente,
+        'usuarios': usuarios,  # 👈 esto es lo que faltaba
     }
     return render(request, 'admin/dashboard_admin.html', context)
 
 
 @login_required
 def perfil_admin(request):
-    # Get the current user's profile
-    user = request.user
-    
-    if request.method == 'POST':
-        # Process form data if it's a POST request
-        form = UserProfileForm(request.POST, instance=user)
-        if form.is_valid():
-            form.save()
-            # Add success message
-            messages.success(request, 'Perfil actualizado correctamente')
-            return redirect('perfil_admin')
-    else:
-        # Display form with current user data
-        form = UserProfileForm(instance=user)
-    
-    context = {
-        'user': user,
-        'form': form,
-    }
-    
-    return render(request, 'admin/perfil_admin.html', context)
+    usuario = request.user
+    return render(request, 'admin/perfil_admin.html', {'usuario': usuario})
 
+@login_required
+def editarperfil_admin(request):
+    usuario = request.user
+    perfil_form = PerfilAdminForm(instance=usuario)
+    password_form = CambiarContrasenaForm(user=usuario)
+
+    if request.method == 'POST':
+        if 'guardar_perfil' in request.POST:
+            perfil_form = PerfilAdminForm(request.POST, instance=usuario)
+            if perfil_form.is_valid():
+                perfil_form.save()
+                messages.success(request, 'Perfil actualizado correctamente.')
+                return redirect('perfil_admin')
+        
+        elif 'cambiar_contrasena' in request.POST:
+            password_form = CambiarContrasenaForm(user=usuario, data=request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)  # para que no cierre la sesión
+                messages.success(request, 'Contraseña cambiada correctamente.')
+                return redirect('perfil_admin')
+            else:
+                messages.error(request, 'Corrige los errores en el formulario de contraseña.')
+
+    return render(request, 'admin/editarperfil_admin.html', {
+        'perfil_form': perfil_form,
+        'password_form': password_form
+    })
+    
 # Vista de Ventas
 @login_required
 def ventas_admin(request):

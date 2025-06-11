@@ -1,0 +1,13 @@
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Editar Usuario: {{ usuario.nom_usua }} {{ usuario.apell_usua }}</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Actualizar</button>
+        <a href="{% url 'dashboard_admin' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

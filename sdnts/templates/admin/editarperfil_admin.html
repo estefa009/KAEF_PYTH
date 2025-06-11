@@ -1,0 +1,35 @@
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Editar Perfil del Administrador</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Información Personal</h4>
+            <form method="post">
+                {% csrf_token %}
+                {{ perfil_form.as_p }}
+                <button type="submit" name="guardar_perfil" class="btn btn-success">Guardar Cambios</button>
+                <a href="{% url 'perfil_admin' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+
+        <div class="col-md-6">
+            <h4>Cambiar Contraseña</h4>
+            <form method="post">
+                {% csrf_token %}
+                {{ password_form.as_p }}
+                <button type="submit" name="cambiar_contrasena" class="btn btn-warning">Cambiar Contraseña</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
