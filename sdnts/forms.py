@@ -144,49 +144,29 @@ class CambiarContrasenaForm(PasswordChangeForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
     )
     
+# forms.py
 from django import forms
-from .models import Venta, DetalleVenta, Pago
-from django.forms import inlineformset_factory
+from .models import Venta, DetalleVenta, Pago, CombinacionProducto
 
 class VentaForm(forms.ModelForm):
     class Meta:
         model = Venta
-        fields = ['cod_cliente', 'subtotal', 'iva', 'total', 'estado', 'direccion_entrega', 'observaciones']
-        widgets = {
-            'estado': forms.Select(attrs={'class': 'form-select'}),
-            'direccion_entrega': forms.TextInput(attrs={'class': 'form-control'}),
-            'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
-            'subtotal': forms.NumberInput(attrs={'class': 'form-control'}),
-            'iva': forms.NumberInput(attrs={'class': 'form-control'}),
-            'total': forms.NumberInput(attrs={'class': 'form-control'}),
-            'cod_cliente': forms.Select(attrs={'class': 'form-select'}),
-        }
+        exclude = ['subtotal', 'iva', 'total']
 
 class DetalleVentaForm(forms.ModelForm):
     class Meta:
         model = DetalleVenta
         fields = ['cod_producto', 'cantidad', 'precio_unitario', 'fecha_entrega']
         widgets = {
-            'cod_producto': forms.Select(attrs={'class': 'form-select'}),
-            'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
-            'precio_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
-            'fecha_entrega': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+            'fecha_entrega': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
 
-DetalleVentaFormSet = inlineformset_factory(
-    Venta, DetalleVenta,
-    form=DetalleVentaForm,
-    extra=1,
-    can_delete=False
-)
+class CombinacionProductoForm(forms.ModelForm):
+    class Meta:
+        model = CombinacionProducto
+        fields = ['cod_sabor_masa_1', 'cod_glaseado_1', 'cod_topping_1']
 
 class PagoForm(forms.ModelForm):
     class Meta:
         model = Pago
-        fields = ['metodo_pago', 'monto_total', 'estado_pago', 'transaccion_id']
-        widgets = {
-            'metodo_pago': forms.Select(attrs={'class': 'form-select'}),
-            'estado_pago': forms.Select(attrs={'class': 'form-select'}),
-            'monto_total': forms.NumberInput(attrs={'class': 'form-control'}),
-            'transaccion_id': forms.TextInput(attrs={'class': 'form-control'}),
-        }
+        exclude = ['cod_venta', 'estado_pago', 'transaccion_id']
