@@ -166,8 +166,7 @@ class CombinacionProductoForm(forms.ModelForm):
         model = CombinacionProducto
         fields = [
             'cod_producto', 
-            'cod_sabor_masa_1', 'cod_glaseado_1', 'cod_topping_1',
-            'cod_sabor_masa_2', 'cod_glaseado_2', 'cod_topping_2'
+            'cod_sabor_masa_1', 'cod_glaseado_1', 'cod_topping_1'
         ]
         widgets = {
             'cod_sabor_masa_2': forms.Select(attrs={'class': 'form-control'}),
