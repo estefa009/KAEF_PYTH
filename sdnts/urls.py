@@ -86,6 +86,9 @@ urlpatterns = [
     
     path('ventas_admin/', views.ventas_admin, name='ventas_admin'),
     path('ventas/completa/agregar/', views.agregar_venta_completa, name='agregar_venta_completa'),
+    path('ventas/<int:venta_id>/detalle/', views.detalle_ventas, name='detalle_ventas'),
+    path('ventas/<int:venta_id>/editar_estado/', views.editar_estado_venta, name='editar_estado_venta'),
+
 
     path('reporte-usuarios-pdf/', views.reporte_usuarios_pdf, name='reporte_usuarios_pdf'),
     path('guardar/', views.guardar_usuario, name='guardar_usuario'),
