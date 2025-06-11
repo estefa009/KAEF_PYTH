@@ -294,8 +294,8 @@ class DetalleVenta(models.Model):
     )
     cantidad = models.IntegerField('cantidad', default=1)
     precio_unitario = models.DecimalField('precio unitario', max_digits=10, decimal_places=2)
-    # Django no soporta directamente campos generados como en MySQL, se puede calcular con property
-    
+    fecha_entrega = models.DateTimeField('fecha de entrega', default=timezone.now)  # <-- Obligatorio
+
     class Meta:
         verbose_name = 'Detalle de Venta'
         verbose_name_plural = 'Detalles de Ventas'
@@ -545,36 +545,17 @@ class CombinacionProducto(models.Model):
         on_delete=models.CASCADE,
         related_name='combinaciones_primarias'
     )
-    cod_sabor_masa_2 = models.ForeignKey(
-        SaborMasa,
-        on_delete=models.SET_NULL,
-        related_name='combinaciones_secundarias',
-        blank=True,
-        null=True
-    )
+  
     cod_glaseado_1 = models.ForeignKey(
         Glaseado,
         on_delete=models.CASCADE,
         related_name='combinaciones_primarias'
     )
-    cod_glaseado_2 = models.ForeignKey(
-        Glaseado,
-        on_delete=models.SET_NULL,
-        related_name='combinaciones_secundarias',
-        blank=True,
-        null=True
-    )
+
     cod_topping_1 = models.ForeignKey(
         Topping,
         on_delete=models.SET_NULL,
         related_name='combinaciones_primarias',
-        blank=True,
-        null=True
-    )
-    cod_topping_2 = models.ForeignKey(
-        Topping,
-        on_delete=models.SET_NULL,
-        related_name='combinaciones_secundarias',
         blank=True,
         null=True
     )

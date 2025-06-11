@@ -56,68 +56,67 @@
                                     </div>
                                     
                                     <!-- Selector de sabores con miniaturas -->
-                                    <div class="opcion-seleccion">
-                                        <h4>Masa</h4><p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
-                                        <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="vainilla" data-color="#efd091">
-                                                <div class="color-box" style="background-color: #efd091"></div>
-                                                <span>Vainilla</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="chocolate" data-color="#8B4513">
-                                                <div class="color-box" style="background-color: #8B4513"></div>
-                                                <span>Chocolate</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="red-velvet" data-color="#952d30">
-                                                <div class="color-box" style="background-color: #952d30"></div>
-                                                <span>Red Velvet</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                   <div class="opcion-seleccion">
+    <h4>Masa</h4>
+    <p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
+    <div class="sabor-options">
+        {% for masa in masas %}
+        <div class="sabor-option{% if forloop.first %} active{% endif %}"
+             data-id="{{ masa.cod_sabor_masa }}"
+             data-nombre="{{ masa.nombre|title }}"
+             data-value="{{ masa.nombre|slugify }}"
+             data-color="{% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}">
+            <div class="color-box" style="background-color: {% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}"></div>
+            <span>{{ masa.nombre|title }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+                                    <hr class="linea">
+                                   <div class="opcion-seleccion">
+    <h4>Cobertura</h4>
+    <p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
+    <div class="sabor-options">
+        {% for cobertura in coberturas %}
+        <div class="sabor-option{% if forloop.first %} active{% endif %}"
+             data-id="{{ cobertura.cod_glaseado }}"
+             data-nombre="{{ cobertura.nombre|title }}"
+             data-value="{{ cobertura.nombre|slugify }}"
+             data-color="{% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}">
+            <div class="color-box" style="background-color: {% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}"></div>
+            <span>{{ cobertura.nombre|title }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
                                     <hr class="linea">
                                     <div class="opcion-seleccion">
-                                        <h4>Cobertura</h4><p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
-                                        <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="chocolate-blanco" data-color="#f0e0c0">
-                                                <div class="color-box" style="background-color: #f0e0c0"></div>
-                                                <span>Choc. Blanco</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="chocolate-oscuro" data-color="#5C4033">
-                                                <div class="color-box" style="background-color: #5C4033"></div>
-                                                <span>Choc. Oscuro</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="arequipe" data-color="#D4A76A">
-                                                <div class="color-box" style="background-color: #D4A76A"></div>
-                                                <span>Arequipe</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <hr class="linea">
-                                    <div class="opcion-seleccion">
-                                        <h4>Toppings</h4><p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
-                                        <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="chispas">
-                                                <div class="img-box" style="background-image: url('{% static 'image/pepitasPatron.png' %}')"></div>
-                                                <span>Chispas</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="oreo">
-                                                <div class="img-box" style="background-image: url('{% static 'image/oreoPatron.png' %}')"></div>
-                                                <span>Oreo</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="mym">
-                                                <div class="img-box" style="background-image: url('{% static 'image/mymPatron.png' %}')"></div>
-                                                <span>M&M's</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="chips">
-                                                <div class="img-box" style="background-image: url('{% static 'image/chipsPatron.png' %}')"></div>
-                                                <span>Chips</span>
-                                            </div>
-                                        </div>
-                                    </div>
+    <h4>Toppings</h4>
+    <p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
+    <div class="sabor-options">
+        {% for topping in toppings %}
+        <div class="sabor-option{% if forloop.first %} active{% endif %}"
+             data-id="{{ topping.cod_topping }}"
+             data-nombre="{{ topping.nombre|title }}"
+             data-value="{{ topping.nombre|slugify }}">
+            <div class="img-box"
+                 style="background-image: url('{% static 'image/' %}{{ topping.nombre|slugify }}Patron.png')"></div>
+            <span>{{ topping.nombre|title }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
                                 </div>
                             </div>
                         </div>
-                        <button id="btnCerrarModalS" class="addToCartBtn cart shadow">Agregar al carrito</button>
-                    </div>
+<button
+    id="btnCerrarModalS"
+    class="addToCartBtn cart shadow"
+    data-cod-producto="{{ producto_s.cod_producto }}"
+    data-precio="{{ producto_s.prec_pro }}"
+>
+    Agregar al carrito
+</button>                    </div>
                 </div>
             </div>
             
@@ -159,67 +158,66 @@
                                     </div>
                                     <!-- Selector de sabores con miniaturas -->
                                     <div class="opcion-seleccion">
-                                        <h4>Masa</h4><p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
-                                        <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="vainilla" data-color="#f5e6c8" data-img="url('dona-vainilla.png')">
-                                                <div class="color-box" style="background-color: #efd091"></div>
-                                                <span>Vainilla</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="chocolate" data-color="#8B4513" data-img="url('dona-chocolate.png')">
-                                                <div class="color-box" style="background-color: #8B4513"></div>
-                                                <span>Chocolate</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="red-velvet" data-color="#C62127" data-img="url('dona-redvelvet.png')">
-                                                <div class="color-box" style="background-color: #952d30"></div>
-                                                <span>Red Velvet</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                       <h4>Masa</h4>
+    <p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
+    <div class="sabor-options">
+        {% for masa in masas %}
+        <div class="sabor-option{% if forloop.first %} active{% endif %}"
+             data-id="{{ masa.cod_sabor_masa }}"
+             data-nombre="{{ masa.nombre|title }}"
+             data-value="{{ masa.nombre|slugify }}"
+             data-color="{% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}">
+            <div class="color-box" style="background-color: {% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}"></div>
+            <span>{{ masa.nombre|title }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+                                    <hr class="linea">
+                                   <div class="opcion-seleccion">
+    <h4>Cobertura</h4>
+    <p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
+    <div class="sabor-options">
+        {% for cobertura in coberturas %}
+        <div class="sabor-option{% if forloop.first %} active{% endif %}"
+             data-id="{{ cobertura.cod_glaseado }}"
+             data-nombre="{{ cobertura.nombre|title }}"
+             data-value="{{ cobertura.nombre|slugify }}"
+             data-color="{% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}">
+            <div class="color-box" style="background-color: {% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}"></div>
+            <span>{{ cobertura.nombre|title }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
                                     <hr class="linea">
                                     <div class="opcion-seleccion">
-                                        <h4>Cobertura</h4><p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
-                                        <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="chocolate-blanco" data-color="#f0e0c0" data-img="url('cobertura-blanco.png')">
-                                                <div class="color-box" style="background-color: #f0e0c0"></div>
-                                                <span>Choc. Blanco</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="chocolate-oscuro" data-color="#5C4033" data-img="url('cobertura-oscuro.png')">
-                                                <div class="color-box" style="background-color: #5C4033"></div>
-                                                <span>Choc. Oscuro</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="arequipe" data-color="#D4A76A" data-img="url('cobertura-arequipe.png')">
-                                                <div class="color-box" style="background-color: #D4A76A"></div>
-                                                <span>Arequipe</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <hr class="linea">
-                                    <div class="opcion-seleccion">
-                                        <h4>Toppings</h4><p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
-                                        <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="chispas" data-img="url('topping-chispas.png')">
-                                                <div class="img-box" style="background-image: url('{% static 'Image/pepitasPatron.png' %}')"></div>
-                                                <span>Chispas</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="oreo" data-img="url('topping-oreo.png')">
-                                                <div class="img-box" style="background-image: url('{% static 'Image/oreoPatron.png' %}')"></div>
-                                                <span>Oreo</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="mym" data-img="url('topping-mym.png')">
-                                                <div class="img-box" style="background-image: url('{% static 'Image/mymPatron.png' %}')"></div>
-                                                <span>M&M's</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="chips" data-img="url('topping-chips.png')">
-                                                <div class="img-box" style="background-image: url('{% static 'Image/chipsPatron.png' %}')"></div>
-                                                <span>Chips</span>
-                                            </div>
-                                        </div>
-                                    </div>
+    <h4>Toppings</h4>
+    <p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
+    <div class="sabor-options">
+        {% for topping in toppings %}
+        <div class="sabor-option{% if forloop.first %} active{% endif %}"
+             data-id="{{ topping.cod_topping }}"
+             data-nombre="{{ topping.nombre|title }}"
+             data-value="{{ topping.nombre|slugify }}">
+            <div class="img-box"
+                 style="background-image: url('{% static 'image/' %}{{ topping.nombre|slugify }}Patron.png')"></div>
+            <span>{{ topping.nombre|title }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
                                 </div>
                             </div>
                         </div>
-                        <button id="btnCerrarModalM" class="addToCartBtn cart shadow">Agregar al carrito</button> 
-                    </div>
+                    <button
+    id="btnCerrarModalM"
+    class="addToCartBtn cart shadow"
+    data-cod-producto="{{ producto_m.cod_producto }}"
+    data-precio="{{ producto_m.prec_pro }}"
+>
+    Agregar al carrito
+</button>                    </div>
                 </div>
             </div>
             
@@ -258,67 +256,66 @@
                                     </div>
                                     <!-- Selector de sabores con miniaturas -->
                                     <div class="opcion-seleccion">
-                                        <h4>Masa</h4><p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
-                                        <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="vainilla" data-color="#f5e6c8" data-img="url('dona-vainilla.png')">
-                                                <div class="color-box" style="background-color: #efd091"></div>
-                                                <span>Vainilla</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="chocolate" data-color="#8B4513" data-img="url('dona-chocolate.png')">
-                                                <div class="color-box" style="background-color: #8B4513"></div>
-                                                <span>Chocolate</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="red-velvet" data-color="#C62127" data-img="url('dona-redvelvet.png')">
-                                                <div class="color-box" style="background-color: #952d30"></div>
-                                                <span>Red Velvet</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                         <h4>Masa</h4>
+    <p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
+    <div class="sabor-options">
+        {% for masa in masas %}
+        <div class="sabor-option{% if forloop.first %} active{% endif %}"
+             data-id="{{ masa.cod_sabor_masa }}"
+             data-nombre="{{ masa.nombre|title }}"
+             data-value="{{ masa.nombre|slugify }}"
+             data-color="{% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}">
+            <div class="color-box" style="background-color: {% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}"></div>
+            <span>{{ masa.nombre|title }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+                                    <hr class="linea">
+                                   <div class="opcion-seleccion">
+    <h4>Cobertura</h4>
+    <p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
+    <div class="sabor-options">
+        {% for cobertura in coberturas %}
+        <div class="sabor-option{% if forloop.first %} active{% endif %}"
+             data-id="{{ cobertura.cod_glaseado }}"
+             data-nombre="{{ cobertura.nombre|title }}"
+             data-value="{{ cobertura.nombre|slugify }}"
+             data-color="{% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}">
+            <div class="color-box" style="background-color: {% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}"></div>
+            <span>{{ cobertura.nombre|title }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
                                     <hr class="linea">
                                     <div class="opcion-seleccion">
-                                        <h4>Cobertura</h4><p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
-                                        <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="chocolate-blanco" data-color="#f0e0c0" data-img="url('cobertura-blanco.png')">
-                                                <div class="color-box" style="background-color: #f0e0c0"></div>
-                                                <span>Choc. Blanco</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="chocolate-oscuro" data-color="#5C4033" data-img="url('cobertura-oscuro.png')">
-                                                <div class="color-box" style="background-color: #5C4033"></div>
-                                                <span>Choc. Oscuro</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="arequipe" data-color="#D4A76A" data-img="url('cobertura-arequipe.png')">
-                                                <div class="color-box" style="background-color: #D4A76A"></div>
-                                                <span>Arequipe</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <hr class="linea">
-                                    <div class="opcion-seleccion">
-                                        <h4>Toppings</h4><p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
-                                        <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="chispas" data-img="url('topping-chispas.png')">
-                                                <div class="img-box" style="background-image: url('{% static 'Image/pepitasPatron.png' %}')"></div>
-                                                <span>Chispas</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="oreo" data-img="url('topping-oreo.png')">
-                                                <div class="img-box" style="background-image: url('{% static 'Image/oreoPatron.png' %}')"></div>
-                                                <span>Oreo</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="mym" data-img="url('topping-mym.png')">
-                                                <div class="img-box" style="background-image: url('{% static 'Image/mymPatron.png' %}')"></div>
-                                                <span>M&M's</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="chips" data-img="url('topping-chips.png')">
-                                                <div class="img-box" style="background-image: url('{% static 'Image/chipsPatron.png' %}')"></div>
-                                                <span>Chips</span>
-                                            </div>
-                                        </div>
-                                    </div>
+    <h4>Toppings</h4>
+    <p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
+    <div class="sabor-options">
+        {% for topping in toppings %}
+        <div class="sabor-option{% if forloop.first %} active{% endif %}"
+             data-id="{{ topping.cod_topping }}"
+             data-nombre="{{ topping.nombre|title }}"
+             data-value="{{ topping.nombre|slugify }}">
+            <div class="img-box"
+                 style="background-image: url('{% static 'image/' %}{{ topping.nombre|slugify }}Patron.png')"></div>
+            <span>{{ topping.nombre|title }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
                                 </div>
                             </div>
                         </div>
-                        <button id="btnCerrarModalL" class="addToCartBtn cart shadow">Agregar al carrito</button> 
-                    </div>
+                 <button
+    id="btnCerrarModalL"
+    class="addToCartBtn cart shadow"
+    data-cod-producto="{{ producto_l.cod_producto }}"
+    data-precio="{{ producto_l.prec_pro }}"
+>
+    Agregar al carrito
+</button>                    </div>
                 </div>
             </div>
             <div class="Cajas4 shadow">
@@ -356,67 +353,66 @@
                                     </div>
                                     <!-- Selector de sabores con miniaturas -->
                                     <div class="opcion-seleccion">
-                                        <h4>Masa</h4><p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
-                                        <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="vainilla" data-color="#f5e6c8" data-img="url('dona-vainilla.png')">
-                                                <div class="color-box" style="background-color: #efd091"></div>
-                                                <span>Vainilla</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="chocolate" data-color="#8B4513" data-img="url('dona-chocolate.png')">
-                                                <div class="color-box" style="background-color: #8B4513"></div>
-                                                <span>Chocolate</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="red-velvet" data-color="#C62127" data-img="url('dona-redvelvet.png')">
-                                                <div class="color-box" style="background-color: #952d30"></div>
-                                                <span>Red Velvet</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                         <h4>Masa</h4>
+    <p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
+    <div class="sabor-options">
+        {% for masa in masas %}
+        <div class="sabor-option{% if forloop.first %} active{% endif %}"
+             data-id="{{ masa.cod_sabor_masa }}"
+             data-nombre="{{ masa.nombre|title }}"
+             data-value="{{ masa.nombre|slugify }}"
+             data-color="{% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}">
+            <div class="color-box" style="background-color: {% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}"></div>
+            <span>{{ masa.nombre|title }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+                                    <hr class="linea">
+                                   <div class="opcion-seleccion">
+    <h4>Cobertura</h4>
+    <p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
+    <div class="sabor-options">
+        {% for cobertura in coberturas %}
+        <div class="sabor-option{% if forloop.first %} active{% endif %}"
+             data-id="{{ cobertura.cod_glaseado }}"
+             data-nombre="{{ cobertura.nombre|title }}"
+             data-value="{{ cobertura.nombre|slugify }}"
+             data-color="{% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}">
+            <div class="color-box" style="background-color: {% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}"></div>
+            <span>{{ cobertura.nombre|title }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
                                     <hr class="linea">
                                     <div class="opcion-seleccion">
-                                        <h4>Cobertura</h4><p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
-                                        <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="chocolate-blanco" data-color="#f0e0c0" data-img="url('cobertura-blanco.png')">
-                                                <div class="color-box" style="background-color: #f0e0c0"></div>
-                                                <span>Choc. Blanco</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="chocolate-oscuro" data-color="#5C4033" data-img="url('cobertura-oscuro.png')">
-                                                <div class="color-box" style="background-color: #5C4033"></div>
-                                                <span>Choc. Oscuro</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="arequipe" data-color="#D4A76A" data-img="url('cobertura-arequipe.png')">
-                                                <div class="color-box" style="background-color: #D4A76A"></div>
-                                                <span>Arequipe</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <hr class="linea">
-                                    <div class="opcion-seleccion">
-                                        <h4>Toppings</h4><p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
-                                        <div class="sabor-options">
-                                            <div class="sabor-option active" data-value="chispas" data-img="url('topping-chispas.png')">
-                                                <div class="img-box" style="background-image: url('{% static 'Image/pepitasPatron.png' %}')"></div>
-                                                <span>Chispas</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="oreo" data-img="url('topping-oreo.png')">
-                                                <div class="img-box" style="background-image: url('{% static 'Image/oreoPatron.png' %}')"></div>
-                                                <span>Oreo</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="mym" data-img="url('topping-mym.png')">
-                                                <div class="img-box" style="background-image: url('{% static 'Image/mymPatron.png' %}')"></div>
-                                                <span>M&M's</span>
-                                            </div>
-                                            <div class="sabor-option" data-value="chips" data-img="url('topping-chips.png')">
-                                                <div class="img-box" style="background-image: url('{% static 'Image/chipsPatron.png' %}')"></div>
-                                                <span>Chips</span>
-                                            </div>
-                                        </div>
-                                    </div>
+    <h4>Toppings</h4>
+    <p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
+    <div class="sabor-options">
+        {% for topping in toppings %}
+        <div class="sabor-option{% if forloop.first %} active{% endif %}"
+             data-id="{{ topping.cod_topping }}"
+             data-nombre="{{ topping.nombre|title }}"
+             data-value="{{ topping.nombre|slugify }}">
+            <div class="img-box"
+                 style="background-image: url('{% static 'image/' %}{{ topping.nombre|slugify }}Patron.png')"></div>
+            <span>{{ topping.nombre|title }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
                                 </div>
                             </div>
                         </div>
-                        <button id="btnCerrarModalXL" class="addToCartBtn cart shadow">Agregar al carrito</button> 
-                    </div>
+                 <button
+    id="btnCerrarModalXL"
+    class="addToCartBtn cart shadow"
+    data-cod-producto="{{ producto_xl.cod_producto }}"
+    data-precio="{{ producto_xl.prec_pro }}"
+>
+    Agregar al carrito
+</button>                    </div>
                 </div>
             </div>
             <a class="Cajas5 shadow" href="#"><img src="{% static 'Image/mas.png' %}" alt="Imagen de mas"></a>

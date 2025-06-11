@@ -44,7 +44,7 @@
                 </div>
             </div>
             
-               <div class="container-cart-products">
+             <div class="container-cart-products">
                 <div class="row-product">
                     <!-- Productos se agregarán dinámicamente con JavaScript -->
                 </div>
@@ -112,19 +112,21 @@
                                     </div>
                                 </div>
                             </div>
+                            <br>
                             <div class="botonComprar">
                                 <button type="submit" value="Comprar" id="btnAgregarProducto" class="cart shadow">COMPRAR</button> 
                             </div>
                             <!-- Modal de compra exitosa -->
 <!-- Modal de compra exitosa -->
 <div id="modalCompraExitosa" class="modal" style="display:none;">
-  <div class="modal-content" style="background:#fff; padding:30px; border-radius:20px; text-align:center;">
+  <div class="modal-content" style="background:#fff; padding:30px; border-radius:20px; text-align:center; max-width:600px; margin:auto;">
     <span id="cerrarModalCompra" style="cursor:pointer; float:right; font-size:24px;">&times;</span>
     <div class="infoTotalCarrito"></div>
     <h2>¡Compra realizada con éxito!</h2>
     <p>Gracias por tu compra.</p>
     <button id="okCompraExitosa" class="btn btn-pinck" style="margin-top:15px;">OK</button>
   </div>
+</div>
 </div>
 
 <script>
@@ -142,7 +144,7 @@ document.getElementById('okCompraExitosa')?.addEventListener('click', function()
                         </div>
                     </div>
                     <div class="cart-total">
-                        <h3>Total:</h3>
+                        <h3>SubTotal:</h3>
                         <span class="total-pagar">$0.00</span>
                     </div>
                 </div>
