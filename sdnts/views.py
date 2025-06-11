@@ -205,9 +205,18 @@ def logout_view(request):
 @login_required    
 def vistacliente(request):
     return render(request, 'cliente/vistacliente.html') 
-@login_required
+
 def catalogocliente(request):
-    return render(request, 'cliente/catalogocliente.html')
+    masas = SaborMasa.objects.all()
+    coberturas = Glaseado.objects.all()
+    toppings = Topping.objects.all()
+    # ...otros contextos...
+    return render(request, 'cliente/catalogocliente.html', {
+        'masas': masas,
+        'coberturas': coberturas,
+        'toppings': toppings,
+        # ...otros contextos...
+    })
 
 @login_required
 def contactanoscliente(request):
@@ -368,6 +377,7 @@ def procesar_compra(request):
         data = json.loads(request.body)
         carrito = data.get('carrito', [])
         direccion = data.get('direccion', '')
+        fecha_entrega = data.get('fecha_entrega')  # <-- corregido aquí
         metodo_pago = data.get('metodo_pago', 'NEQUI')
         transaccion_id = data.get('transaccion_id', '')
 
@@ -385,6 +395,7 @@ def procesar_compra(request):
             iva=iva,
             total=total,
             direccion_entrega=direccion,
+            fecha_entrega=fecha_entrega,
             fecha_hora=timezone.now()
         )
 
@@ -398,7 +409,8 @@ def procesar_compra(request):
                 cod_venta=venta,
                 cod_producto=producto,
                 cantidad=item['quantity'],
-                precio_unitario=item['precio']
+                precio_unitario=item['precio'],
+                fecha_entrega=fecha_entrega  # <-- agrega esto
             )
 
             # Guardar la combinación personalizada
@@ -449,6 +461,7 @@ def procesar_compra(request):
             }
         })
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
 
 @login_required
 def exportar_excel(request):
