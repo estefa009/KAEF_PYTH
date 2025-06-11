@@ -8,7 +8,7 @@ from django.utils.html import strip_tags
 import openpyxl
 from django.shortcuts import render,redirect
 from django.contrib.auth import logout
-from sdnts.models import CategoriaInsumo, DetalleVenta, Entrada, Envio, Produccion, Proveedor, Salida, Usuario,Producto, Carrito, CarritoItem, Venta,Domiciliario, Administrador, Cliente
+from sdnts.models import CategoriaInsumo, DetalleVenta, Entrada, Envio, Produccion, Proveedor, Salida, Usuario,Producto, Carrito, CarritoItem, Venta,Domiciliario
 from django.contrib.auth import views as auth_views
 from django.urls import reverse, reverse_lazy
 import json
@@ -629,24 +629,13 @@ def agregar_usuario(request):
     if request.method == 'POST':
         form = UsuarioForm(request.POST)
         if form.is_valid():
-            usuario = form.save()
-            rol = usuario.rol
-
-            if rol == 'ADMIN':
-                Administrador.objects.create(cod_usua=usuario, estado_admin='ACTIVO')
-            elif rol == 'CLIENTE':
-                Cliente.objects.create(cod_usua=usuario, direc_cliente='Sin dirección')
-            elif rol == 'DOMI':
-                Domiciliario.objects.create(cod_usua=usuario, disponibilidad=True)
-
-            messages.success(request, 'Usuario creado correctamente')
-            return redirect('dashboard_admin')
-        else:
-            messages.error(request, 'Error al crear el usuario')
+            form.save()
+            messages.success(request, "Usuario agregado exitosamente.")
+            return redirect('dashboard_admin')  # Redirige al dashboard admin
     else:
         form = UsuarioForm()
 
-    return render(request, 'admin/agregar_usuario.html', {'form': form})
+    return render(request, 'usuario/agregar_usuario.html', {'form': form})
 
 @login_required
 def dashboard_admin(request):
