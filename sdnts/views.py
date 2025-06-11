@@ -210,11 +210,21 @@ def catalogocliente(request):
     masas = SaborMasa.objects.all()
     coberturas = Glaseado.objects.all()
     toppings = Topping.objects.all()
-    # ...otros contextos...
+
+    # Obtener productos por tamaño
+    producto_s = Producto.objects.filter(tamano='S', activo=True).first()
+    producto_m = Producto.objects.filter(tamano='M', activo=True).first()
+    producto_l = Producto.objects.filter(tamano='L', activo=True).first()
+    producto_xl = Producto.objects.filter(tamano='XL', activo=True).first()
+
     return render(request, 'cliente/catalogocliente.html', {
         'masas': masas,
         'coberturas': coberturas,
         'toppings': toppings,
+        'producto_s': producto_s,
+        'producto_m': producto_m,
+        'producto_l': producto_l,
+        'producto_xl': producto_xl,
         # ...otros contextos...
     })
 
@@ -373,93 +383,158 @@ from django.utils import timezone
 
 @csrf_exempt
 def procesar_compra(request):
+    import traceback
     if request.method == 'POST':
-        data = json.loads(request.body)
-        carrito = data.get('carrito', [])
-        direccion = data.get('direccion', '')
-        fecha_entrega = data.get('fecha_entrega')  # <-- corregido aquí
-        metodo_pago = data.get('metodo_pago', 'NEQUI')
-        transaccion_id = data.get('transaccion_id', '')
+        try:
+            data = json.loads(request.body)
+            print('Datos recibidos en procesar_compra:', data)
+            carrito = data.get('carrito', [])
+            direccion = data.get('direccion', '')
+            fecha_entrega = data.get('fecha_entrega')
+            metodo_pago = data.get('metodo_pago', 'NEQUI')
+            transaccion_id = data.get('transaccion_id', '')
 
-        user = request.user if request.user.is_authenticated else None
-        cliente = Cliente.objects.get(cod_usua=user)
-
-        subtotal = sum(item['precio'] * item['quantity'] for item in carrito)
-        iva = subtotal * 0.19
-        total = subtotal + iva
-
-        # 1. Crear la venta
-        venta = Venta.objects.create(
-            cod_cliente=cliente,
-            subtotal=subtotal,
-            iva=iva,
-            total=total,
-            direccion_entrega=direccion,
-            fecha_entrega=fecha_entrega,
-            fecha_hora=timezone.now()
-        )
-
-        # 2. Crear los detalles de venta
-        for item in carrito:
-            producto = Producto.objects.filter(cod_producto=item['cod_producto']).first()
-            if not producto:
-                continue
-
-            DetalleVenta.objects.create(
-                cod_venta=venta,
-                cod_producto=producto,
-                cantidad=item['quantity'],
-                precio_unitario=item['precio'],
-                fecha_entrega=fecha_entrega  # <-- agrega esto
-            )
-
-            # Guardar la combinación personalizada
+            user = request.user if request.user.is_authenticated else None
+            if not user:
+                print('Usuario no autenticado')
+                return JsonResponse({'success': False, 'error': 'Usuario no autenticado'})
             try:
-                masa = SaborMasa.objects.get(nombre__iexact=item['masa']['nombre'])
-                cobertura = Glaseado.objects.get(nombre__iexact=item['cobertura']['nombre'])
-                topping = Topping.objects.get(nombre__iexact=item['topping']['nombre'])
-                CombinacionProducto.objects.create(
+                cliente = Cliente.objects.get(cod_usua=user)
+            except Exception as e:
+                print('No se encontró Cliente para el usuario:', user, e)
+                return JsonResponse({'success': False, 'error': 'No se encontró Cliente para el usuario'})
+
+            subtotal = sum(item['precio'] * item['quantity'] for item in carrito)
+            iva = subtotal * 0.19
+            total = subtotal + iva
+
+            # 1. Crear la venta (sin fecha_entrega)
+            venta = Venta.objects.create(
+                cod_cliente=cliente,
+                subtotal=subtotal,
+                iva=iva,
+                total=total,
+                direccion_entrega=direccion,
+                fecha_hora=timezone.now()
+            )
+            print('Venta creada:', venta)
+
+            # 2. Crear los detalles de venta y combinaciones
+            COBERTURA_MAP = {
+                "Chocolate Blanco": "Choc Blanco",
+                "Chocolate Oscuro": "Choc Oscuro",
+                "Arequipe": "Arequipe",
+                # Agrega aquí todos los nombres posibles
+            }
+            for item in carrito:
+                producto = Producto.objects.filter(cod_producto=item['cod_producto']).first()
+                if not producto:
+                    print('Producto no encontrado para cod_producto:', item['cod_producto'])
+                    continue
+                DetalleVenta.objects.create(
                     cod_venta=venta,
                     cod_producto=producto,
-                    cod_sabor_masa_1=masa,
-                    cod_glaseado_1=cobertura,
-                    cod_topping_1=topping
+                    cantidad=item['quantity'],
+                    precio_unitario=item['precio'],
+                    fecha_entrega=fecha_entrega
                 )
-            except Exception:
-                pass
+                print('DetalleVenta creado para producto:', producto)
+                # Guardar la combinación personalizada
+                try:
+                    import unicodedata
+                    def normalizar(s):
+                        if not s:
+                            return ''
+                        s = s.strip().lower().replace(' ', '')
+                        s = ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
+                        return s
+                    # --- MASA ---
+                    masa_nombre = item['masa']['nombre']
+                    masa = SaborMasa.objects.filter(nombre__iexact=masa_nombre).first()
+                    if not masa:
+                        masa = SaborMasa.objects.filter(nombre__icontains=masa_nombre).first()
+                    if not masa:
+                        print('No se encontró SaborMasa para:', masa_nombre)
+                        print('Nombres válidos en BD:', list(SaborMasa.objects.values_list('nombre', flat=True)))
+                        raise Exception(f'SaborMasa no encontrado para "{masa_nombre}"')
+                    # --- COBERTURA ---
+                    cobertura_nombre = item['cobertura']['nombre']
+                    COBERTURA_MAP = {
+                        normalizar('Chocolate Blanco'): 'Choc Blanco',
+                        normalizar('Chocolate Oscuro'): 'Choc Oscuro',
+                        normalizar('Arequipe'): 'Arequipe',
+                        # Agrega aquí todos los nombres posibles
+                    }
+                    cobertura_nombre_norm = normalizar(cobertura_nombre)
+                    cobertura_nombre_db = COBERTURA_MAP.get(cobertura_nombre_norm)
+                    cobertura = None
+                    if cobertura_nombre_db:
+                        cobertura = Glaseado.objects.filter(nombre__iexact=cobertura_nombre_db).first()
+                    if not cobertura:
+                        cobertura = Glaseado.objects.filter(nombre__icontains=cobertura_nombre).first()
+                    if not cobertura:
+                        print('No se encontró Glaseado para:', cobertura_nombre)
+                        print('Nombres válidos en BD:', list(Glaseado.objects.values_list('nombre', flat=True)))
+                        raise Exception(f'Glaseado no encontrado para "{cobertura_nombre}"')
+                    # --- TOPPING ---
+                    topping = None
+                    topping_nombre = item['topping']['nombre']
+                    if topping_nombre and topping_nombre.lower() != 'ninguno':
+                        topping = Topping.objects.filter(nombre__iexact=topping_nombre).first()
+                        if not topping:
+                            topping = Topping.objects.filter(nombre__icontains=topping_nombre).first()
+                        if not topping:
+                            print('No se encontró Topping para:', topping_nombre)
+                            print('Nombres válidos en BD:', list(Topping.objects.values_list('nombre', flat=True)))
+                            raise Exception(f'Topping no encontrado para "{topping_nombre}"')
+                    CombinacionProducto.objects.create(
+                        cod_venta=venta,
+                        cod_producto=producto,
+                        cod_sabor_masa_1=masa,
+                        cod_glaseado_1=cobertura,
+                        cod_topping_1=topping
+                    )
+                    print('CombinacionProducto creada')
+                except Exception as e:
+                    print('Error creando CombinacionProducto:', e)
 
-        # 3. Crear el pago
-        Pago.objects.create(
-            cod_venta=venta,
-            metodo_pago=metodo_pago,
-            monto_total=total,
-            fecha_hora_pago=timezone.now(),
-            estado_pago='PENDIENTE',
-            transaccion_id=transaccion_id
-        )
+            # 3. Crear el pago
+            Pago.objects.create(
+                cod_venta=venta,
+                metodo_pago=metodo_pago,
+                monto_total=total,
+                fecha_hora_pago=timezone.now(),
+                estado_pago='PENDIENTE',
+                transaccion_id=transaccion_id
+            )
+            print('Pago creado')
 
-        # 4. Preparar detalles para la respuesta
-        detalles = DetalleVenta.objects.filter(cod_venta=venta)
-        detalle_list = []
-        for d in detalles:
-            detalle_list.append({
-                'producto': d.cod_producto.nomb_pro,
-                'cantidad': d.cantidad,
-                'precio_unitario': float(d.precio_unitario),
-                'subtotal': float(d.precio_unitario) * d.cantidad
+            # 4. Preparar detalles para la respuesta
+            detalles = DetalleVenta.objects.filter(cod_venta=venta)
+            detalle_list = []
+            for d in detalles:
+                detalle_list.append({
+                    'producto': d.cod_producto.nomb_pro,
+                    'cantidad': d.cantidad,
+                    'precio_unitario': float(d.precio_unitario),
+                    'subtotal': float(d.precio_unitario) * d.cantidad
+                })
+
+            return JsonResponse({
+                'success': True,
+                'venta': {
+                    'fecha': venta.fecha_hora.strftime('%d/%m/%Y %H:%M:%S'),
+                    'direccion': venta.direccion_entrega,
+                    'subtotal': float(venta.subtotal),
+                    'iva': float(venta.iva),
+                    'total': float(venta.total),
+                    'detalles': detalle_list
+                }
             })
-
-        return JsonResponse({
-            'success': True,
-            'venta': {
-                'fecha': venta.fecha_hora.strftime('%d/%m/%Y %H:%M:%S'),
-                'direccion': venta.direccion_entrega,
-                'subtotal': float(venta.subtotal),
-                'iva': float(venta.iva),
-                'total': float(venta.total),
-                'detalles': detalle_list
-            }
-        })
+        except Exception as e:
+            print('Error en procesar_compra:', e)
+            traceback.print_exc()
+            return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
 
 
