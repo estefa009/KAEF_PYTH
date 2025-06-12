@@ -241,8 +241,8 @@ function agregarAlCarrito(producto) {
     // Actualizar la vista
     showHTML();
 
-    // Mostrar notificación con detalles
-    alert(`¡Agregado al carrito!\n${producto.titulo}\n${producto.descripcion}`);
+    // Mostrar notificación con detalles usando modal personalizado
+    mostrarModalAgregadoCarrito(producto);
 }
 
 function showHTML() {
@@ -670,7 +670,7 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', async f
     transaccion_id: referenciaPago
 };
     console.log('Enviando fetch a /procesar_compra/ con:', payload);
-    alert('Enviando datos al backend. Revisa consola para detalles.');
+    // alert('Enviando datos al backend. Revisa consola para detalles.'); // Eliminado modal nativo
     
     // Validar método de pago y referencia
     if (!payload.metodo_pago || !payload.transaccion_id) {
@@ -702,46 +702,45 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', async f
         })
         .then(data => {
             console.log('Respuesta JSON del backend:', data);
-            alert('Respuesta del backend: ' + JSON.stringify(data));
             if (data.success) {
                 localStorage.removeItem('cart');
                 showHTML();
                 document.getElementById('modalP').style.display = 'none';
-
-                // Factura final con estilos Bootstrap
-                const venta = data.venta;
-                let facturaHTML = `
-                <h3>Factura de Compra</h3>
-                <p><b>Fecha:</b> ${venta.fecha}</p>
-                <p><b>Dirección:</b> ${venta.direccion}</p>
-                <table class="table table-bordered table-sm" style="margin-bottom:10px;">
-                    <thead class="thead-light">
-                        <tr>
-                            <th style="text-align:left;">Producto</th>
-                            <th class="text-center">Cant.</th>
-                            <th class="text-right">Unitario</th>
-                            <th class="text-right">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${venta.detalles.map(det => `
-                            <tr>
-                                <td>${det.producto}</td>
-                                <td class="text-center">${det.cantidad}</td>
-                                <td class="text-right">$${det.precio_unitario.toFixed(2)}</td>
-                                <td class="text-right">$${det.subtotal.toFixed(2)}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                <div class="text-right">
-                    <b>Subtotal:</b> $${venta.subtotal.toFixed(2)}<br>
-                    <b>IVA (19%):</b> $${venta.iva.toFixed(2)}<br>
-                    <b>Total:</b> $${venta.total.toFixed(2)}
-                </div>
-            `;
-                document.querySelector('#modalCompraExitosa .infoTotalCarrito').innerHTML = facturaHTML;
-                document.getElementById('modalCompraExitosa').style.display = 'flex';
+                // Mostrar modal de compra exitosa y resumen
+                const modal = document.getElementById('modalCompraExitosa');
+                if (!modal) {
+                    console.error('No se encontró el modalCompraExitosa en el DOM');
+                    document.body.insertAdjacentHTML('beforeend', `<div style="color:red; background:#fff3cd; border:1px solid #f5c6cb; padding:10px; position:fixed; top:10px; right:10px; z-index:9999;">No se encontró el modalCompraExitosa en el DOM</div>`);
+                    return;
+                }
+                const info = modal.querySelector('.infoTotalCarrito');
+                if (!info) {
+                    console.error('No se encontró el elemento .infoTotalCarrito dentro del modalCompraExitosa');
+                    modal.innerHTML += '<div style="color:red; background:#fff3cd; border:1px solid #f5c6cb; padding:10px;">No se encontró el elemento .infoTotalCarrito</div>';
+                } else if (data.venta) {
+                    let detalles = data.venta.detalles || [];
+                    let productosHTML = `<h3>Resumen de tu compra</h3><table style='width:100%;margin-bottom:10px;'><thead><tr><th style='text-align:left;'>Producto</th><th>Cant.</th><th>Unitario</th><th>Subtotal</th></tr></thead><tbody>`;
+                    detalles.forEach(det => {
+                        productosHTML += `<tr><td>${det.producto}</td><td style='text-align:center;'>${det.cantidad}</td><td style='text-align:right;'>$${Number(det.precio_unitario).toLocaleString()}</td><td style='text-align:right;'>$${Number(det.subtotal).toLocaleString()}</td></tr>`;
+                    });
+                    productosHTML += `</tbody></table>`;
+                    productosHTML += `<div style='text-align:right;'><b>Subtotal:</b> $${Number(data.venta.subtotal).toLocaleString()}<br><b>IVA (19%):</b> $${Number(data.venta.iva).toLocaleString()}<br><b>Total:</b> $${Number(data.venta.total).toLocaleString()}<br><b>Dirección:</b> ${data.venta.direccion}</div>`;
+                    info.innerHTML = productosHTML;
+                } else {
+                    info.innerHTML = '<div style="color:red;">No se recibió resumen de venta del backend.</div>';
+                }
+                // Mostrar el modal correctamente (remover hidden y usar display flex)
+                modal.classList.remove('hidden');
+                modal.classList.add('show');
+                modal.style.display = 'flex';
+                modal.style.opacity = '1';
+                modal.style.zIndex = '9999';
+                // Forzar repaint para asegurar visibilidad
+                void modal.offsetWidth;
+                // Scroll al modal para asegurar visibilidad
+                modal.scrollIntoView({behavior: 'smooth', block: 'center'});
+                // Actualizar el contador del carrito en el nav si existe
+                if (typeof showHTML === 'function') showHTML();
             } else {
                 alert('Error al procesar la compra: ' + (data.error || ''));
             }
@@ -770,9 +769,48 @@ function getCookie(name) {
 }
 
 // Cerrar el modal de compra exitosa
-document.getElementById('cerrarModalCompra')?.addEventListener('click', function () {
-    document.getElementById('modalCompraExitosa').style.display = 'none';
-});
-document.getElementById('okCompraExitosa')?.addEventListener('click', function () {
-    document.getElementById('modalCompraExitosa').style.display = 'none';
-});
+const cerrarModalCompra = document.getElementById('cerrarModalCompra');
+const okCompraExitosa = document.getElementById('okCompraExitosa');
+function cerrarModalCompraExitosa() {
+    const modal = document.getElementById('modalCompraExitosa');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+        // Refrescar el carrito y la página completamente
+        location.reload();
+    }
+}
+cerrarModalCompra?.addEventListener('click', cerrarModalCompraExitosa);
+okCompraExitosa?.addEventListener('click', cerrarModalCompraExitosa);
+
+// Modal personalizado para agregado al carrito
+function mostrarModalAgregadoCarrito(producto) {
+    const modal = document.getElementById('modalAgregadoCarrito');
+    const titulo = document.getElementById('modalAgregadoTitulo');
+    const descripcion = document.getElementById('modalAgregadoDescripcion');
+    if (!modal || !titulo || !descripcion) return;
+    titulo.textContent = producto.titulo || '';
+    descripcion.textContent = producto.descripcion || '';
+    modal.classList.add('show');
+    modal.classList.remove('hidden');
+    // Cerrar con X o OK
+    const closeBtn = document.getElementById('closeAgregadoCarrito');
+    const okBtn = document.getElementById('okAgregadoCarrito');
+    function cerrar() {
+        modal.classList.remove('show');
+        modal.classList.add('hidden');
+        closeBtn.removeEventListener('click', cerrar);
+        okBtn.removeEventListener('click', cerrar);
+    }
+    closeBtn.addEventListener('click', cerrar);
+    okBtn.addEventListener('click', cerrar);
+    // Cerrar con Escape
+    function cerrarEscape(e) {
+        if (e.key === 'Escape') {
+            cerrar();
+            document.removeEventListener('keydown', cerrarEscape);
+        }
+    }
+    document.addEventListener('keydown', cerrarEscape);
+}

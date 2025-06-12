@@ -1043,20 +1043,20 @@ def crear_produccion(request):
                 salida = salida_form.save(commit=False)
                 salida.cod_produccion = produccion
                 insumo = salida.cod_insumo
-                if insumo.stock >= salida.cantidad:
-                    insumo.stock -= salida.cantidad
+                if insumo.cnt_insumo >= salida.cantidad:
+                    insumo.cnt_insumo -= salida.cantidad
                     insumo.save()
                     salida.save()
                 else:
                     entrada = Entrada(
                         cod_insumo=insumo,
-                        cnt_entrada=salida.cantidad - insumo.stock,
+                        cnt_entrada=salida.cantidad - insumo.cnt_insumo,
                         precio_entrada=insumo.precio,
                         fecha_caducidad=None,
                         nom_entrada=f"Auto recarga para producción {produccion.cod_produccion}"
                     )
                     entrada.save()
-                    insumo.stock += entrada.cnt_entrada - salida.cantidad
+                    insumo.cnt_insumo += entrada.cnt_entrada - salida.cantidad
                     insumo.save()
                     salida.save()
             return redirect('produccion_admin')
@@ -1120,7 +1120,7 @@ def envios_admin(request):
     # ✅ Corregido: usar 'ENTREGADO' en lugar de 'COMPLETADO'
     envios_completados = Envio.objects.filter(estado='ENTREGADO')
     
-    return render(request, 'admin/envios_admin.html', {
+    return render(request, 'admin/envios/envios_admin.html', {
         'envios_pendientes': envios_pendientes,
         'envios_completados': envios_completados
     })

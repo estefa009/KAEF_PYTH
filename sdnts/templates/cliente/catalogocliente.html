@@ -773,12 +773,46 @@
   <div class="modal-content modal-content-small">
     <span class="close" id="closeFecha">&times;</span>
     <div class="modal-form">
-      <h2>Fecha de entrega</h2>
+      <h2>Fecha de entrega</h2>  
+       <p>(fechas disponibles de entrega, 3 dias luego de realizar la compra)</p>
       <input type="date" id="inputFecha" min="{{ today|date:'Y-m-d' }}" />
       <div class="modal-form-buttons">
         <button id="confirmFecha" class="boton">Confirmar</button>
         <button id="cancelFecha" class="boton boton-cancelar">Cancelar</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación de agregado al carrito -->
+<div id="modalAgregadoCarrito" class="modal hidden">
+  <div class="modal-content modal-content-small modal-agregado-carrito">
+    <span class="close" id="closeAgregadoCarrito">&times;</span>
+    <div class="modal-agregado-body">
+      <h2 class="modal-agregado-title">¡Agregado al carrito!</h2>
+      <div class="modal-agregado-detalles">
+        <div id="modalAgregadoTitulo" class="modal-agregado-titulo"></div>
+        <div id="modalAgregadoDescripcion" class="modal-agregado-descripcion"></div>
+      </div>
+      <button id="okAgregadoCarrito" class="boton modal-agregado-ok">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de compra exitosa -->
+<div id="modalCompraExitosa" class="modal hidden">
+  <div class="modal-content modal-content-small modal-compra-exitosa-custom">
+    <span class="close" id="cerrarModalCompra">&times;</span>
+    <div class="infoTotalCarrito"></div>
+    <button id="okCompraExitosa" class="btn btn-success" style="margin-top: 16px; width: 100%;">OK</button>
+  </div>
+</div>
+
+<!-- Modal de advertencia reutilizable -->
+<div id="modalAdvertencia" class="modal modal-advertencia hidden">
+  <div class="modal-content modal-content-advertencia">
+    <span id="closeAdvertencia" class="close">&times;</span>
+    <div id="mensajeAdvertencia" class="mensaje-advertencia"></div>
+    <button id="okAdvertencia" class="btn btn-warning mt-3">OK</button>
   </div>
 </div>
