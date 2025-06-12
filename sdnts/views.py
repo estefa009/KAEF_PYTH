@@ -1371,7 +1371,7 @@ def correos_admin(request):
     
 def ver_correo(request, cod_correo):
     correo = get_object_or_404(Correo, cod_correo=cod_correo)
-    return render(request, 'admin/correo/ver_correo.html', {'correo': correo})
+    return render(request, 'admin/correos/ver_correo.html', {'correo': correo})
   
 from django.core.mail import EmailMessage
 from .models import Correo

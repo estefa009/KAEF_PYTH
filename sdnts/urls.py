@@ -125,7 +125,7 @@ urlpatterns = [
     #correo
     path('correos_admin/', views.correos_admin, name='correos_admin'),
     path('correo/<int:cod_correo>/', views.ver_correo, name='ver_correo'),
-    path('correos/enviar/', views.enviar_correos_masivos, name='enviar_correos_masivos'),
+    path('correos/enviar_correos_masivos/', views.enviar_correos_masivos, name='enviar_correos_masivos'),
 
     
     path('reporte-usuarios-pdf/', views.reporte_usuarios_pdf, name='reporte_usuarios_pdf'),
