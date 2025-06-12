@@ -248,6 +248,11 @@ textarea.form-control:focus {
     border-color: #f78fb3;
     box-shadow: 0 0 5px rgba(247, 143, 179, 0.5);
 }
+
+
+
+
+
 /* Estilos para el modal */
 .modal-lg {
     max-width: 800px;

@@ -633,7 +633,7 @@ def procesar_compra(request):
         except Exception as e:
             print('Error en procesar_compra:', e)
             traceback.print_exc()
-            return JsonResponse({'success': False, 'error': str(e)})
+            return JsonResponse({'success': False, 'error': str(e)})       
             return JsonResponse({'success': False, 'error': 'Método no permitido'})
             carrito = data.get('carrito', [])
             direccion = data.get('direccion', '')  # Puedes pedirla en el modal
@@ -1527,9 +1527,13 @@ def reporte_usuarios_pdf(request):
     roles = ['ADMIN', 'CLIENTE', 'DOMI']
     conteo_roles = [Usuario.objects.filter(rol=rol).count() for rol in roles]
 
+    # Generar el gráfico
+    plt.figure(figsize=(6, 4))  # tamaño opcional
+    plt.bar(roles, conteo_roles, color='skyblue')
     plt.title('Usuarios por Rol')
     plt.xlabel('Rol')
     plt.ylabel('Cantidad')
+    plt.tight_layout()
 
     # Guardar gráfico en memoria
     buf = io.BytesIO()
@@ -1537,6 +1541,9 @@ def reporte_usuarios_pdf(request):
     buf.seek(0)
     grafico_base64 = base64.b64encode(buf.read()).decode('utf-8')
     buf.close()
+
+    # Cerrar el plot (importantísimo para evitar sobrecarga)
+    plt.close()
 
     # Renderizar template HTML con gráfico embebido
     html_string = render_to_string('reportes/usuarios_pdf.html', {
@@ -1554,28 +1561,41 @@ def reporte_usuarios_pdf(request):
     response['Content-Disposition'] = 'inline; filename="reporte_usuarios.pdf"'
     return response
 
-
+import openpyxl
+from openpyxl.styles import Font, Alignment
+from django.http import HttpResponse
+from .models import Usuario
 
 def reporte_usuarios_excel(request):
-    # Crear libro de Excel
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Usuarios"
 
     # Cabeceras
-    ws.append(['ID', 'Nombre', 'Apellido', 'Email', 'Rol', 'Activo'])
+    encabezados = ['ID', 'Nombre', 'Apellido', 'Email', 'Rol', 'Activo']
+    ws.append(encabezados)
+
+    # Formato de cabeceras
+    for col in ws.iter_cols(min_row=1, max_row=1, min_col=1, max_col=len(encabezados)):
+        for cell in col:
+            cell.font = Font(bold=True)
+            cell.alignment = Alignment(horizontal='center')
 
     # Llenar filas con los datos
     usuarios = Usuario.objects.all()
     for usuario in usuarios:
         ws.append([
             usuario.pk,
-            usuario.nomUsua,
-            usuario.apellUsua,
-            usuario.emailUsua,
+            usuario.nom_usua,
+            usuario.apell_usua,
+            usuario.email,
             usuario.rol,
-            "Sí" if usuario.activo else "No"
         ])
+
+    # Ajustar ancho de columnas
+    for column_cells in ws.columns:
+        length = max(len(str(cell.value)) for cell in column_cells)
+        ws.column_dimensions[column_cells[0].column_letter].width = length + 2
 
     # Preparar respuesta
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -1583,6 +1603,7 @@ def reporte_usuarios_excel(request):
     wb.save(response)
 
     return response
+
 
 def guardar_usuario(request):
     if request.method == 'POST':

@@ -46,10 +46,14 @@
             </a>
             
 
-            <a href="{% url 'reporte_usuarios_pdf' %}" class="btn btn-danger">
-                <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
-            </a>
-
+            <div class="d-flex justify-content-center gap-2">
+    <a href="{% url 'reporte_usuarios_pdf' %}?rol={{ request.GET.rol }}" class="btn btn-danger">
+    <i class="bi bi-file-earmark-pdf"></i> PDF
+</a>
+   <a href="{% url 'reporte_usuarios_excel' %}?rol={{ request.GET.rol }}" class="btn btn-success">
+    <i class="bi bi-file-earmark-spreadsheet"></i> Excel
+</a>
+</div>
             <form method="GET" class="mb-3 d-flex align-items-center form-rosa-pastel">
              <label for="rol" class="me-2">Filtrar por rol:</label>
              <select name="rol" id="rol" class="form-select me-2" style="width: auto;">
