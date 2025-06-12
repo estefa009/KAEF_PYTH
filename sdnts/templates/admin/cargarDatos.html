@@ -29,55 +29,7 @@
 </div>
 {% endif %}
     {% include "includes/nav_admin.html" %}
-<main>
 
-    {% if usuarioLogueado %}
-    <h4>
-        <p>Bienvenid@ {{ usuarioLogueado.nomUsua }}</p>
-    </h4>
-    {% endif %}
-
-    <!-- Barra de búsqueda -->
-    <form id="searchForm" onsubmit="search(event)" class="search-form">
-        <label style="margin-left: 300px;">
-            <input type="text" id="buscar" placeholder="Buscar..">
-            <button type="submit" style="border: none; background: none;"><i class="bi bi-search"></i></button>
-        </label>
-    </form>
-
-    <!-- Menú de usuario -->
-    <div class="d-flex align-items-center gap-3" style="margin-left: auto; margin-right: 40px;">
-        <li class="nav-item dropdown list-unstyled">
-            <a href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-person-circle" style="font-size: 30px; color: #333333"></i>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
-                <li><span class="dropdown-header">Administrador</span></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'perfil_admin' %}">Perfil</a></li>
-                <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
-            </ul>
-        </li>
-    </div>
-</main>
-
-<!-- Contenido principal -->
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12 col-md-6 text-center mt-3">
-            <div class="vent_semanal p-3 shadow-sm bg-light">
-                <h5><i class="bi bi-bag-heart-fill"></i> <br>Ventas Semanales</h5>
-                <h4><b>$30,320</b></h4>
-            </div>
-        </div>
-        <div class="col-12 col-md-6 text-center mt-3">
-            <div class="vent_mensual p-3 shadow-sm bg-light">
-                <h5><i class="bi bi-calendar-check"></i> <br>Ventas Mensuales</h5>
-                <h4><b>$300.328.55</b></h4>
-            </div>
-        </div>
-    </div>
-</div>
 
 <div class="container mt-5 tablaa">
     {% if request.GET.success %}
