@@ -22,15 +22,17 @@
                 </svg> 
             </div>
         <h2>PERFIL DEL ADMINISTRADOR</h2>
-        <ul class="list-group">
+        <ul class="list-group list-group-custom">
             <li class="list-group-item"><strong>Nombre:</strong> {{ usuario.nom_usua }}</li>
             <li class="list-group-item"><strong>Apellido:</strong> {{ usuario.apell_usua }}</li>
             <li class="list-group-item"><strong>Teléfono:</strong> {{ usuario.tele_usua }}</li>
             <li class="list-group-item"><strong>Email:</strong> {{ usuario.email }}</li>
             <li class="list-group-item"><strong>Rol:</strong> {{ usuario.rol }}</li>
         </ul>
-        <a href="{% url 'editarperfil_admin' %}" class="btn btn-primary mt-3">Editar Perfil</a>
-        <a href="{% url 'dashboard_admin' %}" class="btn btn-primary mt-3">Volver</a>
+        <div class=" botones d-flex justify-content-end mt-3">
+            <a href="{% url 'editarperfil_admin' %}" class="btn btn-primary me-2 btn-custom">Editar Perfil</a>
+            <a href="{% url 'dashboard_admin' %}" class="btn btn-primary btn-custom">Volver</a>
+       </div>
     </div>
 
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>

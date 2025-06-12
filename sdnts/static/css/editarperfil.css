@@ -1,0 +1,143 @@
+/* Estilos generales */
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 20px;
+    border-radius: 60px !important;
+    background: linear-gradient(to bottom, #ffeef3, #FFF9F2);
+    box-shadow: 0 8px 20px rgba(255, 192, 203, 0.4);
+    font-family: "Dunkin";
+    color: #ff80a4;
+    
+}
+
+h2 {
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+h4 {
+    color: #ff80a4;
+    margin-bottom: 20px;
+
+}
+
+/* Alertas */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Formularios */
+form {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    background-color: #f3f0f0;
+    padding: 25px;
+    border-radius: 60px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    margin: 10px;
+    border: #ffc0cb 3px solid;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #495057;
+    border-radius: 30px !important;
+   
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 30px;
+    transition: border-color 0.3s;
+    border: #ffc0cb 3px solid;
+    font-style: italic;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="password"]:focus,
+select:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* Botones */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    margin-right: 10px;
+}
+
+.btn-success {
+    background-color: red;
+    color: white;
+    border-radius: 30px;
+}
+
+.btn-success:hover {
+    background-color: red;
+    border-radius: 30px;
+
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+}
+
+/* Diseño responsive */
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+    }
+    
+    .col-md-6 {
+        width: 100%;
+        margin-bottom: 30px;
+    }
+}
