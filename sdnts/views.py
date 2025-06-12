@@ -1288,7 +1288,30 @@ def eliminar_entrada(request, cod_entrada):
 def salidas_admin(request):
     # ✅ Corregido: usar el modelo 'Salida' directamente
     salidas = Salida.objects.all().order_by('-fecha_hora_salida')
-    return render(request, 'admin/salidas_admin.html', {'salidas': salidas})
+    return render(request, 'admin/salidas/salidas_admin.html', {'salidas': salidas})
+def eliminar_salida(request, cod_salida):
+    salida = get_object_or_404(Salida, cod_salida=cod_salida)
+    salida.delete()
+    return redirect('salidas_admin')  # Redirige a la lista de salidas
+
+
+def agregar_salida(request):
+    if request.method == 'POST':
+        form = SalidaForm(request.POST)
+        if form.is_valid():
+            salida = form.save()
+
+            # Descontar del inventario del insumo
+            insumo = salida.cod_insumo
+            insumo.cnt_insumo -= salida.cantidad
+            insumo.save()
+
+            return redirect('salidas_admin')  # Redirige a la lista de salidas
+    else:
+        form = SalidaForm()
+    
+    return render(request, 'admin/salidas/agregar_salida.html', {'form': form})
+
 
 # Vista de Categorías
 from .models import CategoriaInsumo
@@ -1361,12 +1384,50 @@ def cargarDatos(request):
 
 # 🔥 VISTAS ADICIONALES QUE PODRÍAS NECESITAR
 
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Insumo
+from .forms import InsumoForm  # Asegúrate de tener este formulario creado
 @login_required
 def insumos_admin(request):
     """Vista para gestionar insumos"""
     from .models import Insumo
     insumos = Insumo.objects.select_related('cod_categoria').all()
-    return render(request, 'admin/insumos_admin.html', {'insumos': insumos})
+    return render(request, 'admin/insumos/insumos_admin.html', {'insumos': insumos})
+
+# Agregar insumo
+def agregar_insumo(request):
+    if request.method == 'POST':
+        form = InsumoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('insumos_admin')
+    else:
+        form = InsumoForm()
+    return render(request, 'admin/insumos/agregar_insumo.html', {'form': form})
+
+# Editar insumo
+def editar_insumo(request, cod_insumo):
+    insumo = get_object_or_404(Insumo, cod_insumo=cod_insumo)
+    if request.method == 'POST':
+        form = InsumoForm(request.POST, instance=insumo)
+        if form.is_valid():
+            form.save()
+            return redirect('insumos_admin')
+    else:
+        form = InsumoForm(instance=insumo)
+    return render(request, 'admin/insumos/editar_insumo.html', {'form': form})
+
+# Eliminar insumo
+def eliminar_insumo(request, cod_insumo):
+    insumo = get_object_or_404(Insumo, cod_insumo=cod_insumo)
+    if request.method == 'POST':
+        insumo.delete()
+        return redirect('insumos_admin')
+    return render(request, 'admin/insumos/eliminar_insumo.html', {'insumo': insumo})
+
+
+
+
 
 @login_required
 def productos_admin(request):

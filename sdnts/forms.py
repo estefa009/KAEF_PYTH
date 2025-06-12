@@ -263,4 +263,32 @@ class EntradaForm(forms.ModelForm):
         widgets = {
             'fecha_caducidad': forms.DateInput(attrs={'type': 'date'}),
         }
+from django import forms
+from .models import Insumo
+
+class InsumoForm(forms.ModelForm):
+    class Meta:
+        model = Insumo
+        fields = ['cod_categoria', 'nomb_insumo', 'cnt_insumo', 'unidad_medida']
+        widgets = {
+            'cod_categoria': forms.Select(attrs={'class': 'form-control'}),
+            'nomb_insumo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del insumo'}),
+            'cnt_insumo': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Cantidad'}),
+            'unidad_medida': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Unidad de medida'}),
+        }
+        
+from django import forms
+from .models import Salida
+
+class SalidaForm(forms.ModelForm):
+    class Meta:
+        model = Salida
+        fields = ['cod_produccion', 'cod_insumo', 'cantidad']
+        widgets = {
+            'cod_produccion': forms.Select(attrs={'class': 'form-control'}),
+            'cod_insumo': forms.Select(attrs={'class': 'form-control'}),
+            'cantidad': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+        }
+        
+
 

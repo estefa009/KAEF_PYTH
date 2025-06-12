@@ -67,7 +67,6 @@ urlpatterns = [
     path('cargarDatos/', views.cargarDatos, name='cargarDatos'),
     path('correos_admin/', views.correos_admin, name='correos_admin'),
     path('dashboard_admin/', views.dashboard_admin, name='dashboard_admin'),
-    path('insumos_admin/', views.insumos_admin, name='insumos_admin'),
     path('perfil_admin/', views.perfil_admin, name='perfil_admin'),
     path('editarperfil_admin/', views.editarperfil_admin, name='editarperfil_admin'),
     path('usuario/editar/<int:cod_usuario>/', views.editar_usuario, name='editar_usuario'),
@@ -84,7 +83,6 @@ urlpatterns = [
     path('produccion/eliminar/<int:cod_produccion>/', views.eliminar_produccion, name='eliminar_produccion'),
 
     
-    path('salidas_admin/', views.salidas_admin, name='salidas_admin'),
     
     #Ventas
     
@@ -114,8 +112,19 @@ urlpatterns = [
     path('categorias/eliminar/<int:cod_categoria>/', views.eliminar_categoria, name='eliminar_categoria'),
     path('categorias/agregar_categoria', views.agregar_categoria, name='agregar_categoria'),
 
+    #insumos
+    path('insumos_admin/', views.insumos_admin, name='insumos_admin'),
+    path('insumos/agregar/', views.agregar_insumo, name='agregar_insumo'),
+    path('insumos/editar/<int:cod_insumo>/', views.editar_insumo, name='editar_insumo'),
+    path('insumos/eliminar/<int:cod_insumo>/', views.eliminar_insumo, name='eliminar_insumo'),
   
-  
+    #salidas
+    path('salidas_admin/', views.salidas_admin, name='salidas_admin'),
+    path('salidas/eliminar/<int:cod_salida>/', views.eliminar_salida, name='eliminar_salida'),
+    path('salidas/agregar/', views.agregar_salida, name='agregar_salida'),
+
+    
+    
     path('reporte-usuarios-pdf/', views.reporte_usuarios_pdf, name='reporte_usuarios_pdf'),
     path('guardar/', views.guardar_usuario, name='guardar_usuario'),
     path('actualizar-usuario/', views.actualizar_usuario, name='actualizar_usuario'),
