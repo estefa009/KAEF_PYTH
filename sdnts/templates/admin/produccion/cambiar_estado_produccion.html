@@ -1,0 +1,10 @@
+<h2>Cambiar Estado de Producción</h2>
+<form method="post">
+    {% csrf_token %}
+    <select name="estado">
+        {% for key, val in produccion.ESTADOS %}
+        <option value="{{ key }}" {% if produccion.estado == key %}selected{% endif %}>{{ val }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Actualizar</button>
+</form>

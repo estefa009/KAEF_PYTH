@@ -78,7 +78,15 @@ urlpatterns = [
 
     path('eliminar_usuario/<int:cod_usuario>/', views.eliminar_usuario, name='eliminar_usuario'),
 
+    #produccion_admin
     path('produccion_admin/', views.produccion_admin, name='produccion_admin'),
+    path('produccion/crear/', views.crear_produccion, name='crear_produccion'),
+    path('produccion/editar/<int:cod_produccion>/', views.editar_produccion, name='editar_produccion'),
+    path('produccion/estado/<int:cod_produccion>/', views.cambiar_estado_produccion, name='cambiar_estado_produccion'),
+    path('produccion/asignar-envio/<int:cod_produccion>/', views.asignar_envio_produccion, name='asignar_envio_produccion'),
+    path('produccion/eliminar/<int:cod_produccion>/', views.eliminar_produccion, name='eliminar_produccion'),
+
+    
     path('proveedores_admin/', views.proveedores_admin, name='proveedores_admin'),
     path('salidas_admin/', views.salidas_admin, name='salidas_admin'),
     
