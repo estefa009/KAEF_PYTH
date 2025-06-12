@@ -1360,11 +1360,74 @@ def eliminar_categoria(request, cod_categoria):
 # Vista de Correos - COMENTADA porque no tienes este modelo
 # Si necesitas esta funcionalidad, debes crear el modelo Correo
 
+from .models import Correo
+
 @login_required
 def correos_admin(request):
-    from .models import Correo  # Asegúrate de que este modelo exista
-    correos_enviados = Correo.objects.all().order_by('-fecha_envio')
-    return render(request, 'admin/correos_admin.html', {'correos': correos_enviados})
+    historial_correos = Correo.objects.all().order_by('-fecha_envio')
+    return render(request, 'admin/correos/correos_admin.html', {
+        'historial_correos': historial_correos
+    })
+    
+def ver_correo(request, cod_correo):
+    correo = get_object_or_404(Correo, cod_correo=cod_correo)
+    return render(request, 'admin/correo/ver_correo.html', {'correo': correo})
+  
+from django.core.mail import EmailMessage
+from .models import Correo
+from .models import Cliente, Administrador, Domiciliario  # Ajusta si usas otros nombres
+
+def enviar_correos_masivos(request):
+    if request.method == 'POST':
+        destinatarios_tipo = request.POST.getlist('destinatarios')
+        asunto = request.POST.get('asunto')
+        mensaje = request.POST.get('mensaje')
+        archivos = request.FILES.getlist('adjuntos')
+
+        # Obtener correos reales de los destinatarios seleccionados
+        correos_a_enviar = []
+
+        if 'CLIENTE' in destinatarios_tipo:
+            correos_a_enviar += list(Cliente.objects.filter(cod_usua__email__isnull=False).values_list('cod_usua__email', flat=True))
+
+        if 'ADMIN' in destinatarios_tipo:
+            correos_a_enviar += list(Administrador.objects.filter(cod_usua__email__isnull=False).values_list('cod_usua__email', flat=True))
+
+        if 'DOMI' in destinatarios_tipo:
+            correos_a_enviar += list(Domiciliario.objects.filter(cod_usua__email__isnull=False).values_list('cod_usua__email', flat=True))
+
+        # Enviar correos y registrar en BD
+        enviados = 0
+        for correo_dest in set(correos_a_enviar):  # Evitar duplicados
+            try:
+                email = EmailMessage(
+                    asunto,
+                    mensaje,
+                    to=[correo_dest]
+                )
+
+                # Adjuntar archivos
+                for adj in archivos:
+                    email.attach(adj.name, adj.read(), adj.content_type)
+
+                email.send()
+                enviado = True
+                enviados += 1
+            except Exception as e:
+                enviado = False  # puedes registrar el error si lo deseas
+
+            # Guardar registro en BD
+            Correo.objects.create(
+                destinatario=correo_dest,
+                asunto=asunto,
+                mensaje=mensaje,
+                enviado=enviado
+            )
+
+        messages.success(request, f'Se enviaron {enviados} correos.')
+        return redirect('correos_admin')
+
+    return redirect('admin/correos/correos_admin')
 
 
 # Vista para Cargar Datos

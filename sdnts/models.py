@@ -596,7 +596,7 @@ class CarritoItem(models.Model):
     
     
     
-    class Correo(models.Model):
+class Correo(models.Model):
         cod_correo = models.AutoField(primary_key=True)
         destinatario = models.EmailField('destinatario')
         asunto = models.CharField('asunto', max_length=200)
