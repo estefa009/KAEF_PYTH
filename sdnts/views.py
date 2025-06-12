@@ -1707,3 +1707,37 @@ def eliminar_usuario(request, cod_usuario):
       return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
+from django.contrib.auth.hashers import make_password
+import csv
+
+def cargar_datos_view(request):
+    if request.method == 'POST':
+        archivo = request.FILES.get('archivo')
+
+        # Validar extensión
+        if not archivo.name.endswith('.csv'):
+            messages.error(request, 'El archivo debe tener extensión .csv')
+            return redirect('cargarDatos')
+
+        try:
+            decoded_file = archivo.read().decode('utf-8').splitlines()
+            reader = csv.DictReader(decoded_file)
+
+            for fila in reader:
+                Usuario.objects.update_or_create(
+                    email=fila['email'],
+                    defaults={
+                        'nom_usua': fila['nombre'],
+                        'apell_usua': fila['apellido'],
+                        'password': make_password(fila['contraseña']),
+                        'rol': fila['rol'].upper(),  # Asegura que el rol esté en mayúsculas
+                    }
+                )
+
+            messages.success(request, 'Datos cargados exitosamente.')
+        except Exception as e:
+            messages.error(request, f'Error al procesar el archivo: {e}')
+
+        return redirect('cargarDatos')  # Redirige para recargar la página y mostrar mensajes
+
+    return render(request, 'admin/cargarDatos.html')  # Reemplaza con tu template real

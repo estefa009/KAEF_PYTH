@@ -606,24 +606,32 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Función para mostrar el modal
-    window.mostrarModalResumen = function(datos) {
-        if (modalResumen) {
-            const contenidoModal = modalResumen.querySelector('.modal-content');
-            if (contenidoModal) {
-                // Actualizar el contenido del modal con los datos
-                contenidoModal.innerHTML = `
-                    <span class="close">&times;</span>
-                    <h2>Resumen de tu compra</h2>
-                    <div class="resumen-detalles">
-                        ${datos}
-                    </div>
-                    <button class="btn btn-success">OK</button>
-                `;
-            }
-            modalResumen.classList.remove('hidden');
+   window.mostrarModalResumen = function(datos) {
+    if (modalResumen) {
+        const contenidoModal = modalResumen.querySelector('.modal-content');
+        if (contenidoModal) {
+            // Actualizar el contenido del modal
+            contenidoModal.innerHTML = `
+                <span class="close">&times;</span>
+                <h2>Resumen de tu compra</h2>
+                <div class="resumen-detalles">
+                    ${datos}
+                </div>
+                <button class="btn btn-success">OK</button>
+            `;
+
+            // 🔁 Reasignar eventos a los nuevos botones
+            const nuevoBtnOK = contenidoModal.querySelector('button');
+            const nuevoBtnClose = contenidoModal.querySelector('.close');
+
+            nuevoBtnOK?.addEventListener('click', cerrarModalResumen);
+            nuevoBtnClose?.addEventListener('click', cerrarModalResumen);
         }
-    };
+
+        modalResumen.classList.remove('hidden');
+    }
+};
+
 });
 
 // Mostrar estado inicial del carrito
