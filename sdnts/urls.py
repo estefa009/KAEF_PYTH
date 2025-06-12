@@ -64,7 +64,7 @@ urlpatterns = [
     path('editar_perfildomi/', views.editar_perfildomi, name='editar_perfildomi'),
 
     #administrador
-    path('cargarDatos/', views.cargarDatos, name='cargarDatos'),
+    path('cargar-datos/', views.cargar_datos_view, name='cargarDatos'),
     path('dashboard_admin/', views.dashboard_admin, name='dashboard_admin'),
     path('perfil_admin/', views.perfil_admin, name='perfil_admin'),
     path('editarperfil_admin/', views.editarperfil_admin, name='editarperfil_admin'),
@@ -72,6 +72,8 @@ urlpatterns = [
     path('agregar_usuario/', views.agregar_usuario, name='agregar_usuario'),
 
     path('eliminar_usuario/<int:cod_usuario>/', views.eliminar_usuario, name='eliminar_usuario'),
+
+
 
     #produccion_admin
     path('produccion_admin/', views.produccion_admin, name='produccion_admin'),
