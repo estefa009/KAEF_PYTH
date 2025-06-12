@@ -1291,11 +1291,48 @@ def salidas_admin(request):
     return render(request, 'admin/salidas_admin.html', {'salidas': salidas})
 
 # Vista de Categorías
+from .models import CategoriaInsumo
 @login_required
 def categorias_admin(request):
     # ✅ Corregido: usar 'CategoriaInsumo' en lugar de 'Categoria'
     categorias = CategoriaInsumo.objects.all()
-    return render(request, 'admin/categorias_admin.html', {'categorias': categorias})
+    return render(request, 'admin/categorias/categorias_admin.html', {'categorias': categorias})
+
+
+def agregar_categoria(request):
+    if request.method == 'POST':
+        nom_categoria = request.POST.get('nom_categoria').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+
+        if CategoriaInsumo.objects.filter(nom_categoria__iexact=nom_categoria).exists():
+            messages.warning(request, 'Ya existe una categoría con ese nombre.')
+        else:
+            CategoriaInsumo.objects.create(
+                nom_categoria=nom_categoria,
+                descripcion=descripcion if descripcion else None
+            )
+            messages.success(request, 'Categoría agregada exitosamente.')
+        
+        return redirect('categorias_admin')  # Cambia por el nombre correcto de tu ruta
+
+    # Para métodos GET también puedes mostrar la tabla de categorías
+    categorias = CategoriaInsumo.objects.all()
+    return render(request, 'admin/categorias/categorias_admin.html', {
+        'categorias': categorias
+    })
+
+def eliminar_categoria(request, cod_categoria):
+    categoria = get_object_or_404(CategoriaInsumo, cod_categoria=cod_categoria)
+    
+    try:
+        categoria.delete()
+        messages.success(request, 'Categoría eliminada correctamente.')
+    except:
+        messages.error(request, 'No se pudo eliminar la categoría. Puede estar relacionada con insumos.')
+
+    return redirect('categorias_admin')
+
+
 
 # Vista de Correos - COMENTADA porque no tienes este modelo
 # Si necesitas esta funcionalidad, debes crear el modelo Correo
