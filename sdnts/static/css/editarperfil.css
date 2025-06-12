@@ -101,33 +101,35 @@ select:focus {
 }
 
 .btn-success {
-    background-color: red;
+    background-color: #ff85a2;
     color: white;
     border-radius: 30px;
 }
 
 .btn-success:hover {
-    background-color: red;
+    background-color: #ff5b8a;
     border-radius: 30px;
 
 }
 
 .btn-secondary {
-    background-color: #6c757d;
+    background-color: #ff85a2;
     color: white;
 }
 
 .btn-secondary:hover {
-    background-color: #5a6268;
+    background-color: #ff5b8a;
 }
 
 .btn-warning {
-    background-color: #ffc107;
-    color: #212529;
+    background-color: #ff85a2;
+    color: white;
+    border-radius: 30px;
+
 }
 
 .btn-warning:hover {
-    background-color: #e0a800;
+    background-color: #ff5b8a;
 }
 
 /* Diseño responsive */

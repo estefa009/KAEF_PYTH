@@ -1,62 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Venta #{{ venta.cod_venta }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('../Image/fondo.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        h3 {
+            color: #3498db;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: white;
+        }
+        
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .table th {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .table tr:hover {
+            background-color: #e6f7ff;
+        }
+        
+        hr {
+            border: 0;
+            height: 1px;
+            background: #ddd;
+            margin: 30px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #5a6268;
+        }
+        
+        strong {
+            color: #2c3e50;
+        }
+        
+        .total {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Detalle de Venta #{{ venta.cod_venta }}</h2>
 
-{% block contenido %}
-<h2>Detalle de Venta #{{ venta.cod_venta }}</h2>
+        <p><strong>Cliente:</strong> {{ venta.cod_cliente.cod_usua.nom_usua }} {{ venta.cod_cliente.cod_usua.apell_usua }}</p>
+        <p><strong>Dirección de entrega:</strong> {{ venta.direccion_entrega }}</p>
+        <p><strong>Estado:</strong> {{ venta.estado }}</p>
+        <p><strong>Fecha y hora:</strong> {{ venta.fecha_hora }}</p>
 
-<p><strong>Cliente:</strong> {{ venta.cod_cliente.cod_usua.nom_usua }} {{ venta.cod_cliente.cod_usua.apell_usua }}</p>
-<p><strong>Dirección de entrega:</strong> {{ venta.direccion_entrega }}</p>
-<p><strong>Estado:</strong> {{ venta.estado }}</p>
-<p><strong>Fecha y hora:</strong> {{ venta.fecha_hora }}</p>
+        <hr>
 
-<hr>
+        <h3>Productos:</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Combinación</th>
+                    <th>Cantidad</th>
+                    <th>Precio unitario</th>
+                    <th>Fecha de entrega</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detalle in detalles %}
+                <tr>
+                    <td>{{ detalle.cod_producto.nombre }}</td>
+                    <td>
+                        {% if detalle.cod_producto.combinacion %}
+                            {{ detalle.cod_producto.combinacion }}
+                        {% else %}
+                            Sin combinación
+                        {% endif %}
+                    </td>
+                    <td>{{ detalle.cantidad }}</td>
+                    <td>${{ detalle.precio_unitario }}</td>
+                    <td>{{ detalle.fecha_entrega }}</td>
+                    <td>${{ detalle.subtotal }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-<h3>Productos:</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Producto</th>
-            <th>Combinación</th>
-            <th>Cantidad</th>
-            <th>Precio unitario</th>
-            <th>Fecha de entrega</th>
-            <th>Subtotal</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for detalle in detalles %}
-        <tr>
-            <td>{{ detalle.cod_producto.nombre }}</td>
-            <td>
-                {% if detalle.cod_producto.combinacion %}
-                    {{ detalle.cod_producto.combinacion }}
-                {% else %}
-                    Sin combinación
-                {% endif %}
-            </td>
-            <td>{{ detalle.cantidad }}</td>
-            <td>${{ detalle.precio_unitario }}</td>
-            <td>{{ detalle.fecha_entrega }}</td>
-            <td>${{ detalle.subtotal }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        <p class="total"><strong>Total:</strong> ${{ total }}</p>
 
-<p><strong>Total:</strong> ${{ total }}</p>
+        <hr>
 
-<hr>
+        <h3>Pago:</h3>
+        {% if venta.pago %}
+            <p><strong>Método de pago:</strong> {{ venta.pago.get_metodo_pago_display }}</p>
+            <p><strong>Monto total:</strong> ${{ venta.pago.monto_total }}</p>
+            <p><strong>Fecha y hora de pago:</strong> {{ venta.pago.fecha_hora_pago }}</p>
+            <p><strong>Estado:</strong> {{ venta.pago.get_estado_pago_display }}</p>
+            {% if venta.pago.transaccion_id %}
+                <p><strong>ID de transacción:</strong> {{ venta.pago.transaccion_id }}</p>
+            {% endif %}
+        {% else %}
+            <p>No se ha registrado un pago para esta venta.</p>
+        {% endif %}
 
-<h3>Pago:</h3>
-{% if venta.pago %}
-    <p><strong>Método de pago:</strong> {{ venta.pago.get_metodo_pago_display }}</p>
-    <p><strong>Monto total:</strong> ${{ venta.pago.monto_total }}</p>
-    <p><strong>Fecha y hora de pago:</strong> {{ venta.pago.fecha_hora_pago }}</p>
-    <p><strong>Estado:</strong> {{ venta.pago.get_estado_pago_display }}</p>
-    {% if venta.pago.transaccion_id %}
-        <p><strong>ID de transacción:</strong> {{ venta.pago.transaccion_id }}</p>
-    {% endif %}
-{% else %}
-    <p>No se ha registrado un pago para esta venta.</p>
-{% endif %}
-
-<a href="{% url 'ventas_admin' %}" class="btn btn-secondary mt-4">Volver</a>
-{% endblock %}
+        <a href="{% url 'ventas_admin' %}" class="btn">Volver</a>
+    </div>
+</body>
+</html>
