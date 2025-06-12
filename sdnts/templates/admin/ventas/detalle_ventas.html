@@ -1,0 +1,62 @@
+
+{% block contenido %}
+<h2>Detalle de Venta #{{ venta.cod_venta }}</h2>
+
+<p><strong>Cliente:</strong> {{ venta.cod_cliente.cod_usua.nom_usua }} {{ venta.cod_cliente.cod_usua.apell_usua }}</p>
+<p><strong>Dirección de entrega:</strong> {{ venta.direccion_entrega }}</p>
+<p><strong>Estado:</strong> {{ venta.estado }}</p>
+<p><strong>Fecha y hora:</strong> {{ venta.fecha_hora }}</p>
+
+<hr>
+
+<h3>Productos:</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Combinación</th>
+            <th>Cantidad</th>
+            <th>Precio unitario</th>
+            <th>Fecha de entrega</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for detalle in detalles %}
+        <tr>
+            <td>{{ detalle.cod_producto.nombre }}</td>
+            <td>
+                {% if detalle.cod_producto.combinacion %}
+                    {{ detalle.cod_producto.combinacion }}
+                {% else %}
+                    Sin combinación
+                {% endif %}
+            </td>
+            <td>{{ detalle.cantidad }}</td>
+            <td>${{ detalle.precio_unitario }}</td>
+            <td>{{ detalle.fecha_entrega }}</td>
+            <td>${{ detalle.subtotal }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<p><strong>Total:</strong> ${{ total }}</p>
+
+<hr>
+
+<h3>Pago:</h3>
+{% if venta.pago %}
+    <p><strong>Método de pago:</strong> {{ venta.pago.get_metodo_pago_display }}</p>
+    <p><strong>Monto total:</strong> ${{ venta.pago.monto_total }}</p>
+    <p><strong>Fecha y hora de pago:</strong> {{ venta.pago.fecha_hora_pago }}</p>
+    <p><strong>Estado:</strong> {{ venta.pago.get_estado_pago_display }}</p>
+    {% if venta.pago.transaccion_id %}
+        <p><strong>ID de transacción:</strong> {{ venta.pago.transaccion_id }}</p>
+    {% endif %}
+{% else %}
+    <p>No se ha registrado un pago para esta venta.</p>
+{% endif %}
+
+<a href="{% url 'ventas_admin' %}" class="btn btn-secondary mt-4">Volver</a>
+{% endblock %}

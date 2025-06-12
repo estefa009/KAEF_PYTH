@@ -894,17 +894,38 @@ def editarperfil_admin(request):
     })
     
 # Vista de Ventas
+from django.core.paginator import Paginator
+from django.db.models import Sum
+
 @login_required
 def ventas_admin(request):
-    ventas = Venta.objects.all().order_by('-fecha_hora')
-    total_ventas = ventas.aggregate(Sum('total'))['total__sum'] or 0
-    
-    return render(request, 'admin/ventas/ventas_admin.html', {
+    ventas_list = Venta.objects.all().order_by('-fecha_hora')
+
+    # Paginación
+    paginator = Paginator(ventas_list, 10)  # 10 ventas por página
+    page_number = request.GET.get('page', 1)
+    ventas = paginator.get_page(page_number)
+
+    # Estadísticas
+    ventas_pendientes = Venta.objects.filter(estado='PENDIENTE').count()
+    ventas_en_camino = Venta.objects.filter(estado='EN_CAMINO').count()
+    ventas_entregadas = Venta.objects.filter(estado='ENTREGADO').count()
+
+    total_ventas = ventas_list.aggregate(Sum('total'))['total__sum'] or 0
+
+    context = {
         'ventas': ventas,
-        'total_ventas': total_ventas
-    })
-    
-# views.py
+        'total_ventas': total_ventas,
+        'ventasPendientes': ventas_pendientes,
+        'ventasEnCamino': ventas_en_camino,
+        'ventasEntregadas': ventas_entregadas,
+        'pagina_actual': ventas.number,
+        'total_paginas': paginator.num_pages,
+        'range_paginas': range(1, paginator.num_pages + 1),
+    }
+
+    return render(request, 'admin/ventas/ventas_admin.html', context)
+
 from django.shortcuts import render, redirect
 from django.forms import modelformset_factory
 from .models import Venta, DetalleVenta, Pago, CombinacionProducto
@@ -970,18 +991,127 @@ def agregar_venta_completa(request):
         'productos': Producto.objects.all(), 
     })
 
+@login_required
+def detalle_ventas(request, venta_id):
+    venta = get_object_or_404(Venta, pk=venta_id)
+    detalles = DetalleVenta.objects.filter(cod_venta=venta).select_related('cod_producto')
 
+    total = sum(detalle.subtotal for detalle in detalles)
 
+    context = {
+        'venta': venta,
+        'detalles': detalles,
+        'total': total,
+    }
+    return render(request, 'admin/ventas/detalle_ventas.html', context)
 
+@login_required
+def editar_estado_venta(request, venta_id):
+    venta = get_object_or_404(Venta, pk=venta_id)
 
+    if request.method == 'POST':
+        nuevo_estado = request.POST.get('estado')
+        if nuevo_estado in dict(Venta.ESTADOS).keys():
+            venta.estado = nuevo_estado
+            venta.save()
+            return redirect('ventas_admin')
+
+    return render(request, 'admin/ventas/editar_estado_venta.html', {
+        'venta': venta,
+        'estados': Venta.ESTADOS
+    })
 
 
 # Vista de Producción
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Produccion, Salida, Entrada, Insumo, Venta, Envio
+from .forms import ProduccionForm, SalidaForm, EntradaForm, EnvioForm
+from django.db import transaction
 @login_required
 def produccion_admin(request):
-    # ✅ Corregido: usar 'fecha_inicio' en lugar de 'fecha'
-    producciones = Produccion.objects.all().order_by('-fecha_inicio')
-    return render(request, 'admin/produccion_admin.html', {'producciones': producciones})
+    producciones = Produccion.objects.select_related('cod_venta').all()
+    return render(request, 'admin/produccion/produccion_admin.html', {'producciones': producciones})
+
+
+def crear_produccion(request):
+    if request.method == 'POST':
+        form = ProduccionForm(request.POST)
+        salida_form = SalidaForm(request.POST)
+        if form.is_valid() and salida_form.is_valid():
+            with transaction.atomic():
+                produccion = form.save()
+                salida = salida_form.save(commit=False)
+                salida.cod_produccion = produccion
+                insumo = salida.cod_insumo
+                if insumo.stock >= salida.cantidad:
+                    insumo.stock -= salida.cantidad
+                    insumo.save()
+                    salida.save()
+                else:
+                    entrada = Entrada(
+                        cod_insumo=insumo,
+                        cnt_entrada=salida.cantidad - insumo.stock,
+                        precio_entrada=insumo.precio,
+                        fecha_caducidad=None,
+                        nom_entrada=f"Auto recarga para producción {produccion.cod_produccion}"
+                    )
+                    entrada.save()
+                    insumo.stock += entrada.cnt_entrada - salida.cantidad
+                    insumo.save()
+                    salida.save()
+            return redirect('produccion_admin')
+    else:
+        form = ProduccionForm()
+        salida_form = SalidaForm()
+    return render(request, 'admin/produccion/crear_produccion.html', {'form': form, 'salida_form': salida_form})
+
+def editar_produccion(request, cod_produccion):
+    produccion = get_object_or_404(Produccion, pk=cod_produccion)
+    if request.method == 'POST':
+        form = ProduccionForm(request.POST, instance=produccion)
+        if form.is_valid():
+            form.save()
+            return redirect('produccion_admin')
+    else:
+        form = ProduccionForm(instance=produccion)
+    return render(request, 'admin/produccion/editar_produccion.html', {'form': form, 'produccion': produccion})
+
+def cambiar_estado_produccion(request,cod_produccion ):
+    produccion = get_object_or_404(Produccion, pk=cod_produccion)
+    if request.method == 'POST':
+        nuevo = request.POST.get('estado')
+        if nuevo in dict(Produccion.ESTADOS):
+            produccion.estado = nuevo
+            if nuevo == 'FINALIZADO':
+                produccion.fecha_fin = timezone.now()
+            produccion.save()
+        return redirect('produccion_admin')
+    return render(request, 'admin/produccion/cambiar_estado_produccion.html', {'produccion': produccion, 'estados': Produccion.ESTADOS})
+
+def asignar_envio_produccion(request, cod_produccion):
+    venta = get_object_or_404(Venta, cod_venta=cod_produccion)
+    if request.method == 'POST':
+        form = EnvioForm(request.POST)
+        if form.is_valid():
+            envio = form.save(commit=False)
+            envio.cod_venta = venta
+            envio.fecha_asignacion = timezone.now()
+            envio.estado = 'ASIGNADO'
+            envio.save()
+            return redirect('produccion_admin')
+    else:
+        form = EnvioForm()
+    return render(request, 'admin/produccion/asignar_envio_produccion.html', {'form': form, 'venta': venta})
+
+def eliminar_produccion(request, cod_produccion):
+    produccion = get_object_or_404(Produccion, pk=cod_produccion)
+    if request.method == 'POST':
+        produccion.delete()
+        return redirect('produccion_admin')
+    return render(request, 'admin/produccion/eliminar_produccion.html', {'produccion': produccion})
+
+
+
 
 # Vista de Envíos
 @login_required

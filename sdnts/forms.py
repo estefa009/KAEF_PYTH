@@ -144,7 +144,7 @@ class CambiarContrasenaForm(PasswordChangeForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
     )
     
-# forms.py
+# ventas
 from django import forms
 from .models import Venta, DetalleVenta, Pago, CombinacionProducto
 
@@ -166,22 +166,41 @@ class CombinacionProductoForm(forms.ModelForm):
         model = CombinacionProducto
         fields = [
             'cod_producto', 
-            'cod_sabor_masa_1', 'cod_glaseado_1', 'cod_topping_1'
+            'cod_sabor_masa_1', 
+            'cod_glaseado_1', 
+            'cod_topping_1'
         ]
         widgets = {
-            'cod_sabor_masa_2': forms.Select(attrs={'class': 'form-control'}),
-            'cod_glaseado_2': forms.Select(attrs={'class': 'form-control'}),
-            'cod_topping_2': forms.Select(attrs={'class': 'form-control'}),
+            'cod_producto': forms.Select(attrs={'class': 'form-control'}),
+            'cod_sabor_masa_1': forms.Select(attrs={'class': 'form-control'}),
+            'cod_glaseado_1': forms.Select(attrs={'class': 'form-control'}),
+            'cod_topping_1': forms.Select(attrs={'class': 'form-control'}),
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Hacemos opcionales los campos de la segunda combinación
-        self.fields['cod_sabor_masa_2'].required = False
-        self.fields['cod_glaseado_2'].required = False
-        self.fields['cod_topping_2'].required = False
 
 class PagoForm(forms.ModelForm):
     class Meta:
         model = Pago
         exclude = ['cod_venta', 'estado_pago', 'transaccion_id']
+
+#produccion
+from .models import Produccion, Salida, Entrada, Envio
+
+class ProduccionForm(forms.ModelForm):
+    class Meta:
+        model = Produccion
+        fields = ['cod_venta', 'observaciones']
+
+class SalidaForm(forms.ModelForm):
+    class Meta:
+        model = Salida
+        fields = ['cod_insumo', 'cantidad']
+
+class EntradaForm(forms.ModelForm):
+    class Meta:
+        model = Entrada
+        fields = ['cod_insumo', 'cnt_entrada', 'precio_entrada', 'fecha_caducidad', 'lote']
+
+class EnvioForm(forms.ModelForm):
+    class Meta:
+        model = Envio
+        fields = ['cod_domi', 'tarifa_envio', 'observaciones', 'firma_recepcion']

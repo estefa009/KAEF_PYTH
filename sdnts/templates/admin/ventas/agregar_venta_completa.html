@@ -53,14 +53,9 @@
                 {{ form.cod_sabor_masa_1.label_tag }} {{ form.cod_sabor_masa_1 }}
                 {{ form.cod_glaseado_1.label_tag }} {{ form.cod_glaseado_1 }}
                 {{ form.cod_topping_1.label_tag }} {{ form.cod_topping_1 }}
-
-                <div class="combinacion-secundaria-fields d-none">
-                    {{ form.cod_sabor_masa_2.label_tag }} {{ form.cod_sabor_masa_2 }}
-                    {{ form.cod_glaseado_2.label_tag }} {{ form.cod_glaseado_2 }}
-                    {{ form.cod_topping_2.label_tag }} {{ form.cod_topping_2 }}
-                </div>
             </div>
         {% endfor %}
+
 
         <h4>Totales</h4>
         <p>Subtotal: $<span id="subtotal">0.00</span></p>
@@ -88,26 +83,7 @@
 
         combinacionForms.forEach((form) => {
             const productoSelect = form.querySelector('select[name$="cod_producto"]');
-            const secondaryFields = form.querySelector(".combinacion-secundaria-fields");
-
-            function toggleCamposSecundarios() {
-                const productoId = productoSelect.value;
-                const talla = productosConTalla[productoId];
-                if (talla === 'M' || talla === 'L') {
-                    secondaryFields.classList.remove("d-none");
-                } else {
-                    secondaryFields.classList.add("d-none");
-                    // Opcional: limpiar los campos
-                    secondaryFields.querySelectorAll('select').forEach(select => {
-                        select.selectedIndex = 0;
-                    });
-                }
-            }
-
-            if (productoSelect) {
-                productoSelect.addEventListener("change", toggleCamposSecundarios);
-                toggleCamposSecundarios(); // Ejecutar al cargar
-            }
+            
         });
     });
 </script>

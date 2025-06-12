@@ -11,6 +11,29 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="{% static 'css/domiciliario.css' %}">
+
+  <style>
+    .btn-outline-pink {
+      color: #d63384;
+      border-color: #d63384;
+    }
+
+    .btn-outline-pink:hover {
+      background-color: #d63384;
+      color: white;
+    }
+
+    .btn-pink {
+      background-color: #e83e8c;
+      border-color: #e83e8c;
+      color: white;
+    }
+
+    .btn-pink:hover {
+      background-color: #d63384;
+      border-color: #d63384;
+    }
+  </style>
 </head>
 
 <body>
@@ -25,82 +48,117 @@
       <br>
       <img src="{% static 'icon/5.ico' %}" alt="">
       <a class="degradado" href="{% url 'mis_domicilios' %}">Mis Domicilios <i class="bi bi-scooter"></i></a>
-      <a class="degradado" href="{% url 'historial_envios' %}">Historial de Envios <i class="bi bi-clipboard-data"></i></a>
+      <a class="degradado" href="{% url 'historial_envios' %}">Historial de Envíos <i class="bi bi-clipboard-data"></i></a>
       <br><br><br><br><hr><br><br><br><br><br>
       <a class="degradado" href="{% url 'logout' %}"><b>Cerrar Sesión <i class="bi bi-arrow-bar-right"></i></b></a>
     </div>
+
     <main>
       <h1 id="site-name">
-       <img src="{% static 'icon/7.ico' %}" alt="Logo Stefas Donuts" class="brand-logo">
-     </h1>
-     <h1>Bienvenid@ {{ user.nom_usua }} {{user.apell_usua}}</h1>
-      </form>
-        <div class="icons d-flex justify-content-end align-items-center gap-3 me-3">
-  <!-- Botón de notificaciones -->
-          <button class="btn btn-outline-secondary position-relative" data-bs-toggle="modal" data-bs-target="#modalNotificaciones">
-            <i class="bi bi-bell"></i>
-            {% if nuevos_envios %}
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                {{ nuevos_envios|length }}
-              </span>
-            {% endif %}
-          </button>
+        <img src="{% static 'icon/7.ico' %}" alt="Logo Stefas Donuts" class="brand-logo">
+      </h1>
+      <div class="welcome-message">
+        <h1>Bienvenid@ {{ user.nom_usua }} {{ user.apell_usua }}</h1>
+      </div>
+    
 
-          <!-- Botón de perfil -->
-          <a href="{% url 'perfildomi' %}" class="btn btn-outline-primary">
-            <i class="bi bi-person-circle"></i>
-          </a>
+      <div class="icon-bar">
+        <!-- Botón de notificaciones -->
+        <button class="btnnoti btn-outline position-relative" data-bs-toggle="modal" data-bs-target="#modalNotificaciones">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="miniicon">
+           <path fill-rule="evenodd" d="M5.25 9a6.75 6.75 0 0 1 13.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 0 1-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 1 1-7.48 0 24.585 24.585 0 0 1-4.831-1.244.75.75 0 0 1-.298-1.205A8.217 8.217 0 0 0 5.25 9.75V9Zm4.502 8.9a2.25 2.25 0 1 0 4.496 0 25.057 25.057 0 0 1-4.496 0Z" clip-rule="evenodd" />
+         </svg>
 
-          <span>Domiciliario</span>
-        </div>
+          {% if nuevos_envios %}
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              {{ nuevos_envios|length }}
+            </span>
+          {% endif %}
+        </button>
 
-   </main>
+        <!-- Botón de perfil -->
+        <a href="{% url 'perfildomi' %}" class="btn btn ">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="miniicon">
+            <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
+         </svg>
+
+        </a>
+
+        <span class="text"><strong>Domiciliario</strong></span>
+      </div>
+    </main>
   </nav>
 
-
- <div class="table_envios">
-  <br>
-  <center><h5><b>MIS DOMICILIOS</b></h5></center>
-  <div class="container mt-4">
-    <div class="table-responsive">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Cod. Asignación</th>
-            <th>Fecha/Hora Asignada</th>
-            <th>Fecha/Hora Entrega</th>
-            <th>Tarifa</th>
-            <th>Segunda Fecha</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% if envios %}
-            {% for envio in envios %}
-              <tr>
-                <td>{{ envio.cod_asignacion }}</td>
-                <td>{{ envio.fecha_hora_asignada }}</td>
-                <td><input type="datetime-local" class="form-control" name="fecha_hora_entrega_{{ envio.id }}" value="{{ envio.fecha_hora_entrega|date:'Y-m-d\\TH:i' }}" disabled></td>
-                <td><input type="text" class="form-control" name="tarifa_{{ envio.id }}" value="{{ envio.tarifa_envio }}" disabled></td>
-                <td><input type="datetime-local" class="form-control" name="segunda_fecha_{{ envio.id }}" value="{{ envio.segunda_fecha_entrega|date:'Y-m-d\\TH:i' }}" disabled></td>
-                <td><input type="text" class="form-control" name="estado_{{ envio.id }}" value="{{ envio.estado_envio }}" disabled></td>
-                <td>
-                  <button class="btn btn-primary" onclick="enableEdit({{ envio.id }})">Editar</button>
-                  <button class="btn btn-warning" onclick="sendToHistorial({{ envio.id }})">Archivar</button>
-                </td>
-              </tr>
-            {% endfor %}
-          {% else %}
-            <tr><td colspan="7" class="text-center">No hay envíos disponibles.</td></tr>
-          {% endif %}
-        </tbody>
-      </table>
+  <!-- Tabla de envíos -->
+  <div class="table_envios">
+    <br>
+    <center><h5><b>MIS DOMICILIOS</b></h5></center>
+    <div class="container mt-4">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Cod. Asignación</th>
+              <th>Fecha/Hora Asignada</th>
+              <th>Fecha/Hora Entrega</th>
+              <th>Tarifa</th>
+              <th>Segunda Fecha</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if envios %}
+              {% for envio in envios %}
+                <tr>
+                  <td>{{ envio.cod_asignacion }}</td>
+                  <td>{{ envio.fecha_hora_asignada }}</td>
+                  <td><input type="datetime-local" class="form-control" name="fecha_hora_entrega_{{ envio.id }}" value="{{ envio.fecha_hora_entrega|date:'Y-m-d\\TH:i' }}" disabled></td>
+                  <td><input type="text" class="form-control" name="tarifa_{{ envio.id }}" value="{{ envio.tarifa_envio }}" disabled></td>
+                  <td><input type="datetime-local" class="form-control" name="segunda_fecha_{{ envio.id }}" value="{{ envio.segunda_fecha_entrega|date:'Y-m-d\\TH:i' }}" disabled></td>
+                  <td><input type="text" class="form-control" name="estado_{{ envio.id }}" value="{{ envio.estado_envio }}" disabled></td>
+                  <td>
+                    <button class="btn btn-primary" onclick="enableEdit({{ envio.id }})">Editar</button>
+                    <button class="btn btn-warning" onclick="sendToHistorial({{ envio.id }})">Archivar</button>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="7" class="text-center">No hay envíos disponibles.</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
- </div>
 
+  <!-- Modal de notificaciones -->
+  <div class="modal fade" id="modalNotificaciones" tabindex="-1" aria-labelledby="notificacionesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="notificacionesLabel">Nuevos Domicilios</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          {% if nuevos_envios %}
+            <ul class="list-group">
+              {% for envio in nuevos_envios %}
+                <li class="list-group-item">
+                  <strong>Código:</strong> {{ envio.cod_asignacion }}<br>
+                  <strong>Asignado:</strong> {{ envio.fecha_hora_asignada|date:"d/m/Y H:i" }}
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>No tienes nuevos domicilios asignados.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- Scripts -->
   <script>
     const menuToggle = document.getElementById('menuToggle');
     const sidenav = document.getElementById('mySidenav');
@@ -128,33 +186,19 @@
       window.location.href = url;
     }
   </script>
+  <script>
+    // Cierra el menú al hacer clic fuera de él
+document.addEventListener('click', function(event) {
+  const isClickInsideMenu = sidenav.contains(event.target);
+  const isClickOnToggle = menuToggle.contains(event.target);
 
+  if (!isClickInsideMenu && !isClickOnToggle && sidenav.classList.contains('open')) {
+    sidenav.classList.remove('open');
+    mainContent.classList.remove('shifted');
+  }
+});
 
-  <!-- Modal de notificaciones -->
-<div class="modal fade" id="modalNotificaciones" tabindex="-1" aria-labelledby="notificacionesLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-sm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="notificacionesLabel">Nuevos Domicilios</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body">
-        {% if nuevos_envios %}
-          <ul class="list-group">
-            {% for envio in nuevos_envios %}
-              <li class="list-group-item">
-                <strong>Código:</strong> {{ envio.cod_asignacion }}<br>
-                <strong>Asignado:</strong> {{ envio.fecha_hora_asignada|date:"d/m/Y H:i" }}
-              </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p>No tienes nuevos domicilios asignados.</p>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-</div>
+  </script>
 
 </body>
 </html>

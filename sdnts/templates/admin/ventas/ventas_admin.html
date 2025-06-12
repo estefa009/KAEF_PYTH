@@ -43,27 +43,21 @@
 </head>
 
 <body>
-<!-- Insertar botón de menú -->
-<button id="menuToggle" class="menu-toggle">
-    <i class="bi bi-list"></i>
-</button>
-
-
-<!-- Insertar menú nav -->
-{% include "includes/nav_admin.html" %}
+<body>
+    {% include "includes/nav_admin.html" %}
 
 <main>
-    <h4><p>Bienvenid@ {{ user.nom_usua }} {{ user.apell_usua }}</p></h4>
-   
+        <h4><p>Bienvenid@ {{ user.nom_usua }} {{ user.apell_usua }}</p></h4>
+
+
     <!-- Menú de usuario -->
     <div class="d-flex align-items-center gap-3" style="margin-left: auto; margin-right: 40px;">
-        <li class="nav-item dropdown list-unstyled">
-            <a href="#" id="adminDropdown" role="button"
-                data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-person-circle" style="font-size: 30px; color: #333333"></i>
-            </a>
+            <li class="nav-item dropdown list-unstyled">
+                <a href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-circle" style="font-size: 30px; color: #333333"></i>
+                </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
-                <li><span class="dropdown-header">Administrador {{ user.nom_usua }} </span></li>
+                <li><span class="dropdown-header">Administrador  {{ user.nom_usua }}</span></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="{% url 'perfil_admin' %}">Perfil</a></li>
                 <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
@@ -128,79 +122,69 @@
                 </div>
             </div>
 
-            <!-- Tabla de ventas -->
+{% load static %}
+
+        {% block content %}
+        <div class="container mt-5">
+            <h2 class="mb-4">Listado de Ventas</h2>
+            
             <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Cliente</th>
-                        <th>Fecha</th>
-                        <th>Total</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Cliente</th>
+                            <th>Fecha y Hora</th>
+                            <th>Subtotal</th>
+                            <th>IVA</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                            <th>Dirección Entrega</th>
+                            <th>Observaciones</th>
+                            <th>Ver Detalles</th>
+                            <th>Opciones</th>
+                        </tr>
                     </thead>
-                    <tbody>
-                    {% if not ventas %}
-                    <tr>
-                        <td colspan="6" class="text-center">No hay ventas registradas</td>
-                    </tr>
-                    {% else %}
-                    {% for venta in ventas %}
-                    <tr>
-                        <td>{{ venta.codVenta }}</td>
-                        <td>{{ venta.codCliente|default:"Sin cliente" }}</td>
-                        <td>{{ venta.fechaHora|date:"d/m/Y H:i" }}</td>
-                        <td>${{ venta.total|floatformat:2 }}</td>
-                        <td>
-                            <span class="badge {{ venta.estado|lower|cut:' ' }}">
-                                {{ venta.estado }}
-                            </span>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-rosa me-2"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modalDetalleVenta"
-                                    data-id="{{ venta.codVenta }}"
-                                    data-cliente="{{ venta.codCliente|default:'Sin cliente' }}"
-                                    data-fecha="{{ venta.fechaHora|date:'Y-m-d' }}"
-                                    data-hora="{{ venta.fechaHora|date:'H:i' }}"
-                                    data-subtotal="{{ venta.subtotal }}"
-                                    data-iva="{{ venta.iva }}"
-                                    data-total="{{ venta.total }}"
-                                    data-estado="{{ venta.estado }}"
-                                    data-direccion="{{ venta.direccionEntrega }}"
-                                    data-observaciones="{{ venta.observaciones|default:'Ninguna' }}">
-                                <i class="bi bi-eye"></i> Ver
-                            </button>
-                            <button class="btn btn-sm btn-info me-2"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modalEditarVenta"
-                                    data-id="{{ venta.codVenta }}"
-                                    data-cliente="{{ venta.codCliente }}"
-                                    data-fecha="{{ venta.fechaHora|date:'Y-m-d' }}"
-                                    data-hora="{{ venta.fechaHora|date:'H:i' }}"
-                                    data-subtotal="{{ venta.subtotal }}"
-                                    data-iva="{{ venta.iva }}"
-                                    data-total="{{ venta.total }}"
-                                    data-estado="{{ venta.estado }}"
-                                    data-direccion="{{ venta.direccionEntrega }}"
-                                    data-observaciones="{{ venta.observaciones }}">
-                                <i class="bi bi-pencil"></i> Editar
-                            </button>
-                            <button class="btn btn-sm btn-danger"
-                                    onclick="confirmarEliminar({{ venta.codVenta }})">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    {% endif %}
+                    <tbody id="tablaVentas">
+                        {% for venta in ventas %}
+                        <tr data-estado="{{ venta.estado }}">
+                            <td>{{ venta.cod_venta }}</td>
+                            <td>{{ venta.nombre_cliente }}</td>
+                            <td>{{ venta.fecha_hora|date:"Y-m-d H:i" }}</td>
+                            <td>${{ venta.subtotal }}</td>
+                            <td>${{ venta.iva }}</td>
+                            <td><strong>${{ venta.total }}</strong></td>
+                            <td>{{ venta.estado }}</td>
+                            <td>{{ venta.direccion_entrega }}</td>
+                            <td>{{ venta.observaciones|default:"-" }}</td>
+                            <td class="text-center">
+                                <a href="{% url 'detalle_ventas' venta.cod_venta %}" class="btn btn-info btn-sm">
+                                    Detalles
+                                </a>
+                            </td>
+                            <td class="text-center">
+                                <a href="{% url 'editar_estado_venta' venta.cod_venta %}" class="btn btn-warning btn-sm">
+                                    Editar Estado
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="11" class="text-center">No hay ventas registradas.</td>
+                        </tr>
+                        {% endfor %}
                     </tbody>
+                    <tfoot>
+                        <tr class="table-secondary">
+                            <th colspan="5" class="text-end">Total general:</th>
+                            <th colspan="6">${{ total_ventas }}</th>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
-
+        </div>
+        {% endblock %}
+    
             <!-- Paginación -->
             {% if total_paginas > 1 %}
             <nav>
@@ -228,6 +212,22 @@
         </div>
     </div>
 </div>
+    <script>
+    function filtrarVentas() {
+        const estadoSeleccionado = document.getElementById('filtroEstado').value;
+        const filas = document.querySelectorAll('#tablaVentas tr');
+
+        filas.forEach(fila => {
+            const estado = fila.getAttribute('data-estado');
+
+            if (!estadoSeleccionado || estado === estadoSeleccionado) {
+                fila.style.display = '';
+            } else {
+                fila.style.display = 'none';
+            }
+        });
+    }
+</script>
 
 </body>
 </html>
