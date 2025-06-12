@@ -1388,13 +1388,13 @@ def enviar_correos_masivos(request):
         correos_a_enviar = []
 
         if 'CLIENTE' in destinatarios_tipo:
-            correos_a_enviar += list(Cliente.objects.filter(cod_usua__email__isnull=False).values_list('cod_usua__email', flat=True))
+            correos_a_enviar += list(Cliente.objects.select_related('cod_usua').values_list('cod_usua__email', flat=True))
 
         if 'ADMIN' in destinatarios_tipo:
-            correos_a_enviar += list(Administrador.objects.filter(cod_usua__email__isnull=False).values_list('cod_usua__email', flat=True))
+            correos_a_enviar += list(Administrador.objects.select_related('cod_usua').values_list('cod_usua__email', flat=True))
 
         if 'DOMI' in destinatarios_tipo:
-            correos_a_enviar += list(Domiciliario.objects.filter(cod_usua__email__isnull=False).values_list('cod_usua__email', flat=True))
+            correos_a_enviar += list(Domiciliario.objects.select_related('cod_usua').values_list('cod_usua__email', flat=True))
 
         # Enviar correos y registrar en BD
         enviados = 0
