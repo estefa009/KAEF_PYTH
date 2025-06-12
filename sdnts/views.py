@@ -1090,6 +1090,15 @@ def cambiar_estado_produccion(request,cod_produccion ):
                 produccion.fecha_fin = timezone.now()
             produccion.save()
         return redirect('produccion_admin')
+    # Actualizar el estado de la venta asociada según el estado de la producción
+    venta = produccion.cod_venta
+    if produccion.estado == 'EN_PROCESO':
+        venta.estado = 'PREPARACION'
+    elif produccion.estado == 'FINALIZADO':
+        venta.estado = 'EN_CAMINO'  
+    elif produccion.estado == 'PENDIENTE':
+        venta.estado = 'PENDIENTE'
+    venta.save()
     return render(request, 'admin/produccion/cambiar_estado_produccion.html', {'produccion': produccion, 'estados': Produccion.ESTADOS})
 
 def asignar_envio_produccion(request, cod_produccion):
@@ -1160,7 +1169,7 @@ def eliminar_envio(request, pk):
 @login_required
 def proveedores_admin(request):
     proveedores = Proveedor.objects.all()
-    return render(request, 'admin/proveedores_admin.html', {'proveedores': proveedores})
+    return render(request, 'admin/proveedores/proveedores_admin.html', {'proveedores': proveedores})
 
 # Vista de Entradas (Inventario)
 @login_required

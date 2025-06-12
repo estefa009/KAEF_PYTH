@@ -212,7 +212,6 @@ class EnvioForm(forms.ModelForm):
             'estado',
             'tarifa_envio',
             'observaciones',
-            'firma_recepcion',
         ]
         widgets = {
             'fecha_asignacion': forms.DateTimeInput(attrs={
@@ -232,10 +231,7 @@ class EnvioForm(forms.ModelForm):
                 'rows': 3,
                 'placeholder': 'Observaciones adicionales'
             }),
-            'firma_recepcion': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Nombre o firma de quien recibe'
-            }),
+            
             'estado': forms.Select(attrs={'class': 'form-select'}),
             'cod_domi': forms.Select(attrs={'class': 'form-select'}),
             'tarifa_envio': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),

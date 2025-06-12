@@ -86,7 +86,6 @@ urlpatterns = [
     path('produccion/eliminar/<int:cod_produccion>/', views.eliminar_produccion, name='eliminar_produccion'),
 
     
-    path('proveedores_admin/', views.proveedores_admin, name='proveedores_admin'),
     path('salidas_admin/', views.salidas_admin, name='salidas_admin'),
     
     #Ventas
@@ -102,6 +101,13 @@ urlpatterns = [
     path('envios/envios/editar/<int:pk>/', views.editar_envio, name='editar_envio'),
     path('envios/envios/eliminar/<int:pk>/', views.eliminar_envio, name='eliminar_envio'),
     
+    #proveedores
+    path('proveedores_admin/', views.proveedores_admin, name='proveedores_admin'),
+    path('proveedores/agregar_proveedores/', views.proveedor_agregar, name='proveedor_agregar'),
+    path('proveedores/editar_proveedores/<int:cod_proveedor>/', views.proveedor_editar, name='proveedor_editar'),
+    path('proveedores/eliminar_proveedores/<int:cod_proveedor>/', views.proveedor_eliminar, name='proveedor_eliminar'),
+  
+  
     path('reporte-usuarios-pdf/', views.reporte_usuarios_pdf, name='reporte_usuarios_pdf'),
     path('guardar/', views.guardar_usuario, name='guardar_usuario'),
     path('actualizar-usuario/', views.actualizar_usuario, name='actualizar_usuario'),
