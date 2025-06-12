@@ -12,9 +12,22 @@
         .combos {
             cursor: pointer;
         }
+        .detalle-venta {
+            display: none;
+        }
+        .detalle-venta.show {
+            display: table-row;
+        }
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
+    {% csrf_token %}
 
     {% include 'includes/nav_cliente.html' %}
 
@@ -30,7 +43,7 @@
 
             <section class="settings-menu">
                 <nav class="settings-tabs">
-                    <a href="#perfil" class="tab active">Carrito</a>
+                    <a href="#perfil" class="tab active">Mis Compras</a>
                     <a href="#comunicacion" class="tab">Mis direcciones</a>
                     <a href="#direcciones" class="tab">Mis pedidos</a>
                     <a href="#pago" class="tab">Mi cuenta</a>
@@ -38,35 +51,159 @@
 
                 <div class="settings-content">
                     <div id="perfil" class="content active">
-                        <h2>Carro de compras</h2>
-                        <p>Aquí podrás ver la información de tu carrito de compras.</p>
+                        {% if ventas %}
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Total</th>
+                                            <th>Subtotal</th>
+                                            <th>Estado</th>
+                                            <th>Detalles</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for venta in ventas %}
+                                        <tr>
+                                            <td>{{ venta.fecha_hora|date:"Y-m-d H:i:s" }}</td>
+                                            <td>${{ venta.total }}</td>
+                                            <td>${{ venta.subtotal }}</td>
+                                            <td>{{ venta.estado }}</td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm" 
+                                                        onclick="toggleDetalleVenta({{ venta.cod_venta }})">
+                                                    Ver Detalles
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% if venta.combinaciones.all %}
+                                        <tr id="detalle-venta-{{ venta.cod_venta }}" class="detalle-venta">
+                                            <td colspan="5">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Producto</th>
+                                                            <th>Masa</th>
+                                                            <th>Glaseado</th>
+                                                            <th>Topping</th>
+                                                            <th>Cantidad</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for combinacion in venta.combinaciones.all %}
+                                                        <tr>
+                                                            <td>{{ combinacion.cod_producto.nomb_pro }}</td>
+                                                            <td>{{ combinacion.cod_sabor_masa_1.nombre }}</td>
+                                                            <td>{{ combinacion.cod_glaseado_1.nombre }}</td>
+                                                            <td>{{ combinacion.cod_topping_1.nombre }}</td>
+                                                            {% for detalles in venta.detalles.all %}
+                                                               
+                                                               <td>{{ detalles.cantidad }}</td>
+                                                              
+                                                            {% endfor %}
+
+
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center">
+                                <p>No tienes compras realizadas</p>
+                                <a href="{% url 'catalogocliente' %}" class="btn btn-primary">
+                                    Ir al catálogo
+                                </a>
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div id="comunicacion" class="content">
                         <h2>Dirección</h2>
-                        <p><strong>Dirección principal:</strong> {{ user.cliente.direc_cliente }}</p>
+                        <p><strong>Dirección principal:</strong> {{ usuario.cliente.direc_cliente }}</p>
                     </div>
 
                     <div id="direcciones" class="content">
                         <h2>Mis pedidos</h2>
-                        <p>Aquí podrás observar tus anteriores pedidos.</p>
-                        <!-- Aquí podrías agregar una tabla con pedidos si los manejas -->
+                        {% if ventas %}
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha de Entraga</th>
+                                            <th>Total</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+    {% for venta in ventas %}
+        {% for detalles in venta.detalles.all %}
+        <tr>
+            <td>{{ detalles.fecha_entrega }}</td>
+            <td>${{ venta.total }}</td>
+            <td>{{ venta.estado }}</td>
+        </tr>
+        {% endfor %}
+    {% endfor %}
+</tbody>
+
+                                </table>
+                            </div>
+                        {% else %}
+                            <p>No tienes pedidos anteriores.</p>
+                        {% endif %}
                     </div>
 
                     <div id="pago" class="content">
                         <h2>Mi cuenta</h2>
-                        <p><strong>Nombre:</strong> {{ user.nom_usua }} {{ user.apell_usua }}</p>
-                        <p><strong>Correo:</strong> {{ user.email }}</p>
-                        <p><strong>Teléfono:</strong> {{ user.tele_usua }}</p>
-                        <p><strong>Dirección:</strong> {{ user.cliente.direc_cliente }}</p>
-                        <p><strong>Historial de compras:</strong> {{ user.cliente.historial_compras }}</p>
+                        <p><strong>Nombre:</strong> {{ usuario.nom_usua }} {{ usuario.apell_usua }}</p>
+                        <p><strong>Correo:</strong> {{ usuario.email }}</p>
+                        <p><strong>Teléfono:</strong> {{ usuario.tele_usua }}</p>
+                        <p><strong>Dirección:</strong> {{ usuario.cliente.direc_cliente }}</p>
+                        
+                        {% if items_carrito %}
+                        <h3>Carrito actual</h3>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Cantidad</th>
+                                        <th>Precio</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in items_carrito %}
+                                    <tr>
+                                        <td>{{ item.producto.nomb_pro }}</td>
+                                        <td>{{ item.cantidad }}</td>
+                                        <td>${{ item.producto.prec_pro }}</td>
+                                        <td>${{ item.subtotal }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="text-right"><strong>Total:</strong></td>
+                                        <td>${{ carrito.total }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        {% endif %}
 
                         <a href="{% url 'editar_perfil' %}" class="btn btn-primary mt-3">Editar perfil</a>
                     </div>
                 </div>
             </section>
-
-            <script src="{% static 'scripts/Perfil.js' %}"></script>
         </div>
     </div>
 
@@ -85,6 +222,50 @@
         </div>
     </div>
 
-    <script src="{% static 'js/perfil.js' %}" defer></script>
+    <!-- Scripts al final del documento -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/perfil.js' %}"></script>
+    
+    <script>
+        // Función para mostrar/ocultar detalles de venta
+        function toggleDetalleVenta(codVenta) {
+            const detalle = document.getElementById(`detalle-venta-${codVenta}`);
+            detalle.classList.toggle('show');
+        }
+        
+        // Cambiar entre pestañas
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.settings-tabs .tab');
+            const contents = document.querySelectorAll('.settings-content .content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remover clase active de todas las pestañas y contenidos
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    
+                    // Agregar clase active a la pestaña clickeada
+                    this.classList.add('active');
+                    
+                    // Mostrar el contenido correspondiente
+                    const target = this.getAttribute('href');
+                    document.querySelector(target).classList.add('active');
+                });
+            });
+
+            // Inicializar modales si existen
+            if (typeof bootstrap !== 'undefined') {
+                var modals = document.querySelectorAll('.modal');
+                modals.forEach(function(modal) {
+                    new bootstrap.Modal(modal);
+                });
+            }
+        });
+    </script>
 </body>
 </html>

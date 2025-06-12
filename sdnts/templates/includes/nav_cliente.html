@@ -52,13 +52,22 @@
                     <button class="botonPagar shadow" id="btnPagar">PAGAR</button>
                     <div id="modalP" class="modal hidden">
                         <div class="modal-contentP">    
-                            <div class="miacolucci">
+                            <div class="miacolucci">  <!-- DIVA -->
+                                <br><br><br><br>
                                 <div class="metodoPago">
                                     <h1 id="modal-title">Método de Pago:</h1>
-                                    <div class="nequi-container shadow">
+                                    <div class="opciones-metodo-pago" style="margin-bottom: 15px;">
+                                        <label style="margin-right: 20px;">
+                                            <input type="radio" name="metodo_pago" value="NEQUI" id="radioNequi" checked> Nequi
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="metodo_pago" value="DAVIPLATA" id="radioDavi"> Daviplata
+                                        </label>
+                                    </div>
+                                    <div id="contenedorNequi" class="nequi-container shadow">
                                         <div class="formas">
                                             <h1>N. de referencia:</h1>
-                                            <input type="text" name="txtCorreo" class="nroReferencia shadow" placeholder="Digita el N. de tu pago" required maxlength="10">
+                                            <input type="text" name="txtReferenciaNequi" class="nroReferencia shadow" placeholder="Digita el N. de tu pago" required maxlength="10">
                                             <h2>(Click al logo para info Nequi)</h2>
                                         </div>
                                         <div class="logo-nequi" onclick="openModal('modalNequiSpecific')">
@@ -76,10 +85,10 @@
                                             <img class="nequiQR" src="{% static 'Image/nequiQR.jpg' %}">
                                         </div>
                                     </div>
-                                    <div class="davi-container shadow">
+                                    <div id="contenedorDavi" class="davi-container shadow" style="display:none;">
                                         <div class="formas">
                                             <h1>N. de referencia:</h1>
-                                            <input type="text" name="txtCorreo" class="nroReferencia shadow" placeholder="Digita el N. de tu pago" required maxlength="10">
+                                            <input type="text" name="txtReferenciaDavi" class="nroReferencia shadow" placeholder="Digita el N. de tu pago" required maxlength="10">
                                             <h2>(Click al logo para info Davi)</h2>
                                         </div>
                                         <div class="logo-davi" onclick="openModal('modalDaviSpecific')">
@@ -116,31 +125,6 @@
                             <div class="botonComprar">
                                 <button type="submit" value="Comprar" id="btnAgregarProducto" class="cart shadow">COMPRAR</button> 
                             </div>
-                            <!-- Modal de compra exitosa -->
-<!-- Modal de compra exitosa -->
-<div id="modalCompraExitosa" class="modal" style="display:none;">
-  <div class="modal-content" style="background:#fff; padding:30px; border-radius:20px; text-align:center; max-width:600px; margin:auto;">
-    <span id="cerrarModalCompra" style="cursor:pointer; float:right; font-size:24px;">&times;</span>
-    <div class="infoTotalCarrito"></div>
-    <h2>¡Compra realizada con éxito!</h2>
-    <p>Gracias por tu compra.</p>
-    <button id="okCompraExitosa" class="btn btn-pinck" style="margin-top:15px;">OK</button>
-  </div>
-</div>
-</div>
-
-<script>
-// Cerrar modal con la X
-document.getElementById('cerrarModalCompra')?.addEventListener('click', function() {
-    document.getElementById('modalCompraExitosa').style.display = 'none';
-    location.reload();
-});
-// Cerrar modal y recargar con el botón OK
-document.getElementById('okCompraExitosa')?.addEventListener('click', function() {
-    document.getElementById('modalCompraExitosa').style.display = 'none';
-    location.reload();
-});
-</script>
                         </div>
                     </div>
                     <div class="cart-total">

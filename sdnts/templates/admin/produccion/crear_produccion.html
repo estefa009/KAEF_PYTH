@@ -1,0 +1,8 @@
+<h2>Crear Producción</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <h4>Salida de Insumo</h4>
+    {{ salida_form.as_p }}
+    <button type="submit">Guardar</button>
+</form>

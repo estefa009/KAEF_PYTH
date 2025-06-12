@@ -15,8 +15,8 @@ const colores = {
         'red-velvet': '#952d30'
     },
     cobertura: {
-        'chocolate-blanco': '#f0e0c0',
-        'chocolate-oscuro': '#5C4033',
+        'choc-blanco': '#f0e0c0',
+        'choc-oscuro': '#5C4033',
         'arequipe': '#D4A76A'
     },
     toppings: {
@@ -241,8 +241,8 @@ function agregarAlCarrito(producto) {
     // Actualizar la vista
     showHTML();
 
-    // Mostrar notificación con detalles
-    alert(`¡Agregado al carrito!\n${producto.titulo}\n${producto.descripcion}`);
+    // Mostrar notificación con detalles usando modal personalizado
+    mostrarModalAgregadoCarrito(producto);
 }
 
 function showHTML() {
@@ -347,7 +347,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Toma los datos del botón
-        const cod_producto = this.dataset.codProducto;
+        const cod_producto = Number(this.dataset.codProducto);
         const precio = parseFloat(this.dataset.precio);
 
         const producto = {
@@ -457,15 +457,18 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        const cod_producto = Number(this.dataset.codProducto);
+        const precio = parseFloat(this.dataset.precio);
+
         const producto = {
             id: `M-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
-            cod_producto: "{{producto.cod_producto}}", // <-- este valor debe venir del backend
+            cod_producto: cod_producto,
             tipo: 'combo-dona',
             talla: 'M',
             masa: selecciones.masa,
             cobertura: selecciones.cobertura,
             topping: selecciones.topping,
-            precio: 16806.72,
+            precio: precio,
             titulo: 'Donas Talla M',
             descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
             quantity: 1,
@@ -483,15 +486,18 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        const cod_producto = Number(this.dataset.codProducto);
+        const precio = parseFloat(this.dataset.precio);
+
         const producto = {
             id: `L-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
-            cod_producto: "{{producto.cod_producto}}", // <-- este valor debe venir del backend
+            cod_producto: cod_producto,
             tipo: 'combo-dona',
             talla: 'L',
             masa: selecciones.masa,
             cobertura: selecciones.cobertura,
             topping: selecciones.topping,
-            precio: 25210.08,
+            precio: precio,
             titulo: 'Donas Talla L',
             descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
             quantity: 1,
@@ -508,15 +514,18 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        const cod_producto = Number(this.dataset.codProducto);
+        const precio = parseFloat(this.dataset.precio);
+
         const producto = {
             id: `XL-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
-            cod_producto: "{{producto.cod_producto}}", // <-- este valor debe venir del backend
+            cod_producto: cod_producto,
             tipo: 'combo-dona',
             talla: 'XL',
             masa: selecciones.masa,
             cobertura: selecciones.cobertura,
             topping: selecciones.topping,
-            precio: 33613.45,
+            precio: precio,
             titulo: 'Donas Talla XL',
             descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
             quantity: 1,
@@ -525,6 +534,96 @@ document.addEventListener('DOMContentLoaded', function () {
 
         agregarAlCarrito(producto);
     });
+
+    // Manejo de radio buttons para métodos de pago
+    const radioNequi = document.getElementById('radioNequi');
+    const radioDavi = document.getElementById('radioDavi');
+    const contenedorNequi = document.getElementById('contenedorNequi');
+    const contenedorDavi = document.getElementById('contenedorDavi');
+
+    function toggleMetodoPago() {
+        if (radioNequi.checked) {
+            contenedorNequi.style.display = 'block';
+            contenedorDavi.style.display = 'none';
+        } else if (radioDavi.checked) {
+            contenedorNequi.style.display = 'none';
+            contenedorDavi.style.display = 'block';
+        }
+    }
+
+    // Agregar eventos a los radio buttons
+    if (radioNequi) radioNequi.addEventListener('change', toggleMetodoPago);
+    if (radioDavi) radioDavi.addEventListener('change', toggleMetodoPago);
+
+    // Manejo de modales específicos
+    window.openModal = function(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'block';
+        }
+    }
+
+    window.closeModal = function(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // Cerrar modales al hacer click fuera
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal-nequi')) {
+            event.target.style.display = 'none';
+        }
+        if (event.target.classList.contains('modal-davi')) {
+            event.target.style.display = 'none';
+        }
+    }
+
+    // Manejo del modal de resumen de compra
+    const modalResumen = document.querySelector('.modal');
+    const btnOK = document.querySelector('.modal button');
+    const btnClose = document.querySelector('.modal .close');
+    
+    function cerrarModalResumen() {
+        if (modalResumen) {
+            modalResumen.classList.add('hidden');
+            // Opcional: recargar la página después de cerrar
+            // window.location.reload();
+        }
+    }
+
+    // Botón OK
+    btnOK?.addEventListener('click', cerrarModalResumen);
+    
+    // Botón X (close)
+    btnClose?.addEventListener('click', cerrarModalResumen);
+
+    // Cerrar modal al hacer click fuera
+    window.addEventListener('click', function(event) {
+        if (event.target === modalResumen) {
+            cerrarModalResumen();
+        }
+    });
+
+    // Función para mostrar el modal
+    window.mostrarModalResumen = function(datos) {
+        if (modalResumen) {
+            const contenidoModal = modalResumen.querySelector('.modal-content');
+            if (contenidoModal) {
+                // Actualizar el contenido del modal con los datos
+                contenidoModal.innerHTML = `
+                    <span class="close">&times;</span>
+                    <h2>Resumen de tu compra</h2>
+                    <div class="resumen-detalles">
+                        ${datos}
+                    </div>
+                    <button class="btn btn-success">OK</button>
+                `;
+            }
+            modalResumen.classList.remove('hidden');
+        }
+    };
 });
 
 // Mostrar estado inicial del carrito
@@ -612,7 +711,87 @@ document.getElementById('equis')?.addEventListener('click', function () {
     document.getElementById('modalP').style.display = 'none';
 });
 
-document.getElementById('btnAgregarProducto')?.addEventListener('click', function (e) {
+// Helpers to show modals and get user input as Promise
+function getDireccionFromModal() {
+    return new Promise((resolve, reject) => {
+        const modal = document.getElementById('modalDireccion');
+        const input = document.getElementById('inputDireccion');
+        const confirm = document.getElementById('confirmDireccion');
+        const cancel = document.getElementById('cancelDireccion');
+        const close = document.getElementById('closeDireccion');
+
+        function cleanup() {
+            confirm.removeEventListener('click', onConfirm);
+            cancel.removeEventListener('click', onCancel);
+            close.removeEventListener('click', onCancel);
+            modal.classList.add('hidden');
+        }
+        function onConfirm(e) {
+            e.preventDefault();
+            if (input.value.trim()) {
+                cleanup();
+                resolve(input.value.trim());
+            } else {
+                input.focus();
+                input.classList.add('input-error');
+            }
+        }
+        function onCancel(e) {
+            e.preventDefault();
+            cleanup();
+            resolve(null);
+        }
+        input.classList.remove('input-error');
+        input.value = '';
+        modal.classList.remove('hidden');
+        input.focus();
+        confirm.addEventListener('click', onConfirm);
+        cancel.addEventListener('click', onCancel);
+        close.addEventListener('click', onCancel);
+    });
+}
+
+function getFechaFromModal(minDateStr) {
+    return new Promise((resolve, reject) => {
+        const modal = document.getElementById('modalFecha');
+        const input = document.getElementById('inputFecha');
+        const confirm = document.getElementById('confirmFecha');
+        const cancel = document.getElementById('cancelFecha');
+        const close = document.getElementById('closeFecha');
+
+        function cleanup() {
+            confirm.removeEventListener('click', onConfirm);
+            cancel.removeEventListener('click', onCancel);
+            close.removeEventListener('click', onCancel);
+            modal.classList.add('hidden');
+        }
+        function onConfirm(e) {
+            e.preventDefault();
+            if (input.value && input.value >= minDateStr) {
+                cleanup();
+                resolve(input.value);
+            } else {
+                input.focus();
+                input.classList.add('input-error');
+            }
+        }
+        function onCancel(e) {
+            e.preventDefault();
+            cleanup();
+            resolve(null);
+        }
+        input.classList.remove('input-error');
+        input.value = '';
+        input.setAttribute('min', minDateStr);
+        modal.classList.remove('hidden');
+        input.focus();
+        confirm.addEventListener('click', onConfirm);
+        cancel.addEventListener('click', onCancel);
+        close.addEventListener('click', onCancel);
+    });
+}
+
+document.getElementById('btnAgregarProducto')?.addEventListener('click', async function (e) {
     e.preventDefault();
 
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -621,7 +800,8 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', functio
         return;
     }
 
-    const direccion = prompt('¿A qué dirección deseas el envío?');
+    // Get address from modal
+    const direccion = await getDireccionFromModal();
     if (!direccion) return;
 
     // Calcular la fecha mínima (hoy + 3 días)
@@ -629,78 +809,136 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', functio
     const minDate = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + 3);
     const minDateStr = minDate.toISOString().split('T')[0];
 
-    let fechaEntrega = prompt(`¿Qué fecha deseas para la entrega? (Formato: AAAA-MM-DD)\nLa fecha mínima de entrega es: ${minDateStr}`);
+    // Get date from modal
+    let fechaEntrega = await getFechaFromModal(minDateStr);
     if (!fechaEntrega) return;
 
-    // Validar que la fecha sea válida y >= minDate
-    while (fechaEntrega < minDateStr) {
-        fechaEntrega = prompt(`La fecha debe ser al menos ${minDateStr}.\nPor favor ingresa una fecha válida para la entrega (AAAA-MM-DD):`);
-        if (!fechaEntrega) return;
+    // Obtener método de pago seleccionado
+    const metodoPagoSeleccionado = document.querySelector('input[name="metodo_pago"]:checked')?.value;
+    // Obtener número de referencia según método de pago
+    let referenciaPago = '';
+    if (metodoPagoSeleccionado === 'NEQUI') {
+        referenciaPago = document.querySelector('#contenedorNequi .nroReferencia')?.value.trim();
+    } else if (metodoPagoSeleccionado === 'DAVIPLATA') {
+        referenciaPago = document.querySelector('#contenedorDavi .nroReferencia')?.value.trim();
     }
 
+    // Validar campos de pago
+    if (!metodoPagoSeleccionado) {
+        alert('Debes seleccionar un método de pago.');
+        return;
+    }
+    if (!referenciaPago || referenciaPago.length < 4) {
+        alert('Debes digitar un número de referencia válido (mínimo 4 dígitos).');
+        return;
+    }
     // Ahora puedes usar direccion y fechaEntrega
+    const payload = {
+        carrito: cart,
+        direccion: direccion,
+        fecha_entrega: fechaEntrega,
+        metodo_pago: metodoPagoSeleccionado,
+        transaccion_id: referenciaPago
+    };
+    console.log('Enviando fetch a /procesar_compra/ con:', payload);
+
+    // Validar método de pago y referencia
+    if (!payload.metodo_pago || !payload.transaccion_id) {
+        alert('Falta seleccionar método de pago o referencia de pago.');
+        return;
+    }
+
     fetch('/procesar_compra/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': getCookie('csrftoken')
         },
-        body: JSON.stringify({
-            carrito: cart,
-            direccion: direccion,
-            fecha_entrega: fechaEntrega, // <-- agrega esto
-            metodo_pago: metodoPagoSeleccionado,
-            transaccion_id: referenciaPago
-        })
+        body: JSON.stringify(payload)
     })
-        .then(response => response.json())
+        .then(async response => {
+            console.log('Respuesta recibida del backend:', response);
+            if (!response.ok) {
+                let text = await response.text();
+                alert('Respuesta HTTP no OK: ' + response.status + '\n' + text);
+                throw new Error('HTTP ' + response.status + ': ' + text);
+            }
+            try {
+                return await response.json();
+            } catch (e) {
+                alert('La respuesta no es JSON válido: ' + e);
+                throw e;
+            }
+        })
         .then(data => {
+            console.log('Respuesta JSON del backend:', data);
             if (data.success) {
                 localStorage.removeItem('cart');
                 showHTML();
                 document.getElementById('modalP').style.display = 'none';
-
-                // Factura final con estilos Bootstrap
-                const venta = data.venta;
-                let facturaHTML = `
-                <h3>Factura de Compra</h3>
-                <p><b>Fecha:</b> ${venta.fecha}</p>
-                <p><b>Dirección:</b> ${venta.direccion}</p>
-                <table class="table table-bordered table-sm" style="margin-bottom:10px;">
-                    <thead class="thead-light">
-                        <tr>
-                            <th style="text-align:left;">Producto</th>
-                            <th class="text-center">Cant.</th>
-                            <th class="text-right">Unitario</th>
-                            <th class="text-right">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${venta.detalles.map(det => `
-                            <tr>
-                                <td>${det.producto}</td>
-                                <td class="text-center">${det.cantidad}</td>
-                                <td class="text-right">$${det.precio_unitario.toFixed(2)}</td>
-                                <td class="text-right">$${det.subtotal.toFixed(2)}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                <div class="text-right">
-                    <b>Subtotal:</b> $${venta.subtotal.toFixed(2)}<br>
-                    <b>IVA (19%):</b> $${venta.iva.toFixed(2)}<br>
-                    <b>Total:</b> $${venta.total.toFixed(2)}
-                </div>
-            `;
-                document.querySelector('#modalCompraExitosa .infoTotalCarrito').innerHTML = facturaHTML;
-                document.getElementById('modalCompraExitosa').style.display = 'flex';
+                // Mostrar modal de compra exitosa y resumen
+                const modal = document.getElementById('modalCompraExitosa');
+                if (!modal) {
+                    console.error('No se encontró el modalCompraExitosa en el DOM');
+                    document.body.insertAdjacentHTML('beforeend', `<div style="color:red; background:#fff3cd; border:1px solid #f5c6cb; padding:10px; position:fixed; top:10px; right:10px; z-index:9999;">No se encontró el modalCompraExitosa en el DOM</div>`);
+                    return;
+                }
+                const info = modal.querySelector('.infoTotalCarrito');
+                if (!info) {
+                    console.error('No se encontró el elemento .infoTotalCarrito dentro del modalCompraExitosa');
+                    modal.innerHTML += '<div style="color:red; background:#fff3cd; border:1px solid #f5c6cb; padding:10px;">No se encontró el elemento .infoTotalCarrito</div>';
+                } else if (data.venta) {
+                    let detalles = data.venta.detalles || [];
+                    let productosHTML = `<h3>Resumen de tu compra</h3>
+<table style='width:100%;margin-bottom:10px;'>
+<thead>
+<tr>
+<th style='text-align:left;'>Producto</th>
+<th>Cant.</th>
+<th>Unitario</th>
+<th>Subtotal</th>
+</tr>
+</thead>
+<tbody>`;
+                    detalles.forEach(det => {
+                        productosHTML += `<tr>
+<td>${det.producto}</td>
+<td style='text-align:center;'>${det.cantidad}</td>
+<td style='text-align:right;'>$${Number(det.precio_unitario).toLocaleString()}</td>
+<td style='text-align:right;'>$${Number(det.subtotal).toLocaleString()}</td>
+</tr>`;
+                    });
+                    productosHTML += `</tbody></table>`;
+                    productosHTML += `<div style='text-align:left;'>
+<b>Subtotal:</b> $${Number(data.venta.subtotal).toLocaleString()}<br>
+<b>IVA (19%):</b> $${Number(data.venta.iva).toLocaleString()}<br>
+<b>Total:</b> $${Number(data.venta.total).toLocaleString()}<br>
+<b>Dirección:</b> ${data.venta.direccion}
+</div>`;
+                    info.innerHTML = productosHTML;
+                } else {
+                    info.innerHTML = '<div style="color:red;">No se recibió resumen de venta del backend.</div>';
+                }
+                // Mostrar el modal correctamente (remover hidden y usar display flex)
+                modal.classList.remove('hidden');
+                modal.classList.add('show');
+                modal.style.display = 'flex';
+                modal.style.opacity = '1';
+                modal.style.zIndex = '9999';
+                // Forzar repaint para asegurar visibilidad
+                void modal.offsetWidth;
+                // Scroll al modal para asegurar visibilidad
+                modal.scrollIntoView({behavior: 'smooth', block: 'center'});
+                // Actualizar el contador del carrito en el nav si existe
+                if (typeof showHTML === 'function') showHTML();
             } else {
                 alert('Error al procesar la compra: ' + (data.error || ''));
             }
         })
         .catch(error => {
-            alert('Ocurrió un error al procesar la compra');
-            console.error(error);
+            alert('Ocurrió un error al procesar la compra: ' + error);
+            document.body.insertAdjacentHTML('beforeend', `<div style="color:red; background:#fff3cd; border:1px solid #f5c6cb; padding:10px; position:fixed; top:10px; right:10px; z-index:9999;">Error: ${error}</div>`);
+            console.error('Error en fetch:', error);
         });
 });
 
@@ -720,12 +958,49 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// ...existing code...
-
 // Cerrar el modal de compra exitosa
-document.getElementById('cerrarModalCompra')?.addEventListener('click', function () {
-    document.getElementById('modalCompraExitosa').style.display = 'none';
-});
-document.getElementById('okCompraExitosa')?.addEventListener('click', function () {
-    document.getElementById('modalCompraExitosa').style.display = 'none';
-});
+const cerrarModalCompra = document.getElementById('cerrarModalCompra');
+const okCompraExitosa = document.getElementById('okCompraExitosa');
+function cerrarModalCompraExitosa() {
+    const modal = document.getElementById('modalCompraExitosa');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+        // Refrescar el carrito y la página completamente
+        location.reload();
+    }
+}
+cerrarModalCompra?.addEventListener('click', cerrarModalCompraExitosa);
+okCompraExitosa?.addEventListener('click', cerrarModalCompraExitosa);
+
+// Modal personalizado para agregado al carrito
+function mostrarModalAgregadoCarrito(producto) {
+    const modal = document.getElementById('modalAgregadoCarrito');
+    const titulo = document.getElementById('modalAgregadoTitulo');
+    const descripcion = document.getElementById('modalAgregadoDescripcion');
+    if (!modal || !titulo || !descripcion) return;
+    titulo.textContent = producto.titulo || '';
+    descripcion.textContent = producto.descripcion || '';
+    modal.classList.add('show');
+    modal.classList.remove('hidden');
+    // Cerrar con X o OK
+    const closeBtn = document.getElementById('closeAgregadoCarrito');
+    const okBtn = document.getElementById('okAgregadoCarrito');
+    function cerrar() {
+        modal.classList.remove('show');
+        modal.classList.add('hidden');
+        closeBtn.removeEventListener('click', cerrar);
+        okBtn.removeEventListener('click', cerrar);
+    }
+    closeBtn.addEventListener('click', cerrar);
+    okBtn.addEventListener('click', cerrar);
+    // Cerrar con Escape
+    function cerrarEscape(e) {
+        if (e.key === 'Escape') {
+            cerrar();
+            document.removeEventListener('keydown', cerrarEscape);
+        }
+    }
+    document.addEventListener('keydown', cerrarEscape);
+}

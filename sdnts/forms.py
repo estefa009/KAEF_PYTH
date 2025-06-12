@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Usuario, Cliente
+from .models import Usuario, Cliente,  Venta
 
 class RegistroUsuarioForm(UserCreationForm):
     password1 = forms.CharField(
@@ -143,3 +143,64 @@ class CambiarContrasenaForm(PasswordChangeForm):
         label='Confirmar nueva contraseña',
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
     )
+    
+# ventas
+from django import forms
+from .models import Venta, DetalleVenta, Pago, CombinacionProducto
+
+class VentaForm(forms.ModelForm):
+    class Meta:
+        model = Venta
+        exclude = ['subtotal', 'iva', 'total']
+
+class DetalleVentaForm(forms.ModelForm):
+    class Meta:
+        model = DetalleVenta
+        fields = ['cod_producto', 'cantidad', 'precio_unitario', 'fecha_entrega']
+        widgets = {
+            'fecha_entrega': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
+
+class CombinacionProductoForm(forms.ModelForm):
+    class Meta:
+        model = CombinacionProducto
+        fields = [
+            'cod_producto', 
+            'cod_sabor_masa_1', 
+            'cod_glaseado_1', 
+            'cod_topping_1'
+        ]
+        widgets = {
+            'cod_producto': forms.Select(attrs={'class': 'form-control'}),
+            'cod_sabor_masa_1': forms.Select(attrs={'class': 'form-control'}),
+            'cod_glaseado_1': forms.Select(attrs={'class': 'form-control'}),
+            'cod_topping_1': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+class PagoForm(forms.ModelForm):
+    class Meta:
+        model = Pago
+        exclude = ['cod_venta', 'estado_pago', 'transaccion_id']
+
+#produccion
+from .models import Produccion, Salida, Entrada, Envio
+
+class ProduccionForm(forms.ModelForm):
+    class Meta:
+        model = Produccion
+        fields = ['cod_venta', 'observaciones']
+
+class SalidaForm(forms.ModelForm):
+    class Meta:
+        model = Salida
+        fields = ['cod_insumo', 'cantidad']
+
+class EntradaForm(forms.ModelForm):
+    class Meta:
+        model = Entrada
+        fields = ['cod_insumo', 'cnt_entrada', 'precio_entrada', 'fecha_caducidad', 'lote']
+
+class EnvioForm(forms.ModelForm):
+    class Meta:
+        model = Envio
+        fields = ['cod_domi', 'tarifa_envio', 'observaciones', 'firma_recepcion']

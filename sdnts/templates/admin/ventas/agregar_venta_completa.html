@@ -1,0 +1,92 @@
+<!-- agregar_venta_completa.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Venta Completa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        function calcularTotales() {
+            let subtotal = 0;
+            document.querySelectorAll('.detalle-form').forEach((form, index) => {
+                const cantidad = parseFloat(form.querySelector('[name$="cantidad"]').value) || 0;
+                const precio = parseFloat(form.querySelector('[name$="precio_unitario"]').value) || 0;
+                subtotal += cantidad * precio;
+            });
+            const iva = subtotal * 0.19;
+            const total = subtotal + iva;
+
+            document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+            document.getElementById('iva').textContent = iva.toFixed(2);
+            document.getElementById('total').textContent = total.toFixed(2);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', calcularTotales);
+            });
+        });
+    </script>
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Agregar Venta Completa</h2>
+    <form method="post">
+        {% csrf_token %}
+        <h4>Datos de la Venta</h4>
+        {{ venta_form.as_p }}
+
+        <h4>Productos en la Venta</h4>
+        {{ detalle_formset.management_form }}
+        {% for form in detalle_formset %}
+            <div class="border rounded p-3 mb-3 bg-light detalle-form">
+                {{ form.as_p }}
+            </div>
+        {% endfor %}
+
+        <h4>Combinaciones Personalizadas</h4>
+        {{ combinacion_formset.management_form }}
+        {% for form in combinacion_formset %}
+            <div class="border rounded p-3 mb-3 bg-light combinacion-form">
+                {{ form.cod_producto.label_tag }} {{ form.cod_producto }}
+                {{ form.cod_sabor_masa_1.label_tag }} {{ form.cod_sabor_masa_1 }}
+                {{ form.cod_glaseado_1.label_tag }} {{ form.cod_glaseado_1 }}
+                {{ form.cod_topping_1.label_tag }} {{ form.cod_topping_1 }}
+            </div>
+        {% endfor %}
+
+
+        <h4>Totales</h4>
+        <p>Subtotal: $<span id="subtotal">0.00</span></p>
+        <p>IVA (19%): $<span id="iva">0.00</span></p>
+        <p>Total: $<span id="total">0.00</span></p>
+
+        <h4>Pago</h4>
+        {{ pago_form.as_p }}
+
+        <button type="submit" class="btn btn-success">Guardar Venta</button>
+        <a href="{% url 'ventas_admin' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+<script>
+    // Mapea productos con tallas, puedes hacerlo desde tu vista o pasar por contexto
+    const productosConTalla = {
+        {% for producto in productos %}
+            "{{ producto.pk }}": "{{ producto.tamano }}",
+        {% endfor %}
+    };
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const combinacionForms = document.querySelectorAll(".combinacion-form");
+
+        combinacionForms.forEach((form) => {
+            const productoSelect = form.querySelector('select[name$="cod_producto"]');
+            
+        });
+    });
+</script>
+
+</body>
+</html>

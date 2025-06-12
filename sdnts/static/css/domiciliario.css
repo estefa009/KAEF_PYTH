@@ -83,6 +83,8 @@ hr{color: #f5f4f4;}
     font-size: 24px;
     cursor: pointer;
     z-index: 1001;
+    margin-top: 15px;
+    margin-left: 15px;
 }
 
 .menu-toggle.open {
@@ -154,7 +156,9 @@ main h1{
     margin-bottom: 10px; /* Espacio debajo del h5 */
     font-size: 25px;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-
+}
+.welcome-message {
+  margin-left: 90px;
 }
 
 main .icons {
@@ -293,3 +297,81 @@ text-decoration: none;
   color: #999;
   font-style: italic;
 }
+
+.encabezado-envios {
+    background-color: #fff9c7;
+    border-radius: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.icon-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Alinea los íconos a la derecha */
+  gap: 50px; /* Espacio entre íconos y texto */
+  margin-right: 5rem;
+  margin-bottom: 16px;
+}
+
+.icon-bar .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 37px;
+  height: 37px;
+  padding: 0;
+  border-radius: 50px;
+  background-color: #fff9c7;
+  border-color: #ff85a2;
+  border: 2px solid #ff85a2;
+  color: #ff85a2;
+  margin-left: 40px;
+  margin-top: 6px;
+}
+
+.icon-bar .text {
+  margin-left: 10px; /* Espacio entre el ícono y el texto */
+  color: #ff85a2;
+  font-size: 25px;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-weight:lighter;
+
+}
+.btnnoti{
+  margin-bottom: 30px;
+  border-radius: 50px;
+  background-color: #fff9c7;
+  border-color: #ff85a2;
+  border: 2px solid #ff85a2;
+  color: #ff85a2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 37px;
+  height: 37px;
+  padding: 0;
+  border-radius: 50px;
+  margin-right: 20px;
+}
+
+.btnnoti:hover {
+  background-color: #FFF0F5;
+  border-color: #ff85a2;
+  border: 2px solid #ff85a2;
+  color: #ff85a2;
+}
+.btn:hover {
+  background-color: #FFF0F5;
+  border-color: #ff85a2;
+  border: 2px solid #ff85a2;
+  color: #ff85a2;
+}
+
+.miniicon{
+  width: 25px;
+  height: 30px;
+}
+.modal-content{
+  border-radius: 35px;
+}
+
+

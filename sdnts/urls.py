@@ -52,9 +52,9 @@ urlpatterns = [
     path('editar_perfil/', views.editar_perfil, name='editar_perfil'),
 
     path('agregar_al_carrito/', views.agregar_al_carrito, name='agregar_al_carrito'),
-    path('eliminar_del_carrito/<int:item_id>/', views.eliminar_del_carrito, name='eliminar_del_carrito'),
-    path('ver_carrito/', views.ver_carrito, name='ver_carrito'),
-    path('actualizar_carrito/', views.actualizar_carrito, name='actualizar_carrito'),
+    path('eliminar-del-carrito/<int:item_id>/', views.eliminar_del_carrito, name='eliminar_del_carrito'),
+    path('ver-carrito/', views.ver_carrito, name='ver_carrito'),
+    path('actualizar-carrito/', views.actualizar_carrito, name='actualizar_carrito'),
      #Domiciliario
     path('mis_domicilios/', views.mis_domicilios, name='mis_domicilios'),
     path('historial_envios/', views.historial_envios, name='historial_envios'),
@@ -78,10 +78,26 @@ urlpatterns = [
 
     path('eliminar_usuario/<int:cod_usuario>/', views.eliminar_usuario, name='eliminar_usuario'),
 
+    #produccion_admin
     path('produccion_admin/', views.produccion_admin, name='produccion_admin'),
+    path('produccion/crear/', views.crear_produccion, name='crear_produccion'),
+    path('produccion/editar/<int:cod_produccion>/', views.editar_produccion, name='editar_produccion'),
+    path('produccion/estado/<int:cod_produccion>/', views.cambiar_estado_produccion, name='cambiar_estado_produccion'),
+    path('produccion/asignar-envio/<int:cod_produccion>/', views.asignar_envio_produccion, name='asignar_envio_produccion'),
+    path('produccion/eliminar/<int:cod_produccion>/', views.eliminar_produccion, name='eliminar_produccion'),
+
+    
     path('proveedores_admin/', views.proveedores_admin, name='proveedores_admin'),
     path('salidas_admin/', views.salidas_admin, name='salidas_admin'),
+    
+    #Ventas
+    
     path('ventas_admin/', views.ventas_admin, name='ventas_admin'),
+    path('ventas/completa/agregar/', views.agregar_venta_completa, name='agregar_venta_completa'),
+    path('ventas/<int:venta_id>/detalle/', views.detalle_ventas, name='detalle_ventas'),
+    path('ventas/<int:venta_id>/editar_estado/', views.editar_estado_venta, name='editar_estado_venta'),
+
+
     path('reporte-usuarios-pdf/', views.reporte_usuarios_pdf, name='reporte_usuarios_pdf'),
     path('guardar/', views.guardar_usuario, name='guardar_usuario'),
     path('actualizar-usuario/', views.actualizar_usuario, name='actualizar_usuario'),
@@ -94,4 +110,3 @@ urlpatterns = [
     path('procesar_compra/', views.procesar_compra, name='procesar_compra'),
 # ...existing code...
 ]
- 

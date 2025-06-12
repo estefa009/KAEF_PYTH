@@ -1,0 +1,23 @@
+{% extends 'admin/ventas/ventas_admin.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Editar Estado de Venta #{{ venta.cod_venta }}</h2>
+    <hr>
+
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="estado" class="form-label">Estado actual: <strong>{{ venta.estado }}</strong></label>
+            <select name="estado" id="estado" class="form-select" required>
+                {% for key, value in estados %}
+                    <option value="{{ key }}" {% if key == venta.estado %}selected{% endif %}>{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <a href="{% url 'ventas_admin' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
