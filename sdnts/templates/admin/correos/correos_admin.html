@@ -28,39 +28,10 @@
 </div>
 {% endif %}
 
-<!-- Insertar botón de menú -->
-<button id="menuToggle" class="menu-toggle">
-    <i class="bi bi-list"></i>
-</button>
+
 
 <!-- Insertar menú nav -->
-{% include "includes/_menu.html" %}
-
-<main>
-    <!-- Barra de búsqueda -->
-    <form id="searchForm" onsubmit="search(event)" class="search-form">
-        <label style="margin-left: 300px;">
-            <input type="text" id="buscar" placeholder="Buscar..">
-            <button type="submit" style="border: none; background: none;"><i class="bi bi-search"></i></button>
-        </label>
-    </form>
-
-    <!-- Menú de usuario -->
-    <div class="d-flex align-items-center gap-3" style="margin-left: auto; margin-right: 40px;">
-        <li class="nav-item dropdown list-unstyled">
-            <a href="#" id="adminDropdown" role="button"
-               data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-person-circle" style="font-size: 30px; color: #333333"></i>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
-                <li><span class="dropdown-header">Administrador</span></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'perfil_admin' %}">Perfil</a></li>
-                <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
-            </ul>
-        </li>
-    </div>
-</main>
+{% include "includes/nav_admin.html" %}
 
 <!-- Contenido principal -->
 <div class="container-fluid">
@@ -145,9 +116,9 @@
                     <table class="table table-hover">
                         <thead>
                         <tr>
-                            <th>Fecha</th>
+                            <th>Fecha de envío</th>
                             <th>Asunto</th>
-                            <th>Destinatarios</th>
+                            <th>Destinatario</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -155,18 +126,18 @@
                         <tbody>
                         {% for correo in historial_correos %}
                         <tr>
-                            <td>{{ correo.fecha }}</td>
+                            <td>{{ correo.fecha_envio|date:"d/m/Y H:i" }}</td>
                             <td>{{ correo.asunto }}</td>
-                            <td>{{ correo.destinatarios }}</td>
+                            <td>{{ correo.destinatario }}</td>
                             <td>
-                                <span class="badge {% if correo.estado == 'Enviado' %}bg-success{% else %}bg-warning text-dark{% endif %}">
-                                    {{ correo.estado }}
+                                <span class="badge {% if correo.enviado %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                    {% if correo.enviado %}Enviado{% else %}Pendiente{% endif %}
                                 </span>
                             </td>
                             <td>
-                                <button class="btn btn-sm btn-rosa">
+                                <a href="{% url 'ver_correo' correo.cod_correo %}" class="btn btn-sm btn-rosa">
                                     <i class="bi bi-eye"></i> Ver
-                                </button>
+                                </a>
                             </td>
                         </tr>
                         {% empty %}
@@ -179,11 +150,9 @@
                 </div>
             </div>
         </div>
+
     </div>
 </div>
-
-<!-- Insertar scripts -->
-{% include "fragments/navs/menu_js.html" %}
 
 </body>
 </html>

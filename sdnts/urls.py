@@ -65,7 +65,6 @@ urlpatterns = [
 
     #administrador
     path('cargarDatos/', views.cargarDatos, name='cargarDatos'),
-    path('correos_admin/', views.correos_admin, name='correos_admin'),
     path('dashboard_admin/', views.dashboard_admin, name='dashboard_admin'),
     path('perfil_admin/', views.perfil_admin, name='perfil_admin'),
     path('editarperfil_admin/', views.editarperfil_admin, name='editarperfil_admin'),
@@ -123,7 +122,11 @@ urlpatterns = [
     path('salidas/eliminar/<int:cod_salida>/', views.eliminar_salida, name='eliminar_salida'),
     path('salidas/agregar/', views.agregar_salida, name='agregar_salida'),
 
-    
+    #correo
+    path('correos_admin/', views.correos_admin, name='correos_admin'),
+    path('correo/<int:cod_correo>/', views.ver_correo, name='ver_correo'),
+    path('correos/enviar_correos_masivos/', views.enviar_correos_masivos, name='enviar_correos_masivos'),
+
     
     path('reporte-usuarios-pdf/', views.reporte_usuarios_pdf, name='reporte_usuarios_pdf'),
     path('guardar/', views.guardar_usuario, name='guardar_usuario'),
