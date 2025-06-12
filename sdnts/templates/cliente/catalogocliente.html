@@ -816,3 +816,51 @@
     <button id="okAdvertencia" class="btn btn-warning mt-3">OK</button>
   </div>
 </div>
+
+<!-- Modal de pago -->
+<div id="modalP" class="modal hidden">
+  <div class="modal-content modal-content-small">
+    <span class="close" id="closeP">&times;</span>
+    <div class="modal-body">
+      <h2>Selecciona tu método de pago</h2>
+      <div class="metodoPago">
+    <h1 id="modal-title">Método de Pago:</h1>
+    <div class="opciones-metodo-pago" style="margin-bottom: 15px;">
+        <label style="margin-right: 20px;">
+            <input type="radio" name="metodoPago" id="radioNequi" value="nequi" checked> Nequi
+        </label>
+        <label>
+            <input type="radio" name="metodoPago" id="radioDavi" value="daviplata"> Daviplata
+        </label>
+    </div>
+    <div id="contenedorNequi" class="nequi-container shadow">
+        <div class="formas">
+            <h2>Pago con Nequi</h2>
+            <p>Número: 302-698-2043</p>
+        </div>
+    </div>
+    <div id="contenedorDavi" class="davi-container shadow" style="display:none;">
+        <div class="formas">
+            <h2>Pago con Daviplata</h2>
+            <p>Número: 302-698-2043</p>
+        </div>
+    </div>
+    <div class="modal-form-buttons">
+        <button id="confirmarPago" class="boton">Confirmar Pago</button>
+        <button id="cancelarPago" class="boton boton-cancelar">Cancelar</button>
+    </div>
+</div>
+  </div>
+</div>
+
+<!-- Modal de resumen de compra -->
+<div class="modal hidden">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Resumen de tu compra</h2>
+        <div class="resumen-detalles">
+            <!-- El contenido se llenará dinámicamente -->
+        </div>
+        <button class="btn btn-success">OK</button>
+    </div>
+</div>

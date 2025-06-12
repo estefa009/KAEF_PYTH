@@ -256,17 +256,33 @@ def nosotroscliente(request):
 
 @login_required
 def perfilcliente(request):
-    usuario = request.user  # usuario autenticado
     try:
-        cliente = usuario.cliente  # acceso al modelo Cliente relacionado
-    except:
-        cliente = None  # por si no es un cliente (es admin u otro)
-
-    contexto = {
-        'usuario': usuario,
-        'cliente': cliente,
-    }
-    return render(request, 'cliente/perfilcliente.html')
+        usuario = request.user
+        cliente = Cliente.objects.get(cod_usua=usuario)
+        
+        # Updated to use correct related_name 'detalles' instead of 'detalle_venta'
+        ventas = Venta.objects.filter(
+            cod_cliente=cliente
+        ).prefetch_related(
+            'detalles',  # Changed from 'detalle_venta' to 'detalles'
+            'combinaciones',
+            'combinaciones__cod_producto',
+            'combinaciones__cod_sabor_masa_1',
+            'combinaciones__cod_glaseado_1',
+            'combinaciones__cod_topping_1'
+        ).order_by('-fecha_hora')
+        
+        context = {
+            'usuario': usuario,
+            'cliente': cliente,
+            'ventas': ventas,
+        }
+        
+        return render(request, 'cliente/perfilcliente.html', context)
+    except Exception as e:
+        print(f"Error en perfilcliente: {str(e)}")
+        messages.error(request, 'Error al cargar el perfil')
+        return redirect('vistacliente')
 
 @login_required
 def editar_perfil(request):
@@ -315,80 +331,136 @@ def agregar_al_carrito(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         producto_id = data.get('producto_id')
-        cantidad = data.get('cantidad', 1)
-        masa = data.get('masa')
-        cobertura = data.get('cobertura')
-        topping = data.get('topping')
+        cantidad = int(data.get('cantidad', 1))
+        masa = data.get('masa', {}).get('nombre')
+        cobertura = data.get('cobertura', {}).get('nombre')
+        topping = data.get('topping', {}).get('nombre')
         
-        producto = get_object_or_404(Producto, id=producto_id)
-        
-        if request.user.is_authenticated:
-            carrito, created = Carrito.objects.get_or_create(usuario=request.user, completado=False)
-        else:
-            if not request.session.session_key:
-                request.session.create()
-            session_key = request.session.session_key
-            carrito, created = Carrito.objects.get_or_create(session_key=session_key, completado=False)
-            request.session['session_key'] = session_key
-        
-        # Verificar si el producto ya está en el carrito
-        item, created = CarritoItem.objects.get_or_create(
-            carrito=carrito,
-            producto=producto,
-            defaults={
-                'masa_seleccionada': masa,
-                'cobertura_seleccionada': cobertura,
-                'topping_seleccionado': topping,
-                'cantidad': cantidad
-            }
-        )
-        
-        if not created:
-            item.cantidad += int(cantidad)
-            item.save()
+        try:
+            producto = get_object_or_404(Producto, cod_producto=producto_id)
+            
+            # Obtener o crear el carrito para el usuario
+            carrito, _ = Carrito.objects.get_or_create(
+                usuario=request.user,
+                completado=False
+            )
+            
+            # Buscar si existe un item con las mismas características
+            item = CarritoItem.objects.filter(
+                carrito=carrito,
+                producto=producto,
+                masa_seleccionada=masa,
+                cobertura_seleccionada=cobertura,
+                topping_seleccionado=topping
+            ).first()
+            
+            if item:
+                # Si existe, actualizar cantidad
+                item.cantidad += cantidad
+                item.save()
+            else:
+                # Si no existe, crear nuevo item
+                item = CarritoItem.objects.create(
+                    carrito=carrito,
+                    producto=producto,
+                    cantidad=cantidad,
+                    masa_seleccionada=masa,
+                    cobertura_seleccionada=cobertura,
+                    topping_seleccionado=topping
+                )
+            
+            return JsonResponse({
+                'success': True,
+                'mensaje': 'Producto agregado al carrito',
+                'total_items': carrito.cantidad_items,
+                'total_carrito': float(carrito.total)
+            })
+            
+        except Exception as e:
+            print(f"Error: {str(e)}")
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=400)
+    
+    return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
+
+@login_required
+def eliminar_del_carrito(request, item_id):
+    try:
+        item = get_object_or_404(CarritoItem, id=item_id, carrito__usuario=request.user)
+        carrito = item.carrito
+        item.delete()
         
         return JsonResponse({
             'success': True,
+            'mensaje': 'Item eliminado del carrito',
             'total_items': carrito.cantidad_items,
             'total_carrito': float(carrito.total)
         })
-    
-    return JsonResponse({'success': False})
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)
 
-def eliminar_del_carrito(request, item_id):
-    item = get_object_or_404(CarritoItem, id=item_id)
-    carrito = item.carrito
-    return redirect('ver_carrito')
-
+@login_required
 def ver_carrito(request):
-    if request.user.is_authenticated:
-        carrito = Carrito.objects.filter(usuario=request.user, completado=False).first()
-    else:
-        session_key = request.session.get('session_key')
-        carrito = Carrito.objects.filter(session_key=session_key, completado=False).first() if session_key else None
-    
-    return render(request, 'includes/carrito.html', {'carrito': carrito})
+    try:
+        carrito = Carrito.objects.filter(
+            usuario=request.user,
+            completado=False
+        ).prefetch_related('items', 'items__producto').first()
+        
+        items = []
+        if carrito:
+            items = CarritoItem.objects.filter(carrito=carrito).select_related('producto')
+        
+        context = {
+            'carrito': carrito,
+            'items': items,
+        }
+        
+        return render(request, 'includes/carrito.html', context)
+        
+    except Exception as e:
+        messages.error(request, f'Error al cargar el carrito: {str(e)}')
+        return redirect('catalogocliente')
 
-
+@login_required
 def actualizar_carrito(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        item_id = data.get('item_id')
-        cantidad = data.get('cantidad')
-        
-        item = get_object_or_404(CarritoItem, id=item_id)
-        item.cantidad = cantidad
-        item.save()
-        
-        return JsonResponse({
-            'success': True,
-            'subtotal': float(item.subtotal()),
-            'total_carrito': float(item.carrito.total),
-            'total_items': item.carrito.cantidad_items
-        })
-    
-    return JsonResponse({'success': False})
-
+        try:
+            data = json.loads(request.body)
+            item_id = data.get('item_id')
+            cantidad = int(data.get('cantidad', 1))
+            
+            item = get_object_or_404(CarritoItem, 
+                                   id=item_id, 
+                                   carrito__usuario=request.user)
+            
+            if cantidad > 0:
+                item.cantidad = cantidad
+                item.save()
+            else:
+                item.delete()
+            
+            carrito = item.carrito
+            
+            return JsonResponse({
+                'success': True,
+                'subtotal': float(item.subtotal()),
+                'total_carrito': float(carrito.total),
+                'total_items': carrito.cantidad_items
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=400)
+            
+    return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.http import JsonResponse
@@ -561,7 +633,7 @@ def procesar_compra(request):
         except Exception as e:
             print('Error en procesar_compra:', e)
             traceback.print_exc()
-            return JsonResponse({'success': False, 'error': str(e)})
+            return JsonResponse({'success': False, 'error': str(e)})       
             return JsonResponse({'success': False, 'error': 'Método no permitido'})
             carrito = data.get('carrito', [])
             direccion = data.get('direccion', '')  # Puedes pedirla en el modal
@@ -791,7 +863,7 @@ def editar_perfildomi(request):
                 messages.error(request, 'Las contraseñas no coinciden.')
                 return redirect('perfildomi')
             user.set_password(password)
-            update_session_auth_hash(request, user)
+            update_session_auth_hash(request, user)  # para que no cierre la sesión
 
         # Guardar datos
         user.nom_usua = nom_usua
@@ -1040,6 +1112,10 @@ def crear_produccion(request):
         if form.is_valid() and salida_form.is_valid():
             with transaction.atomic():
                 produccion = form.save()
+                # Cambiar estado de la venta asociada
+                venta = produccion.cod_venta
+                venta.estado = 'PREPARACION' 
+                venta.save()
                 salida = salida_form.save(commit=False)
                 salida.cod_produccion = produccion
                 insumo = salida.cod_insumo
@@ -1086,6 +1162,15 @@ def cambiar_estado_produccion(request,cod_produccion ):
                 produccion.fecha_fin = timezone.now()
             produccion.save()
         return redirect('produccion_admin')
+    # Actualizar el estado de la venta asociada según el estado de la producción
+    venta = produccion.cod_venta
+    if produccion.estado == 'EN_PROCESO':
+        venta.estado = 'PREPARACION'
+    elif produccion.estado == 'FINALIZADO':
+        venta.estado = 'EN_CAMINO'  
+    elif produccion.estado == 'PENDIENTE':
+        venta.estado = 'PENDIENTE'
+    venta.save()
     return render(request, 'admin/produccion/cambiar_estado_produccion.html', {'produccion': produccion, 'estados': Produccion.ESTADOS})
 
 def asignar_envio_produccion(request, cod_produccion):
@@ -1110,56 +1195,311 @@ def eliminar_produccion(request, cod_produccion):
         return redirect('produccion_admin')
     return render(request, 'admin/produccion/eliminar_produccion.html', {'produccion': produccion})
 
-
-
+#Envio Admin
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Envio
+from .forms import EnvioForm
 
 # Vista de Envíos
 @login_required
 def envios_admin(request):
-    envios_pendientes = Envio.objects.filter(estado='PENDIENTE')
-    # ✅ Corregido: usar 'ENTREGADO' en lugar de 'COMPLETADO'
-    envios_completados = Envio.objects.filter(estado='ENTREGADO')
-    
-    return render(request, 'admin/envios/envios_admin.html', {
-        'envios_pendientes': envios_pendientes,
-        'envios_completados': envios_completados
-    })
+    envios = Envio.objects.all()
+    return render(request, 'admin/envios/envios_admin.html', {'envios': envios})
+
+def crear_envio(request):
+    if request.method == 'POST':
+        form = EnvioForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('envios_admin')
+    else:
+        form = EnvioForm()
+    return render(request, 'admin/envios/crear_envio.html', {'form': form, 'titulo': 'Asignar Envío'})
+
+def editar_envio(request, pk):
+    envio = get_object_or_404(Envio, pk=pk)
+    if request.method == 'POST':
+        form = EnvioForm(request.POST, instance=envio)
+        if form.is_valid():
+            form.save()
+            return redirect('envios_admin')
+    else:
+        form = EnvioForm(instance=envio)
+    return render(request, 'admin/envios/editar_envio.html', {'form': form, 'titulo': 'Editar Envío'})
+
+def eliminar_envio(request, pk):
+    envio = get_object_or_404(Envio, pk=pk)
+    envio.delete()
+    return redirect('envios_admin')
+
+
+
+
+
 
 # Vista de Proveedores
+from .models import Proveedor
+from .forms import ProveedorForm
 @login_required
 def proveedores_admin(request):
     proveedores = Proveedor.objects.all()
-    return render(request, 'admin/proveedores_admin.html', {'proveedores': proveedores})
+    return render(request, 'admin/proveedores/proveedores_admin.html', {'proveedores': proveedores})
+
+
+def agregar_proveedores(request):
+    if request.method == 'POST':
+        Proveedor.objects.create(
+            nom_proveedor=request.POST['nom_proveedor'],
+            telefono_proveedor=request.POST['telefono_proveedor'],
+            direccion_proveedor=request.POST.get('direccion_proveedor', ''),
+            email_proveedor=request.POST.get('email_proveedor', ''),
+            novedad_proveedor=request.POST.get('novedad_proveedor', '')
+        )
+        return redirect('proveedores_admin')
+    return render(request, 'admin/proveedores/agregar_proveedores.html')
+    
+def editar_proveedores(request, cod_proveedor):
+    proveedor = get_object_or_404(Proveedor, pk=cod_proveedor)
+    if request.method == 'POST':
+        proveedor.nom_proveedor = request.POST['nom_proveedor']
+        proveedor.telefono_proveedor = request.POST['telefono_proveedor']
+        proveedor.direccion_proveedor = request.POST.get('direccion_proveedor', '')
+        proveedor.email_proveedor = request.POST.get('email_proveedor', '')
+        proveedor.novedad_proveedor = request.POST.get('novedad_proveedor', '')
+        proveedor.save()
+        return redirect('proveedores_admin')
+    return render(request, 'admin/proveedores/editar_proveedores.html', {'proveedor': proveedor})
+
+
+def eliminar_proveedores(request, cod_proveedor):
+    proveedor = get_object_or_404(Proveedor, pk=cod_proveedor)
+    if request.method == 'POST':
+        proveedor.delete()
+        return redirect('proveedores_admin')
+    return render(request, 'admin/proveedores/eliminar_proveedores.html', {'proveedor': proveedor})
+
+
+
 
 # Vista de Entradas (Inventario)
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Entrada
+from .forms import EntradaForm
+
 @login_required
 def entradas_admin(request):
-    # ✅ Corregido: usar el modelo 'Entrada' directamente
     entradas = Entrada.objects.all().order_by('-fecha_hora_entrada')
-    return render(request, 'admin/entradas_admin.html', {'entradas': entradas})
+    return render(request, 'admin/entradas/entradas_admin.html', {'entradas': entradas})
+
+
+# Agregar entrada
+def agregar_entradas(request):
+    if request.method == 'POST':
+        form = EntradaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('entradas_admin')  # Redirige a la lista de entradas
+    else:
+        form = EntradaForm()
+    return render(request, 'admin/entradas/agregar_entradas.html', {'form': form})
+
+
+# Editar entrada
+def editar_entrada(request, cod_entrada):
+    entrada = get_object_or_404(Entrada, cod_entrada=cod_entrada)
+    insumo_anterior = entrada.cod_insumo
+    cantidad_anterior = entrada.cnt_entrada
+
+    if request.method == 'POST':
+        form = EntradaForm(request.POST, instance=entrada)
+        if form.is_valid():
+            nueva_entrada = form.save(commit=False)
+            nuevo_insumo = nueva_entrada.cod_insumo
+            nueva_cantidad = nueva_entrada.cnt_entrada
+
+            if insumo_anterior == nuevo_insumo:
+                # Mismo insumo: ajustar diferencia de cantidad
+                diferencia = nueva_cantidad - cantidad_anterior
+                nuevo_insumo.cnt_insumo += diferencia
+                nuevo_insumo.save()
+            else:
+                # Cambió el insumo: revertir en el anterior y sumar en el nuevo
+                insumo_anterior.cnt_insumo -= cantidad_anterior
+                insumo_anterior.save()
+
+                nuevo_insumo.cnt_insumo += nueva_cantidad
+                nuevo_insumo.save()
+
+            nueva_entrada.save()
+            return redirect('entradas_admin')
+    else:
+        form = EntradaForm(instance=entrada)
+
+    return render(request, 'admin/entradas/editar_entradas.html', {'form': form})
+
+
+# Eliminar entrada
+def eliminar_entrada(request, cod_entrada):
+    entrada = get_object_or_404(Entrada, cod_entrada=cod_entrada)
+    if request.method == 'POST':
+        # Descontar del stock
+        entrada.cod_insumo.cnt_insumo -= entrada.cnt_entrada
+        entrada.cod_insumo.save()
+
+        entrada.delete()
+        return redirect('entradas_admin')  # Redirige a la lista de entradas
+    return render(request, 'admin/entradas/eliminar_entradas.html', {'entrada': entrada})
+
+
+
+
+
 
 # Vista de Salidas (Inventario)
 @login_required
 def salidas_admin(request):
     # ✅ Corregido: usar el modelo 'Salida' directamente
     salidas = Salida.objects.all().order_by('-fecha_hora_salida')
-    return render(request, 'admin/salidas_admin.html', {'salidas': salidas})
+    return render(request, 'admin/salidas/salidas_admin.html', {'salidas': salidas})
+def eliminar_salida(request, cod_salida):
+    salida = get_object_or_404(Salida, cod_salida=cod_salida)
+    salida.delete()
+    return redirect('salidas_admin')  # Redirige a la lista de salidas
+
+
+def agregar_salida(request):
+    if request.method == 'POST':
+        form = SalidaForm(request.POST)
+        if form.is_valid():
+            salida = form.save()
+
+            # Descontar del inventario del insumo
+            insumo = salida.cod_insumo
+            insumo.cnt_insumo -= salida.cantidad
+            insumo.save()
+
+            return redirect('salidas_admin')  # Redirige a la lista de salidas
+    else:
+        form = SalidaForm()
+    
+    return render(request, 'admin/salidas/agregar_salida.html', {'form': form})
+
 
 # Vista de Categorías
+from .models import CategoriaInsumo
 @login_required
 def categorias_admin(request):
     # ✅ Corregido: usar 'CategoriaInsumo' en lugar de 'Categoria'
     categorias = CategoriaInsumo.objects.all()
-    return render(request, 'admin/categorias_admin.html', {'categorias': categorias})
+    return render(request, 'admin/categorias/categorias_admin.html', {'categorias': categorias})
+
+
+def agregar_categoria(request):
+    if request.method == 'POST':
+        nom_categoria = request.POST.get('nom_categoria').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+
+        if CategoriaInsumo.objects.filter(nom_categoria__iexact=nom_categoria).exists():
+            messages.warning(request, 'Ya existe una categoría con ese nombre.')
+        else:
+            CategoriaInsumo.objects.create(
+                nom_categoria=nom_categoria,
+                descripcion=descripcion if descripcion else None
+            )
+            messages.success(request, 'Categoría agregada exitosamente.')
+        
+        return redirect('categorias_admin')  # Cambia por el nombre correcto de tu ruta
+
+    # Para métodos GET también puedes mostrar la tabla de categorías
+    categorias = CategoriaInsumo.objects.all()
+    return render(request, 'admin/categorias/categorias_admin.html', {
+        'categorias': categorias
+    })
+
+def eliminar_categoria(request, cod_categoria):
+    categoria = get_object_or_404(CategoriaInsumo, cod_categoria=cod_categoria)
+    
+    try:
+        categoria.delete()
+        messages.success(request, 'Categoría eliminada correctamente.')
+    except:
+        messages.error(request, 'No se pudo eliminar la categoría. Puede estar relacionada con insumos.')
+
+    return redirect('categorias_admin')
+
+
 
 # Vista de Correos - COMENTADA porque no tienes este modelo
 # Si necesitas esta funcionalidad, debes crear el modelo Correo
 
+from .models import Correo
+
 @login_required
 def correos_admin(request):
-    from .models import Correo  # Asegúrate de que este modelo exista
-    correos_enviados = Correo.objects.all().order_by('-fecha_envio')
-    return render(request, 'admin/correos_admin.html', {'correos': correos_enviados})
+    historial_correos = Correo.objects.all().order_by('-fecha_envio')
+    return render(request, 'admin/correos/correos_admin.html', {
+        'historial_correos': historial_correos
+    })
+    
+def ver_correo(request, cod_correo):
+    correo = get_object_or_404(Correo, cod_correo=cod_correo)
+    return render(request, 'admin/correos/ver_correo.html', {'correo': correo})
+  
+from django.core.mail import EmailMessage
+from .models import Correo
+from .models import Cliente, Administrador, Domiciliario  # Ajusta si usas otros nombres
+
+def enviar_correos_masivos(request):
+    if request.method == 'POST':
+        destinatarios_tipo = request.POST.getlist('destinatarios')
+        asunto = request.POST.get('asunto')
+        mensaje = request.POST.get('mensaje')
+        archivos = request.FILES.getlist('adjuntos')
+
+        # Obtener correos reales de los destinatarios seleccionados
+        correos_a_enviar = []
+
+        if 'CLIENTE' in destinatarios_tipo:
+            correos_a_enviar += list(Cliente.objects.select_related('cod_usua').values_list('cod_usua__email', flat=True))
+
+        if 'ADMIN' in destinatarios_tipo:
+            correos_a_enviar += list(Administrador.objects.select_related('cod_usua').values_list('cod_usua__email', flat=True))
+
+        if 'DOMI' in destinatarios_tipo:
+            correos_a_enviar += list(Domiciliario.objects.select_related('cod_usua').values_list('cod_usua__email', flat=True))
+
+        # Enviar correos y registrar en BD
+        enviados = 0
+        for correo_dest in set(correos_a_enviar):  # Evitar duplicados
+            try:
+                email = EmailMessage(
+                    asunto,
+                    mensaje,
+                    to=[correo_dest]
+                )
+
+                # Adjuntar archivos
+                for adj in archivos:
+                    email.attach(adj.name, adj.read(), adj.content_type)
+
+                email.send()
+                enviado = True
+                enviados += 1
+            except Exception as e:
+                enviado = False  # puedes registrar el error si lo deseas
+
+            # Guardar registro en BD
+            Correo.objects.create(
+                destinatario=correo_dest,
+                asunto=asunto,
+                mensaje=mensaje,
+                enviado=enviado
+            )
+
+        messages.success(request, f'Se enviaron {enviados} correos.')
+        return redirect('correos_admin')
+
+    return redirect('admin/correos/correos_admin')
 
 
 # Vista para Cargar Datos
@@ -1179,12 +1519,50 @@ def cargarDatos(request):
 
 # 🔥 VISTAS ADICIONALES QUE PODRÍAS NECESITAR
 
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Insumo
+from .forms import InsumoForm  # Asegúrate de tener este formulario creado
 @login_required
 def insumos_admin(request):
     """Vista para gestionar insumos"""
     from .models import Insumo
     insumos = Insumo.objects.select_related('cod_categoria').all()
-    return render(request, 'admin/insumos_admin.html', {'insumos': insumos})
+    return render(request, 'admin/insumos/insumos_admin.html', {'insumos': insumos})
+
+# Agregar insumo
+def agregar_insumo(request):
+    if request.method == 'POST':
+        form = InsumoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('insumos_admin')
+    else:
+        form = InsumoForm()
+    return render(request, 'admin/insumos/agregar_insumo.html', {'form': form})
+
+# Editar insumo
+def editar_insumo(request, cod_insumo):
+    insumo = get_object_or_404(Insumo, cod_insumo=cod_insumo)
+    if request.method == 'POST':
+        form = InsumoForm(request.POST, instance=insumo)
+        if form.is_valid():
+            form.save()
+            return redirect('insumos_admin')
+    else:
+        form = InsumoForm(instance=insumo)
+    return render(request, 'admin/insumos/editar_insumo.html', {'form': form})
+
+# Eliminar insumo
+def eliminar_insumo(request, cod_insumo):
+    insumo = get_object_or_404(Insumo, cod_insumo=cod_insumo)
+    if request.method == 'POST':
+        insumo.delete()
+        return redirect('insumos_admin')
+    return render(request, 'admin/insumos/eliminar_insumo.html', {'insumo': insumo})
+
+
+
+
 
 @login_required
 def productos_admin(request):
@@ -1212,9 +1590,13 @@ def reporte_usuarios_pdf(request):
     roles = ['ADMIN', 'CLIENTE', 'DOMI']
     conteo_roles = [Usuario.objects.filter(rol=rol).count() for rol in roles]
 
+    # Generar el gráfico
+    plt.figure(figsize=(6, 4))  # tamaño opcional
+    plt.bar(roles, conteo_roles, color='skyblue')
     plt.title('Usuarios por Rol')
     plt.xlabel('Rol')
     plt.ylabel('Cantidad')
+    plt.tight_layout()
 
     # Guardar gráfico en memoria
     buf = io.BytesIO()
@@ -1222,6 +1604,9 @@ def reporte_usuarios_pdf(request):
     buf.seek(0)
     grafico_base64 = base64.b64encode(buf.read()).decode('utf-8')
     buf.close()
+
+    # Cerrar el plot (importantísimo para evitar sobrecarga)
+    plt.close()
 
     # Renderizar template HTML con gráfico embebido
     html_string = render_to_string('reportes/usuarios_pdf.html', {
@@ -1239,28 +1624,41 @@ def reporte_usuarios_pdf(request):
     response['Content-Disposition'] = 'inline; filename="reporte_usuarios.pdf"'
     return response
 
-
+import openpyxl
+from openpyxl.styles import Font, Alignment
+from django.http import HttpResponse
+from .models import Usuario
 
 def reporte_usuarios_excel(request):
-    # Crear libro de Excel
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Usuarios"
 
     # Cabeceras
-    ws.append(['ID', 'Nombre', 'Apellido', 'Email', 'Rol', 'Activo'])
+    encabezados = ['ID', 'Nombre', 'Apellido', 'Email', 'Rol', 'Activo']
+    ws.append(encabezados)
+
+    # Formato de cabeceras
+    for col in ws.iter_cols(min_row=1, max_row=1, min_col=1, max_col=len(encabezados)):
+        for cell in col:
+            cell.font = Font(bold=True)
+            cell.alignment = Alignment(horizontal='center')
 
     # Llenar filas con los datos
     usuarios = Usuario.objects.all()
     for usuario in usuarios:
         ws.append([
             usuario.pk,
-            usuario.nomUsua,
-            usuario.apellUsua,
-            usuario.emailUsua,
+            usuario.nom_usua,
+            usuario.apell_usua,
+            usuario.email,
             usuario.rol,
-            "Sí" if usuario.activo else "No"
         ])
+
+    # Ajustar ancho de columnas
+    for column_cells in ws.columns:
+        length = max(len(str(cell.value)) for cell in column_cells)
+        ws.column_dimensions[column_cells[0].column_letter].width = length + 2
 
     # Preparar respuesta
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -1268,6 +1666,7 @@ def reporte_usuarios_excel(request):
     wb.save(response)
 
     return response
+
 
 def guardar_usuario(request):
     if request.method == 'POST':
@@ -1306,4 +1705,5 @@ def eliminar_usuario(request, cod_usuario):
       usuario.delete()
       return redirect(request.META.get('HTTP_REFERER', '/'))
       return redirect(request.META.get('HTTP_REFERER', '/'))
+
 

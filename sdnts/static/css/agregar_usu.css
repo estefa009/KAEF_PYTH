@@ -1,0 +1,88 @@
+
+/* Formulario con borde rosa y sombra */
+form.grande {
+    max-width: 600px;
+    margin: 40px auto;
+    background: linear-gradient(to bottom, #ffeef3, #FFF9F2);
+    box-shadow: 0 8px 20px rgba(255, 192, 203, 0.4);
+    border-radius: 60px !important;
+    padding: 30px 40px;
+    overflow: hidden; /* IMPORTANTE */
+}
+@font-face {
+    font-family: 'Dunkin';
+    src: url('../font/Dunkin.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+/* Título dentro del formulario */
+form.grande h2 {
+    text-align: center;
+    color: #ff85a2;
+    font-size: 25px;
+    margin-bottom: 30px;
+    font-family: "Dunkin", sans-serif;
+}
+
+/* Etiquetas del formulario */
+
+
+/* Campos del formulario */
+form.grande input,
+form.grande select,
+form.grande textarea {
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 5px;
+    border: 3px solid #ff80a4;
+    border-radius: 30px;
+    font-size: 15px;
+    transition: border-color 0.2s;
+    background-color: #f5f7f8;
+    text-align: center;
+    color: #999;
+    font-style: italic;
+}
+
+form.grande input:focus,
+form.grande select:focus,
+form.grande textarea:focus {
+    border-color: #ffb6c1;
+    outline: none;
+    background-color: #f5f7f8;
+}
+
+/* Botones */
+form.grande .btn-primary {
+    background-color: #ffb6c1;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 40px;
+    transition: background 0.3s ease;
+    font-size: 15px;
+    width: 47%;
+}
+
+form.grande .btn-primary:hover {
+    background-color: #ff5b8a;
+    color: white;
+}
+
+form.grande .btn-secondary {
+    background-color: #ff80a4;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 40px;
+    text-decoration: none;
+    transition: background 0.3s ease;
+    margin-left: 10px;
+    font-size: 15px;
+    width: 47%;
+}
+
+form.grande .btn-secondary:hover {
+    background-color: #ff5b8a;
+}

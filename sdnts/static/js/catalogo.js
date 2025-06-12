@@ -358,7 +358,9 @@ document.addEventListener('DOMContentLoaded', function () {
             masa: selecciones.masa,
             cobertura: selecciones.cobertura,
             topping: selecciones.topping,
-            precio: precio,
+             precio: 8403.36,
+             precio: precio,
+
             titulo: 'Donas Talla S',
             descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
             quantity: 1,
@@ -366,6 +368,85 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         agregarAlCarrito(producto);
+
+
+
+        // Evento para agregar Donas Talla M
+        document.getElementById('btnCerrarModalM')?.addEventListener('click', function () {
+            const selecciones = obtenerSeleccionesActuales('M');
+            if (!selecciones) {
+                alert('Por favor selecciona masa, cobertura y topping antes de agregar al carrito');
+                return;
+            }
+
+            const producto = {
+                id: `M-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
+                cod_producto: "{{producto.cod_producto}}", // <-- este valor debe venir del backend
+                tipo: 'combo-dona',
+                talla: 'M',
+                masa: selecciones.masa,
+                cobertura: selecciones.cobertura,
+                topping: selecciones.topping,
+                precio: 16806.72,
+                titulo: 'Donas Talla M',
+                descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
+                quantity: 1,
+                timestamp: Date.now()
+            };
+
+            agregarAlCarrito(producto);
+        });
+
+        // Evento para agregar Donas Talla L
+        document.getElementById('btnCerrarModalL')?.addEventListener('click', function () {
+            const selecciones = obtenerSeleccionesActuales('L');
+            if (!selecciones) {
+                alert('Por favor selecciona masa, cobertura y topping antes de agregar al carrito');
+                return;
+            }
+
+            const producto = {
+                id: `L-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
+                cod_producto: "{{producto.cod_producto}}", // <-- este valor debe venir del backend
+                tipo: 'combo-dona',
+                talla: 'L',
+                masa: selecciones.masa,
+                cobertura: selecciones.cobertura,
+                topping: selecciones.topping,
+                precio: 25210.08,
+                titulo: 'Donas Talla L',
+                descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
+                quantity: 1,
+                timestamp: Date.now()
+            };
+            agregarAlCarrito(producto);
+        });
+
+        // Evento para agregar Donas Talla XL
+        document.getElementById('btnCerrarModalXL')?.addEventListener('click', function () {
+            const selecciones = obtenerSeleccionesActuales('XL');
+            if (!selecciones) {
+                alert('Por favor selecciona masa, cobertura y topping antes de agregar al carrito');
+                return;
+            }
+
+            const producto = {
+                id: `XL-${selecciones.masa.valor}-${selecciones.cobertura.valor}-${selecciones.topping.valor}`,
+                cod_producto: "{{producto.cod_producto}}", // <-- este valor debe venir del backend
+                tipo: 'combo-dona',
+                talla: 'XL',
+                masa: selecciones.masa,
+                cobertura: selecciones.cobertura,
+                topping: selecciones.topping,
+                precio: 33613.45,
+                titulo: 'Donas Talla XL',
+                descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
+                quantity: 1,
+                timestamp: Date.now()
+            };
+
+            agregarAlCarrito(producto);
+        });
     });
 
     // Evento para agregar Donas Talla M
@@ -453,6 +534,96 @@ document.addEventListener('DOMContentLoaded', function () {
 
         agregarAlCarrito(producto);
     });
+
+    // Manejo de radio buttons para métodos de pago
+    const radioNequi = document.getElementById('radioNequi');
+    const radioDavi = document.getElementById('radioDavi');
+    const contenedorNequi = document.getElementById('contenedorNequi');
+    const contenedorDavi = document.getElementById('contenedorDavi');
+
+    function toggleMetodoPago() {
+        if (radioNequi.checked) {
+            contenedorNequi.style.display = 'block';
+            contenedorDavi.style.display = 'none';
+        } else if (radioDavi.checked) {
+            contenedorNequi.style.display = 'none';
+            contenedorDavi.style.display = 'block';
+        }
+    }
+
+    // Agregar eventos a los radio buttons
+    if (radioNequi) radioNequi.addEventListener('change', toggleMetodoPago);
+    if (radioDavi) radioDavi.addEventListener('change', toggleMetodoPago);
+
+    // Manejo de modales específicos
+    window.openModal = function(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'block';
+        }
+    }
+
+    window.closeModal = function(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // Cerrar modales al hacer click fuera
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal-nequi')) {
+            event.target.style.display = 'none';
+        }
+        if (event.target.classList.contains('modal-davi')) {
+            event.target.style.display = 'none';
+        }
+    }
+
+    // Manejo del modal de resumen de compra
+    const modalResumen = document.querySelector('.modal');
+    const btnOK = document.querySelector('.modal button');
+    const btnClose = document.querySelector('.modal .close');
+    
+    function cerrarModalResumen() {
+        if (modalResumen) {
+            modalResumen.classList.add('hidden');
+            // Opcional: recargar la página después de cerrar
+            // window.location.reload();
+        }
+    }
+
+    // Botón OK
+    btnOK?.addEventListener('click', cerrarModalResumen);
+    
+    // Botón X (close)
+    btnClose?.addEventListener('click', cerrarModalResumen);
+
+    // Cerrar modal al hacer click fuera
+    window.addEventListener('click', function(event) {
+        if (event.target === modalResumen) {
+            cerrarModalResumen();
+        }
+    });
+
+    // Función para mostrar el modal
+    window.mostrarModalResumen = function(datos) {
+        if (modalResumen) {
+            const contenidoModal = modalResumen.querySelector('.modal-content');
+            if (contenidoModal) {
+                // Actualizar el contenido del modal con los datos
+                contenidoModal.innerHTML = `
+                    <span class="close">&times;</span>
+                    <h2>Resumen de tu compra</h2>
+                    <div class="resumen-detalles">
+                        ${datos}
+                    </div>
+                    <button class="btn btn-success">OK</button>
+                `;
+            }
+            modalResumen.classList.remove('hidden');
+        }
+    };
 });
 
 // Mostrar estado inicial del carrito
@@ -662,22 +833,21 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', async f
         return;
     }
     // Ahora puedes usar direccion y fechaEntrega
-   const payload = {
-    carrito: cart,
-    direccion: direccion,
-    fecha_entrega: fechaEntrega,
-    metodo_pago: metodoPagoSeleccionado,
-    transaccion_id: referenciaPago
-};
+    const payload = {
+        carrito: cart,
+        direccion: direccion,
+        fecha_entrega: fechaEntrega,
+        metodo_pago: metodoPagoSeleccionado,
+        transaccion_id: referenciaPago
+    };
     console.log('Enviando fetch a /procesar_compra/ con:', payload);
-    // alert('Enviando datos al backend. Revisa consola para detalles.'); // Eliminado modal nativo
-    
+
     // Validar método de pago y referencia
     if (!payload.metodo_pago || !payload.transaccion_id) {
         alert('Falta seleccionar método de pago o referencia de pago.');
         return;
     }
-    
+
     fetch('/procesar_compra/', {
         method: 'POST',
         headers: {
@@ -719,12 +889,32 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', async f
                     modal.innerHTML += '<div style="color:red; background:#fff3cd; border:1px solid #f5c6cb; padding:10px;">No se encontró el elemento .infoTotalCarrito</div>';
                 } else if (data.venta) {
                     let detalles = data.venta.detalles || [];
-                    let productosHTML = `<h3>Resumen de tu compra</h3><table style='width:100%;margin-bottom:10px;'><thead><tr><th style='text-align:left;'>Producto</th><th>Cant.</th><th>Unitario</th><th>Subtotal</th></tr></thead><tbody>`;
+                    let productosHTML = `<h3>Resumen de tu compra</h3>
+<table style='width:100%;margin-bottom:10px;'>
+<thead>
+<tr>
+<th style='text-align:left;'>Producto</th>
+<th>Cant.</th>
+<th>Unitario</th>
+<th>Subtotal</th>
+</tr>
+</thead>
+<tbody>`;
                     detalles.forEach(det => {
-                        productosHTML += `<tr><td>${det.producto}</td><td style='text-align:center;'>${det.cantidad}</td><td style='text-align:right;'>$${Number(det.precio_unitario).toLocaleString()}</td><td style='text-align:right;'>$${Number(det.subtotal).toLocaleString()}</td></tr>`;
+                        productosHTML += `<tr>
+<td>${det.producto}</td>
+<td style='text-align:center;'>${det.cantidad}</td>
+<td style='text-align:right;'>$${Number(det.precio_unitario).toLocaleString()}</td>
+<td style='text-align:right;'>$${Number(det.subtotal).toLocaleString()}</td>
+</tr>`;
                     });
                     productosHTML += `</tbody></table>`;
-                    productosHTML += `<div style='text-align:right;'><b>Subtotal:</b> $${Number(data.venta.subtotal).toLocaleString()}<br><b>IVA (19%):</b> $${Number(data.venta.iva).toLocaleString()}<br><b>Total:</b> $${Number(data.venta.total).toLocaleString()}<br><b>Dirección:</b> ${data.venta.direccion}</div>`;
+                    productosHTML += `<div style='text-align:left;'>
+<b>Subtotal:</b> $${Number(data.venta.subtotal).toLocaleString()}<br>
+<b>IVA (19%):</b> $${Number(data.venta.iva).toLocaleString()}<br>
+<b>Total:</b> $${Number(data.venta.total).toLocaleString()}<br>
+<b>Dirección:</b> ${data.venta.direccion}
+</div>`;
                     info.innerHTML = productosHTML;
                 } else {
                     info.innerHTML = '<div style="color:red;">No se recibió resumen de venta del backend.</div>';

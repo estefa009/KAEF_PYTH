@@ -198,9 +198,97 @@ class SalidaForm(forms.ModelForm):
 class EntradaForm(forms.ModelForm):
     class Meta:
         model = Entrada
-        fields = ['cod_insumo', 'cnt_entrada', 'precio_entrada', 'fecha_caducidad', 'lote']
+        fields = ['cod_insumo', 'cnt_entrada', 'precio_entrada', 'fecha_caducidad']
+
 
 class EnvioForm(forms.ModelForm):
     class Meta:
         model = Envio
-        fields = ['cod_domi', 'tarifa_envio', 'observaciones', 'firma_recepcion']
+        fields = [
+            'cod_domi',
+            'fecha_asignacion',
+            'fecha_salida',
+            'fecha_entrega',
+            'estado',
+            'tarifa_envio',
+            'observaciones',
+        ]
+        widgets = {
+            'fecha_asignacion': forms.DateTimeInput(attrs={
+                'class': 'form-control',
+                'type': 'datetime-local'
+            }),
+            'fecha_salida': forms.DateTimeInput(attrs={
+                'class': 'form-control',
+                'type': 'datetime-local'
+            }),
+            'fecha_entrega': forms.DateTimeInput(attrs={
+                'class': 'form-control',
+                'type': 'datetime-local'
+            }),
+            'observaciones': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Observaciones adicionales'
+            }),
+            
+            'estado': forms.Select(attrs={'class': 'form-select'}),
+            'cod_domi': forms.Select(attrs={'class': 'form-select'}),
+            'tarifa_envio': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+        }
+
+#proveedores
+from .models import Proveedor
+
+class ProveedorForm(forms.ModelForm):
+    class Meta:
+        model = Proveedor
+        fields = ['nom_proveedor', 'telefono_proveedor', 'direccion_proveedor', 'email_proveedor', 'novedad_proveedor']
+        widgets = {
+            'nom_proveedor': forms.TextInput(attrs={'class': 'form-control'}),
+            'telefono_proveedor': forms.TextInput(attrs={'class': 'form-control'}),
+            'direccion_proveedor': forms.TextInput(attrs={'class': 'form-control'}),
+            'email_proveedor': forms.EmailInput(attrs={'class': 'form-control'}),
+            'novedad_proveedor': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+#entradas
+
+from .models import Entrada
+
+class EntradaForm(forms.ModelForm):
+    class Meta:
+        model = Entrada
+        fields = ['cod_insumo', 'cod_proveedor', 'cnt_entrada', 'precio_entrada', 'fecha_caducidad']
+        widgets = {
+            'fecha_caducidad': forms.DateInput(attrs={'type': 'date'}),
+        }
+from django import forms
+from .models import Insumo
+
+class InsumoForm(forms.ModelForm):
+    class Meta:
+        model = Insumo
+        fields = ['cod_categoria', 'nomb_insumo', 'cnt_insumo', 'unidad_medida']
+        widgets = {
+            'cod_categoria': forms.Select(attrs={'class': 'form-control'}),
+            'nomb_insumo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del insumo'}),
+            'cnt_insumo': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Cantidad'}),
+            'unidad_medida': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Unidad de medida'}),
+        }
+        
+from django import forms
+from .models import Salida
+
+class SalidaForm(forms.ModelForm):
+    class Meta:
+        model = Salida
+        fields = ['cod_produccion', 'cod_insumo', 'cantidad']
+        widgets = {
+            'cod_produccion': forms.Select(attrs={'class': 'form-control'}),
+            'cod_insumo': forms.Select(attrs={'class': 'form-control'}),
+            'cantidad': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+        }
+        
+
+

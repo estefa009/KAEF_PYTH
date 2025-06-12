@@ -1409,3 +1409,66 @@ border-radius: 100px;
   background: #fc6998;
   color: #fff;
 }
+
+/* Estilos para contenedores de método de pago */
+.nequi-container,
+.davi-container {
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 15px;
+    background-color: #ffc0cb;
+    transition: display 0.3s ease;
+}
+
+/* Estilos para los modales específicos */
+.modal-nequi,
+.modal-davi {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: -100px;
+    width: 100%;
+    height: 150%;
+    background-color: rgba(0,0,0,0.7);
+}
+
+.modal-nequi-content,
+.modal-davi-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 1px;
+    width: 150%;
+    max-width: 500px;
+    position: relative;
+}
+
+.close-nequi,
+.close-davi {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.modal-nequi-img,
+.modal-davi-img {
+    max-width: 150px;
+    margin-bottom: 15px;
+}
+
+/* Estilos para los logos */
+.logo-nequi,
+.logo-davi {
+    cursor: pointer;
+    text-align: center;
+    margin-top: -20px;
+}
+
+.imagen-nequi img,
+.imagen-davi img {
+    max-width: 150px;
+    height: auto;
+}
