@@ -295,7 +295,7 @@ main h1 {
     }
 
     .btn-rosa {
-        background-color: #ff80a4;
+        background-color: #ffb6c1;
         color: white;
         border: none;
         border-radius: 40px;
@@ -316,3 +316,46 @@ main h1 {
         background-color: #d81b60;
         color: white;
     }
+
+    .form-rosa-pastel {
+        margin-top: 15px;
+}
+
+.form-rosa-pastel label {
+    color: #D87093; /* Rosa medio */
+    font-weight: 500;
+    margin-right: 10px;
+}
+
+.form-rosa-pastel .form-select {
+    background-color: #FFF9FA;
+    border: 1px solid #FFC0CB; /* Rosa claro */
+    border-radius: 30px;
+    color: #DB7093; /* Rosa viejo */
+    padding: 5px 10px;
+    width: auto;
+}
+
+.form-rosa-pastel .form-select:focus {
+    border-color: #FF69B4; /* Rosa intenso */
+    box-shadow: 0 0 0 0.25rem rgba(255, 182, 193, 0.25); /* Rosa claro con transparencia */
+}
+
+.form-rosa-pastel .btn-primary {
+    background-color: #FFB6C1; /* Rosa claro */
+    border-color: #FFB6C1;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 30px;
+    transition: all 0.3s;
+}
+
+.form-rosa-pastel .btn-primary:hover {
+    background-color: #ff80a4; /* Rosa más intenso al hover */
+    border-color: #ff80a4;
+}
+
+.form-rosa-pastel .btn-primary:active {
+    background-color: #ff80a4; /* Rosa viejo */
+    border-color: #ff80a4;
+}

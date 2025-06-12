@@ -35,7 +35,7 @@ form.grande textarea {
     width: 100%;
     padding: 8px 10px;
     margin-top: 5px;
-    border: 3px solid #ffb6c1;
+    border: 3px solid #ff80a4;
     border-radius: 30px;
     font-size: 15px;
     transition: border-color 0.2s;
@@ -55,12 +55,14 @@ form.grande textarea:focus {
 
 /* Botones */
 form.grande .btn-primary {
-    background-color: #ff80a4;
+    background-color: #ffb6c1;
     border: none;
     color: white;
     padding: 10px 20px;
     border-radius: 40px;
     transition: background 0.3s ease;
+    font-size: 15px;
+    width: 47%;
 }
 
 form.grande .btn-primary:hover {
@@ -69,15 +71,18 @@ form.grande .btn-primary:hover {
 }
 
 form.grande .btn-secondary {
-    background-color: #adb5bd;
+    background-color: #ff80a4;
     color: white;
+    border: none;
     padding: 10px 20px;
     border-radius: 40px;
     text-decoration: none;
     transition: background 0.3s ease;
     margin-left: 10px;
+    font-size: 15px;
+    width: 47%;
 }
 
 form.grande .btn-secondary:hover {
-    background-color: #5c6164;
+    background-color: #ff5b8a;
 }

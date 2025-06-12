@@ -1307,3 +1307,4 @@ def eliminar_usuario(request, cod_usuario):
       return redirect(request.META.get('HTTP_REFERER', '/'))
       return redirect(request.META.get('HTTP_REFERER', '/'))
 
+
