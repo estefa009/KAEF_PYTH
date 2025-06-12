@@ -34,30 +34,11 @@
 
 <body>
     {% include "includes/nav_admin.html" %}
-    <main>
-        <h4><p>Bienvenid@ {{ user.nom_usua }} {{ user.apell_usua }}</p></h4>
-
-                    <!-- Menú de usuario (dropdown) -->
-        <div class="d-flex align-items-center gap-3" style="margin-left: auto; margin-right: 40px;">
-            <li class="nav-item dropdown list-unstyled">
-                <a href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-person-circle" style="font-size: 30px; color: #333333"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
-                    <li><span class="dropdown-header">Administrador {{ user.nom_usua }}</span></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="{% url 'perfil_admin' %}">Perfil</a></li>
-                    <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a></li>
-                </ul>
-            </li>
-        </div>
-
-    </main>
 
     <!-- Gestión de usuarios -->
     <div class="tablaa">
         <div class="row">
-            <h2 class="mb-4">Gestión de Usuarios</h2>
+            <h2 class="mb-4">GESTIÓN DE USUARIOS</h2>
 
             <!-- Botón para agregar usuario -->
             <a  href="{% url 'agregar_usuario' %}" class="btn btn-rosa me-2 mb-3">
@@ -83,49 +64,47 @@
 
 
             <!-- Tabla de usuarios -->
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>ID</th><th>Nombre</th><th>Apellido</th><th>Email</th><th>Rol</th><th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for usuario in usuarios %}
-                            <tr>
-                                <td>{{ usuario.cod_usuario }}</td>
-                                <td>{{ usuario.nom_usua }}</td>
-                                <td>{{ usuario.apell_usua }}</td>
-                                <td>{{ usuario.email }}</td>
-                                <td>{{ usuario.get_rol_display }}</td>
-
-                                <td>
-                                    <a href="{% url 'editar_usuario' cod_usuario=usuario.cod_usuario %}" class="btn btn-rosa me-2">
-                                        <i class="bi bi-pencil"></i> Editar
-                                    </a>
-
-                                    <a href="{% url 'eliminar_usuario' cod_usuario=usuario.cod_usuario %}"
-
-                                       onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?');"
-                                       class="btn btn-danger">
-                                        Eliminar
-                                    </a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-
-                    </tbody>
-                </table>
-            </div>
-
-            
-
-        </div>
-    </div>
-    
-    
-    
-
+             <div class="table-responsive">
+    <table class="table tabla-usuarios">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if usuarios %}
+                {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario.cod_usuario }}</td>
+                        <td>{{ usuario.nom_usua }}</td>
+                        <td>{{ usuario.apell_usua }}</td>
+                        <td>{{ usuario.email }}</td>
+                        <td>{{ usuario.get_rol_display }}</td>
+                        <td>
+                            <a href="{% url 'editar_usuario' cod_usuario=usuario.cod_usuario %}" class="btn btn-rosa me-2">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <a href="{% url 'eliminar_usuario' cod_usuario=usuario.cod_usuario %}"
+                               onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?');"
+                               class="btn btn-danger">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="6" class="no-data py-3">No hay usuarios disponibles.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
