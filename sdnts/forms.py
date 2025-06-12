@@ -198,7 +198,7 @@ class SalidaForm(forms.ModelForm):
 class EntradaForm(forms.ModelForm):
     class Meta:
         model = Entrada
-        fields = ['cod_insumo', 'cnt_entrada', 'precio_entrada', 'fecha_caducidad', 'lote']
+        fields = ['cod_insumo', 'cnt_entrada', 'precio_entrada', 'fecha_caducidad']
 
 
 class EnvioForm(forms.ModelForm):
@@ -250,5 +250,17 @@ class ProveedorForm(forms.ModelForm):
             'direccion_proveedor': forms.TextInput(attrs={'class': 'form-control'}),
             'email_proveedor': forms.EmailInput(attrs={'class': 'form-control'}),
             'novedad_proveedor': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+#entradas
+
+from .models import Entrada
+
+class EntradaForm(forms.ModelForm):
+    class Meta:
+        model = Entrada
+        fields = ['cod_insumo', 'cod_proveedor', 'cnt_entrada', 'precio_entrada', 'fecha_caducidad']
+        widgets = {
+            'fecha_caducidad': forms.DateInput(attrs={'type': 'date'}),
         }
 

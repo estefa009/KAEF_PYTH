@@ -1208,12 +1208,80 @@ def eliminar_proveedores(request, cod_proveedor):
 
 
 
+
 # Vista de Entradas (Inventario)
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Entrada
+from .forms import EntradaForm
+
 @login_required
 def entradas_admin(request):
-    # ✅ Corregido: usar el modelo 'Entrada' directamente
     entradas = Entrada.objects.all().order_by('-fecha_hora_entrada')
-    return render(request, 'admin/entradas_admin.html', {'entradas': entradas})
+    return render(request, 'admin/entradas/entradas_admin.html', {'entradas': entradas})
+
+
+# Agregar entrada
+def agregar_entradas(request):
+    if request.method == 'POST':
+        form = EntradaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('entradas_admin')  # Redirige a la lista de entradas
+    else:
+        form = EntradaForm()
+    return render(request, 'admin/entradas/agregar_entradas.html', {'form': form})
+
+
+# Editar entrada
+def editar_entrada(request, cod_entrada):
+    entrada = get_object_or_404(Entrada, cod_entrada=cod_entrada)
+    insumo_anterior = entrada.cod_insumo
+    cantidad_anterior = entrada.cnt_entrada
+
+    if request.method == 'POST':
+        form = EntradaForm(request.POST, instance=entrada)
+        if form.is_valid():
+            nueva_entrada = form.save(commit=False)
+            nuevo_insumo = nueva_entrada.cod_insumo
+            nueva_cantidad = nueva_entrada.cnt_entrada
+
+            if insumo_anterior == nuevo_insumo:
+                # Mismo insumo: ajustar diferencia de cantidad
+                diferencia = nueva_cantidad - cantidad_anterior
+                nuevo_insumo.cnt_insumo += diferencia
+                nuevo_insumo.save()
+            else:
+                # Cambió el insumo: revertir en el anterior y sumar en el nuevo
+                insumo_anterior.cnt_insumo -= cantidad_anterior
+                insumo_anterior.save()
+
+                nuevo_insumo.cnt_insumo += nueva_cantidad
+                nuevo_insumo.save()
+
+            nueva_entrada.save()
+            return redirect('entradas_admin')
+    else:
+        form = EntradaForm(instance=entrada)
+
+    return render(request, 'admin/entradas/editar_entradas.html', {'form': form})
+
+
+# Eliminar entrada
+def eliminar_entrada(request, cod_entrada):
+    entrada = get_object_or_404(Entrada, cod_entrada=cod_entrada)
+    if request.method == 'POST':
+        # Descontar del stock
+        entrada.cod_insumo.cnt_insumo -= entrada.cnt_entrada
+        entrada.cod_insumo.save()
+
+        entrada.delete()
+        return redirect('entradas_admin')  # Redirige a la lista de entradas
+    return render(request, 'admin/entradas/eliminar_entradas.html', {'entrada': entrada})
+
+
+
+
+
 
 # Vista de Salidas (Inventario)
 @login_required

@@ -68,7 +68,6 @@ urlpatterns = [
     path('categorias_admin/', views.categorias_admin, name='categorias_admin'),
     path('correos_admin/', views.correos_admin, name='correos_admin'),
     path('dashboard_admin/', views.dashboard_admin, name='dashboard_admin'),
-    path('entradas_admin/', views.entradas_admin, name='entradas_admin'),
     path('insumos_admin/', views.insumos_admin, name='insumos_admin'),
     path('perfil_admin/', views.perfil_admin, name='perfil_admin'),
     path('editarperfil_admin/', views.editarperfil_admin, name='editarperfil_admin'),
@@ -106,7 +105,11 @@ urlpatterns = [
     path('proveedores/agregar_proveedores/', views.agregar_proveedores, name='agregar_proveedores'),
     path('proveedores/editar_proveedores/<int:cod_proveedor>/', views.editar_proveedores, name='editar_proveedores'),
     path('proveedores/eliminar_proveedores/<int:cod_proveedor>/', views.eliminar_proveedores, name='eliminar_proveedores'),
-  
+    #entradas
+    path('entradas_admin/', views.entradas_admin, name='entradas_admin'),
+    path('entradas/agregar/', views.agregar_entradas, name='agregar_entradas'),
+    path('entradas/editar/<int:cod_entrada>/', views.editar_entrada, name='editar_entrada'),
+    path('entradas/eliminar/<int:cod_entrada>/', views.eliminar_entrada, name='eliminar_entrada'),
   
     path('reporte-usuarios-pdf/', views.reporte_usuarios_pdf, name='reporte_usuarios_pdf'),
     path('guardar/', views.guardar_usuario, name='guardar_usuario'),

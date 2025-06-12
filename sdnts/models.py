@@ -200,19 +200,16 @@ class Entrada(models.Model):
         on_delete=models.CASCADE,
         related_name='entradas'
     )
-    nom_entrada = models.CharField('nombre', max_length=50)
     cnt_entrada = models.IntegerField('cantidad')
     precio_entrada = models.DecimalField('precio', max_digits=10, decimal_places=2)
     fecha_hora_entrada = models.DateTimeField('fecha de entrada', auto_now_add=True)
-    fecha_caducidad = models.DateField('fecha de caducidad')
-    lote = models.CharField('lote', max_length=20, blank=True, null=True)
-    
+    fecha_caducidad = models.DateField('fecha de caducidad')    
     class Meta:
         verbose_name = 'Entrada de Insumo'
         verbose_name_plural = 'Entradas de Insumos'
     
     def __str__(self):
-        return f"Entrada #{self.cod_entrada} - {self.nom_entrada}"
+        return f"Entrada #{self.cod_entrada} - {self.cod_insumo.nomb_insumo}"
 
 class Producto(models.Model):
     """
