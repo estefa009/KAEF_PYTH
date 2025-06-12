@@ -103,9 +103,9 @@ urlpatterns = [
     
     #proveedores
     path('proveedores_admin/', views.proveedores_admin, name='proveedores_admin'),
-    path('proveedores/agregar_proveedores/', views.proveedor_agregar, name='proveedor_agregar'),
-    path('proveedores/editar_proveedores/<int:cod_proveedor>/', views.proveedor_editar, name='proveedor_editar'),
-    path('proveedores/eliminar_proveedores/<int:cod_proveedor>/', views.proveedor_eliminar, name='proveedor_eliminar'),
+    path('proveedores/agregar_proveedores/', views.agregar_proveedores, name='agregar_proveedores'),
+    path('proveedores/editar_proveedores/<int:cod_proveedor>/', views.editar_proveedores, name='editar_proveedores'),
+    path('proveedores/eliminar_proveedores/<int:cod_proveedor>/', views.eliminar_proveedores, name='eliminar_proveedores'),
   
   
     path('reporte-usuarios-pdf/', views.reporte_usuarios_pdf, name='reporte_usuarios_pdf'),

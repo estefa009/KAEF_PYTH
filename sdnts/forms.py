@@ -237,10 +237,18 @@ class EnvioForm(forms.ModelForm):
             'tarifa_envio': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
         }
 
+#proveedores
+from .models import Proveedor
 
-#Envios  del administrador
-from .models import Envio
-
-from django import forms
-from .models import Envio
+class ProveedorForm(forms.ModelForm):
+    class Meta:
+        model = Proveedor
+        fields = ['nom_proveedor', 'telefono_proveedor', 'direccion_proveedor', 'email_proveedor', 'novedad_proveedor']
+        widgets = {
+            'nom_proveedor': forms.TextInput(attrs={'class': 'form-control'}),
+            'telefono_proveedor': forms.TextInput(attrs={'class': 'form-control'}),
+            'direccion_proveedor': forms.TextInput(attrs={'class': 'form-control'}),
+            'email_proveedor': forms.EmailInput(attrs={'class': 'form-control'}),
+            'novedad_proveedor': forms.TextInput(attrs={'class': 'form-control'}),
+        }
 

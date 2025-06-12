@@ -1166,10 +1166,47 @@ def eliminar_envio(request, pk):
 
 
 # Vista de Proveedores
+from .models import Proveedor
+from .forms import ProveedorForm
 @login_required
 def proveedores_admin(request):
     proveedores = Proveedor.objects.all()
     return render(request, 'admin/proveedores/proveedores_admin.html', {'proveedores': proveedores})
+
+
+def agregar_proveedores(request):
+    if request.method == 'POST':
+        Proveedor.objects.create(
+            nom_proveedor=request.POST['nom_proveedor'],
+            telefono_proveedor=request.POST['telefono_proveedor'],
+            direccion_proveedor=request.POST.get('direccion_proveedor', ''),
+            email_proveedor=request.POST.get('email_proveedor', ''),
+            novedad_proveedor=request.POST.get('novedad_proveedor', '')
+        )
+        return redirect('proveedores_admin')
+    return render(request, 'admin/proveedores/agregar_proveedores.html')
+    
+def editar_proveedores(request, cod_proveedor):
+    proveedor = get_object_or_404(Proveedor, pk=cod_proveedor)
+    if request.method == 'POST':
+        proveedor.nom_proveedor = request.POST['nom_proveedor']
+        proveedor.telefono_proveedor = request.POST['telefono_proveedor']
+        proveedor.direccion_proveedor = request.POST.get('direccion_proveedor', '')
+        proveedor.email_proveedor = request.POST.get('email_proveedor', '')
+        proveedor.novedad_proveedor = request.POST.get('novedad_proveedor', '')
+        proveedor.save()
+        return redirect('proveedores_admin')
+    return render(request, 'admin/proveedores/editar_proveedores.html', {'proveedor': proveedor})
+
+
+def eliminar_proveedores(request, cod_proveedor):
+    proveedor = get_object_or_404(Proveedor, pk=cod_proveedor)
+    if request.method == 'POST':
+        proveedor.delete()
+        return redirect('proveedores_admin')
+    return render(request, 'admin/proveedores/eliminar_proveedores.html', {'proveedor': proveedor})
+
+
 
 # Vista de Entradas (Inventario)
 @login_required
