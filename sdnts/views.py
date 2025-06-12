@@ -1040,6 +1040,10 @@ def crear_produccion(request):
         if form.is_valid() and salida_form.is_valid():
             with transaction.atomic():
                 produccion = form.save()
+                # Cambiar estado de la venta asociada
+                venta = produccion.cod_venta
+                venta.estado = 'PREPARACION' 
+                venta.save()
                 salida = salida_form.save(commit=False)
                 salida.cod_produccion = produccion
                 insumo = salida.cod_insumo
@@ -1110,20 +1114,47 @@ def eliminar_produccion(request, cod_produccion):
         return redirect('produccion_admin')
     return render(request, 'admin/produccion/eliminar_produccion.html', {'produccion': produccion})
 
-
-
+#Envio Admin
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Envio
+from .forms import EnvioForm
 
 # Vista de Envíos
 @login_required
 def envios_admin(request):
-    envios_pendientes = Envio.objects.filter(estado='PENDIENTE')
-    # ✅ Corregido: usar 'ENTREGADO' en lugar de 'COMPLETADO'
-    envios_completados = Envio.objects.filter(estado='ENTREGADO')
-    
-    return render(request, 'admin/envios/envios_admin.html', {
-        'envios_pendientes': envios_pendientes,
-        'envios_completados': envios_completados
-    })
+    envios = Envio.objects.all()
+    return render(request, 'admin/envios/envios_admin.html', {'envios': envios})
+
+def crear_envio(request):
+    if request.method == 'POST':
+        form = EnvioForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('envios_admin')
+    else:
+        form = EnvioForm()
+    return render(request, 'admin/envios/crear_envio.html', {'form': form, 'titulo': 'Asignar Envío'})
+
+def editar_envio(request, pk):
+    envio = get_object_or_404(Envio, pk=pk)
+    if request.method == 'POST':
+        form = EnvioForm(request.POST, instance=envio)
+        if form.is_valid():
+            form.save()
+            return redirect('envios_admin')
+    else:
+        form = EnvioForm(instance=envio)
+    return render(request, 'admin/envios/editar_envio.html', {'form': form, 'titulo': 'Editar Envío'})
+
+def eliminar_envio(request, pk):
+    envio = get_object_or_404(Envio, pk=pk)
+    envio.delete()
+    return redirect('envios_admin')
+
+
+
+
+
 
 # Vista de Proveedores
 @login_required

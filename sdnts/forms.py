@@ -200,7 +200,51 @@ class EntradaForm(forms.ModelForm):
         model = Entrada
         fields = ['cod_insumo', 'cnt_entrada', 'precio_entrada', 'fecha_caducidad', 'lote']
 
+
 class EnvioForm(forms.ModelForm):
     class Meta:
         model = Envio
-        fields = ['cod_domi', 'tarifa_envio', 'observaciones', 'firma_recepcion']
+        fields = [
+            'cod_domi',
+            'fecha_asignacion',
+            'fecha_salida',
+            'fecha_entrega',
+            'estado',
+            'tarifa_envio',
+            'observaciones',
+            'firma_recepcion',
+        ]
+        widgets = {
+            'fecha_asignacion': forms.DateTimeInput(attrs={
+                'class': 'form-control',
+                'type': 'datetime-local'
+            }),
+            'fecha_salida': forms.DateTimeInput(attrs={
+                'class': 'form-control',
+                'type': 'datetime-local'
+            }),
+            'fecha_entrega': forms.DateTimeInput(attrs={
+                'class': 'form-control',
+                'type': 'datetime-local'
+            }),
+            'observaciones': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Observaciones adicionales'
+            }),
+            'firma_recepcion': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre o firma de quien recibe'
+            }),
+            'estado': forms.Select(attrs={'class': 'form-select'}),
+            'cod_domi': forms.Select(attrs={'class': 'form-select'}),
+            'tarifa_envio': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+        }
+
+
+#Envios  del administrador
+from .models import Envio
+
+from django import forms
+from .models import Envio
+
