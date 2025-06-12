@@ -1218,3 +1218,194 @@ border-radius: 100px;
     background: #ffc0cb;
     color: #fff;
 }
+.addToCartBtn {
+    background: #4e4032;
+    color: #ffc0cb;
+    font-family: 'Dunkin', 'Arial Rounded MT Bold', Arial, sans-serif;
+    font-weight: bold;
+    border: none;
+    border-radius: 2em;
+    padding: 0.7em 0.7em;
+    margin: 1em auto 1em auto;
+    display: block;
+    box-shadow: 0 6px 24px 0 rgba(78, 64, 50, 0.18);
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.15s;
+    text-shadow: 0 2px 8px rgba(252, 105, 152, 0.10);
+}
+.addToCartBtn:hover, .addToCartBtn:focus {
+    background: #ffc0cb;
+    color: #4e4032;
+    box-shadow: 0 12px 32px 0 rgba(252, 105, 152, 0.18);
+    transform: scale(1.04);
+    outline: none;
+}
+
+/* Modal de agregado al carrito */
+#modalAgregadoCarrito.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(91, 66, 73, 0.18);
+  justify-content: center;
+  align-items: center;
+}
+#modalAgregadoCarrito.show {
+  display: flex;
+}
+.modal-agregado-carrito {
+  background: #fff;
+  border-radius: 40px;
+  box-shadow: 0 8px 32px 0 rgba(252, 105, 152, 0.18), 0 2px 8px 0 #ffc0cb;
+  padding: 32px 32px 24px 32px;
+  max-width: 350px;
+  width: 90vw;
+  text-align: center;
+  position: relative;
+  animation: fadeIn 0.3s;
+}
+.modal-agregado-icon {
+  width: 70px;
+  margin-bottom: 10px;
+}
+.modal-agregado-title {
+  color: #fc6998;
+  font-family: 'Dunkin', 'Arial Rounded MT Bold', Arial, sans-serif;
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+.modal-agregado-detalles {
+  margin-bottom: 18px;
+}
+.modal-agregado-titulo {
+  font-weight: bold;
+  color: #4e4032;
+  font-size: 1.1rem;
+}
+.modal-agregado-descripcion {
+  color: #695450;
+  font-size: 1rem;
+  margin-top: 2px;
+}
+#closeAgregadoCarrito {
+  position: absolute;
+  top: 18px;
+  right: 28px;
+  font-size: 24px;
+  color: #4e4032;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 50%;
+  background: #fff9f9;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+#closeAgregadoCarrito:hover {
+  background: #ffc0cb;
+  color: #fff;
+}
+.modal-agregado-ok {
+  background: #fc6998;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 0.6em 2.2em;
+  font-size: 1.1rem;
+  font-family: 'Dunkin', 'Arial Rounded MT Bold', Arial, sans-serif;
+  margin-top: 10px;
+  box-shadow: 0 2px 8px 0 #ffc0cb;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+.modal-agregado-ok:hover {
+  background: #4e4032;
+  color: #ffc0cb;
+  transform: scale(1.04);
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ====== MODAL COMPRA EXITOSA PERSONALIZADO ====== */
+#modalCompraExitosa.modal {
+  display: none;
+  position: fixed;
+  z-index: 2100;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(91, 66, 73, 0.18);
+  justify-content: center;
+  align-items: center;
+}
+#modalCompraExitosa.show {
+  display: flex;
+}
+.modal-compra-exitosa-custom {
+  background: #fff;
+  border-radius: 44px;
+  box-shadow: 0 8px 32px 0 rgba(252, 105, 152, 0.22), 0 2px 8px 0 #fc6998;
+  padding: 36px 36px 28px 36px;
+  max-width: 400px;
+  width: 92vw;
+  text-align: center;
+  position: relative;
+  animation: fadeIn 0.3s;
+  border: 3px solid #fc6998;
+}
+.modal-compraexitosa-title {
+  color: #4e4032;
+  font-family: 'Dunkin', 'Arial Rounded MT Bold', Arial, sans-serif;
+  font-size: 2.1rem;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+.modal-compraexitosa-detalles {
+  margin-bottom: 20px;
+  color: #695450;
+  font-size: 1.08rem;
+  background: #fff9f9;
+  border-radius: 18px;
+  padding: 12px 8px 8px 8px;
+  box-shadow: 0 1px 4px 0 #ffc0cb33;
+}
+.modal-compraexitosa-ok {
+  background: #fc6998;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 0.6em 2.2em;
+  font-size: 1.1rem;
+  font-family: 'Dunkin', 'Arial Rounded MT Bold', Arial, sans-serif;
+  margin-top: 10px;
+  box-shadow: 0 2px 8px 0 #ffc0cb;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+.modal-compraexitosa-ok:hover {
+  background: #4e4032;
+  color: #ffc0cb;
+  transform: scale(1.04);
+}
+#cerrarModalCompra {
+  position: absolute;
+  top: 18px;
+  right: 28px;
+  font-size: 24px;
+  color: #4e4032;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 50%;
+  background: #fff9f9;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+#cerrarModalCompra:hover {
+  background: #fc6998;
+  color: #fff;
+}
