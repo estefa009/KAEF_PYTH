@@ -50,16 +50,16 @@
                 <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
             </a>
 
-            <form method="GET" class="mb-3 d-flex align-items-center">
-                <label for="rol" class="me-2">Filtrar por rol:</label>
-                <select name="rol" id="rol" class="form-select me-2" style="width: auto;">
-                    <option value="">Todos</option>
-                    <option value="Administrador" {% if request.GET.rol == "Administrador" %}selected{% endif %}>Administrador</option>
-                    <option value="Cliente" {% if request.GET.rol == "Cliente" %}selected{% endif %}>Cliente</option>
-                    <option value="Domiciliario" {% if request.GET.rol == "Domiciliario" %}selected{% endif %}>Domiciliario</option>
-                </select>
-                <button type="submit" class="btn btn-primary">Aplicar</button>
-            </form>
+            <form method="GET" class="mb-3 d-flex align-items-center form-rosa-pastel">
+             <label for="rol" class="me-2">Filtrar por rol:</label>
+             <select name="rol" id="rol" class="form-select me-2" style="width: auto;">
+                 <option value="">Todos</option>
+                 <option value="ADMIN" {% if request.GET.rol == "ADMIN" %}selected{% endif %}>Administrador</option>
+                 <option value="CLIENTE" {% if request.GET.rol == "CLIENTE" %}selected{% endif %}>Cliente</option>
+                 <option value="DOMI" {% if request.GET.rol == "DOMI" %}selected{% endif %}>Domiciliario</option>
+             </select>
+             <button type="submit" class="btn btn-primary">Aplicar</button>
+           </form>
 
 
 
