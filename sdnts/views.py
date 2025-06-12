@@ -1040,6 +1040,10 @@ def crear_produccion(request):
         if form.is_valid() and salida_form.is_valid():
             with transaction.atomic():
                 produccion = form.save()
+                # Cambiar estado de la venta asociada
+                venta = produccion.cod_venta
+                venta.estado = 'PREPARACION' 
+                venta.save()
                 salida = salida_form.save(commit=False)
                 salida.cod_produccion = produccion
                 insumo = salida.cod_insumo
@@ -1086,6 +1090,15 @@ def cambiar_estado_produccion(request,cod_produccion ):
                 produccion.fecha_fin = timezone.now()
             produccion.save()
         return redirect('produccion_admin')
+    # Actualizar el estado de la venta asociada según el estado de la producción
+    venta = produccion.cod_venta
+    if produccion.estado == 'EN_PROCESO':
+        venta.estado = 'PREPARACION'
+    elif produccion.estado == 'FINALIZADO':
+        venta.estado = 'EN_CAMINO'  
+    elif produccion.estado == 'PENDIENTE':
+        venta.estado = 'PENDIENTE'
+    venta.save()
     return render(request, 'admin/produccion/cambiar_estado_produccion.html', {'produccion': produccion, 'estados': Produccion.ESTADOS})
 
 def asignar_envio_produccion(request, cod_produccion):
@@ -1110,26 +1123,90 @@ def eliminar_produccion(request, cod_produccion):
         return redirect('produccion_admin')
     return render(request, 'admin/produccion/eliminar_produccion.html', {'produccion': produccion})
 
-
-
+#Envio Admin
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Envio
+from .forms import EnvioForm
 
 # Vista de Envíos
 @login_required
 def envios_admin(request):
-    envios_pendientes = Envio.objects.filter(estado='PENDIENTE')
-    # ✅ Corregido: usar 'ENTREGADO' en lugar de 'COMPLETADO'
-    envios_completados = Envio.objects.filter(estado='ENTREGADO')
-    
-    return render(request, 'admin/envios/envios_admin.html', {
-        'envios_pendientes': envios_pendientes,
-        'envios_completados': envios_completados
-    })
+    envios = Envio.objects.all()
+    return render(request, 'admin/envios/envios_admin.html', {'envios': envios})
+
+def crear_envio(request):
+    if request.method == 'POST':
+        form = EnvioForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('envios_admin')
+    else:
+        form = EnvioForm()
+    return render(request, 'admin/envios/crear_envio.html', {'form': form, 'titulo': 'Asignar Envío'})
+
+def editar_envio(request, pk):
+    envio = get_object_or_404(Envio, pk=pk)
+    if request.method == 'POST':
+        form = EnvioForm(request.POST, instance=envio)
+        if form.is_valid():
+            form.save()
+            return redirect('envios_admin')
+    else:
+        form = EnvioForm(instance=envio)
+    return render(request, 'admin/envios/editar_envio.html', {'form': form, 'titulo': 'Editar Envío'})
+
+def eliminar_envio(request, pk):
+    envio = get_object_or_404(Envio, pk=pk)
+    envio.delete()
+    return redirect('envios_admin')
+
+
+
+
+
 
 # Vista de Proveedores
+from .models import Proveedor
+from .forms import ProveedorForm
 @login_required
 def proveedores_admin(request):
     proveedores = Proveedor.objects.all()
-    return render(request, 'admin/proveedores_admin.html', {'proveedores': proveedores})
+    return render(request, 'admin/proveedores/proveedores_admin.html', {'proveedores': proveedores})
+
+
+def agregar_proveedores(request):
+    if request.method == 'POST':
+        Proveedor.objects.create(
+            nom_proveedor=request.POST['nom_proveedor'],
+            telefono_proveedor=request.POST['telefono_proveedor'],
+            direccion_proveedor=request.POST.get('direccion_proveedor', ''),
+            email_proveedor=request.POST.get('email_proveedor', ''),
+            novedad_proveedor=request.POST.get('novedad_proveedor', '')
+        )
+        return redirect('proveedores_admin')
+    return render(request, 'admin/proveedores/agregar_proveedores.html')
+    
+def editar_proveedores(request, cod_proveedor):
+    proveedor = get_object_or_404(Proveedor, pk=cod_proveedor)
+    if request.method == 'POST':
+        proveedor.nom_proveedor = request.POST['nom_proveedor']
+        proveedor.telefono_proveedor = request.POST['telefono_proveedor']
+        proveedor.direccion_proveedor = request.POST.get('direccion_proveedor', '')
+        proveedor.email_proveedor = request.POST.get('email_proveedor', '')
+        proveedor.novedad_proveedor = request.POST.get('novedad_proveedor', '')
+        proveedor.save()
+        return redirect('proveedores_admin')
+    return render(request, 'admin/proveedores/editar_proveedores.html', {'proveedor': proveedor})
+
+
+def eliminar_proveedores(request, cod_proveedor):
+    proveedor = get_object_or_404(Proveedor, pk=cod_proveedor)
+    if request.method == 'POST':
+        proveedor.delete()
+        return redirect('proveedores_admin')
+    return render(request, 'admin/proveedores/eliminar_proveedores.html', {'proveedor': proveedor})
+
+
 
 # Vista de Entradas (Inventario)
 @login_required

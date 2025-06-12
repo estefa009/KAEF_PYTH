@@ -69,7 +69,6 @@ urlpatterns = [
     path('correos_admin/', views.correos_admin, name='correos_admin'),
     path('dashboard_admin/', views.dashboard_admin, name='dashboard_admin'),
     path('entradas_admin/', views.entradas_admin, name='entradas_admin'),
-    path('envios_admin/', views.envios_admin, name='envios_admin'),
     path('insumos_admin/', views.insumos_admin, name='insumos_admin'),
     path('perfil_admin/', views.perfil_admin, name='perfil_admin'),
     path('editarperfil_admin/', views.editarperfil_admin, name='editarperfil_admin'),
@@ -87,7 +86,6 @@ urlpatterns = [
     path('produccion/eliminar/<int:cod_produccion>/', views.eliminar_produccion, name='eliminar_produccion'),
 
     
-    path('proveedores_admin/', views.proveedores_admin, name='proveedores_admin'),
     path('salidas_admin/', views.salidas_admin, name='salidas_admin'),
     
     #Ventas
@@ -97,7 +95,19 @@ urlpatterns = [
     path('ventas/<int:venta_id>/detalle/', views.detalle_ventas, name='detalle_ventas'),
     path('ventas/<int:venta_id>/editar_estado/', views.editar_estado_venta, name='editar_estado_venta'),
 
-
+    #Envios del administrador
+    path('envios/envios_admin/', views.envios_admin, name='envios_admin'),
+    path('envios/envios/crear/', views.crear_envio, name='crear_envio'),
+    path('envios/envios/editar/<int:pk>/', views.editar_envio, name='editar_envio'),
+    path('envios/envios/eliminar/<int:pk>/', views.eliminar_envio, name='eliminar_envio'),
+    
+    #proveedores
+    path('proveedores_admin/', views.proveedores_admin, name='proveedores_admin'),
+    path('proveedores/agregar_proveedores/', views.agregar_proveedores, name='agregar_proveedores'),
+    path('proveedores/editar_proveedores/<int:cod_proveedor>/', views.editar_proveedores, name='editar_proveedores'),
+    path('proveedores/eliminar_proveedores/<int:cod_proveedor>/', views.eliminar_proveedores, name='eliminar_proveedores'),
+  
+  
     path('reporte-usuarios-pdf/', views.reporte_usuarios_pdf, name='reporte_usuarios_pdf'),
     path('guardar/', views.guardar_usuario, name='guardar_usuario'),
     path('actualizar-usuario/', views.actualizar_usuario, name='actualizar_usuario'),

@@ -37,97 +37,64 @@
 <!-- Menú -->
 {% include "includes/nav_admin.html" %}
 
+
 <!-- Tabla de envíos -->
 <div class="table_envios">
     <br>
-    <h4 class="ptable"><b>ENVÍOS</b></h4>
+        <h4 class="ptable"><b>ENVÍOS</b></h4>
+
+        <!-- Botones de exportación -->
+        <button style="border-radius: 20px" id="downloadPdf" class="btn btn-outline-danger mt-3">
+            <i class="bi bi-file-earmark-pdf"></i>
+        </button>
+        <button style="border-radius: 20px" id="downloadWord" class="btn btn-outline-primary mt-3">
+            <i class="bi bi-file-earmark-word"></i>
+        </button>
+        <button style="border-radius: 20px" id="downloadExcel" class="btn btn-outline-success mt-3">
+            <i class="bi bi-file-earmark-excel"></i>
+        </button>
 
 
-    <button style="border-radius: 20px" id="downloadPdf" class="btn btn-outline-danger mt-3">
-        <i class="bi bi-file-earmark-pdf"></i>
-    </button>
-    <button style="border-radius: 20px" id="downloadWord" class="btn btn-outline-primary mt-3">
-        <i class="bi bi-file-earmark-word"></i>
-    </button>
-    <button style="border-radius: 20px" id="downloadExcel" class="btn btn-outline-success mt-3">
-        <i class="bi bi-file-earmark-excel"></i>
-    </button>
-    <button style="border-radius: 20px" class="btn btn-pink mt-3" data-bs-toggle="modal" data-bs-target="#modalAgregarEnvio">
-        <i class="bi bi-plus-circle"></i> Asignar Envío
-    </button>
-
+    
     <!-- Tabla -->
-    <table class="table caption-top">
-        <thead>
-            <tr>
-                <th scope="col">COD</th>
-                <th scope="col">Cod Administrador</th>
-                <th scope="col">Cod Domiciliario</th>
-                <th scope="col">Cod Producto</th>
-                <th scope="col">Fecha de Asignación</th>
-                <th scope="col">Estado</th>
-                <th scope="col">ACCIÓN</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if envios %}
-                {% for envio in envios %}
-                    <tr>
-                        <td>{{ envio.cod_asignacion }}</td>
-                        <td>{{ envio.cod_admin }}</td>
-                        <td>{{ envio.cod_domi }}</td>
-                        <td>{{ envio.cod_producto }}</td>
-                        <td>{{ envio.fecha_hora_asignada|date:"d/m/Y H:i" }}</td>
-                        <td>
-                            <span class="badge bg-success">{{ envio.estado }}</span>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                                    data-bs-target="#modalEditarEnvio"
-                                    onclick="editEnvio({{ envio.cod_asignacion }}, {{ envio.cod_admin }}, {{ envio.cod_domi }}, {{ envio.cod_producto }}, '{{ envio.fecha_hora_asignada|date:'Y-m-d' }}')">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger ms-2"
-                                    onclick="confirmDelete({{ envio.cod_asignacion }})">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                {% endfor %}
-            {% else %}
+        <table class="table caption-top">
+            <thead>
                 <tr>
-                    <td colspan="7" class="text-center">No se encontraron resultados.</td>
+                    <th scope="col">COD</th>
+                    <th scope="col">Cod Venta</th>
+                    <th scope="col">Cod Domiciliario</th>
+                    <th scope="col">Fecha de Asignación</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">ACCIONES</th>
                 </tr>
-            {% endif %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% if envios %}
+                    {% for envio in envios %}
+                        <tr>
+                            <td>{{ envio.cod_envio }}</td>
+                            <td>{{ envio.cod_venta }}</td>
+                            <td>{{ envio.cod_domi }}</td>
+                            <td>{{ envio.fecha_asignacion|date:"d/m/Y H:i" }}</td>
+                            <td><span class="badge bg-success">{{ envio.estado }}</span></td>
+                            <td>
+                                <a href="{% url 'editar_envio' envio.cod_envio %}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{% url 'eliminar_envio' envio.cod_envio %}" class="btn btn-sm btn-outline-danger ms-2" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">No se encontraron resultados.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
 </div>
-
-
-<!-- Modal Notificaciones 
-<!-- Modal Agregar Envío (puedes completarlo con tu formulario de Django) -->
-<div class="modal fade" id="modalAgregarEnvio" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-pink text-white">
-                <h5 class="modal-title">Asignar Envío</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí va tu formulario de asignación -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-pink">Guardar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-
-
 </body>
 </html>
 
