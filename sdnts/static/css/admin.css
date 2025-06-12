@@ -359,3 +359,113 @@ main h1 {
     background-color: #ff80a4; /* Rosa viejo */
     border-color: #ff80a4;
 }
+
+/* Estilos para el dropdown menu */
+.dropdown-menu {
+    background-color: white; /* Fondo rosa muy claro */
+    border: 3px solid #ff80a4; /* Borde rosa suave */
+    border-radius: 30px;
+    box-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
+    padding: 0;
+    overflow: hidden;
+    min-width: 220px;
+}
+
+/* Encabezado del dropdown */
+.dropdown-header {
+    color: #D87093; /* Rosa medio */
+    font-weight: 500;
+    padding: 8px 16px;
+    background-color: #FFF9FA;
+    border-bottom: 1px solid #FFD1DC;
+    font-size: 0.9rem;
+}
+
+/* Divisor */
+.dropdown-divider {
+    border-color: #FFD1DC;
+    margin: 0;
+}
+
+/* Items del menú */
+.dropdown-item {
+    color: #DB7093; /* Rosa viejo */
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.dropdown-item:hover, 
+.dropdown-item:focus {
+    background-color: #FFE4E9; /* Rosa más intenso al hover */
+    color: #ec407a; /* Rosa más oscuro */
+    border-left: 3px solid #FF69B4;
+}
+
+/* Item de cerrar sesión */
+.dropdown-item.text-danger {
+    color: #c0063b !important; /* Rosa medio en lugar del rojo estándar */
+}
+
+.dropdown-item.text-danger:hover {
+    color: #c0063b !important; /* Rosa más oscuro al hover */
+    background-color: #FFE4E9;
+}
+
+/* Efecto de animación al abrir el dropdown */
+.dropdown-menu-end {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.profile-picture {
+    width: 20%;
+    height: 250px;
+    background-color: #fff9c7;
+    border-radius: 200px;
+    position: absolute; /* Para que se pueda desplazar respecto al padre */
+    top: -120px; /* Sobresale por encima */
+    left: 20%; /* Centrado horizontalmente */
+    transform: translateX(-50%); /* Ajusta el desplazamiento horizontal */
+    display: flex;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border: 5px solid white; /* Para darle mejor definición */
+}
+.profile-header {
+    height: 60%;
+    width: 80%;
+    background: linear-gradient(to bottom, #ffeef3, #FFF9F2);
+    box-shadow: 0 8px 20px rgba(255, 192, 203, 0.4);
+    border-radius: 100px;
+    margin-top: 10%;
+    margin-left: 165px;
+    padding-left: 80px;
+    position: relative; /* Para que .profile-picture tome este como referencia */
+    margin-bottom: 50px;
+    font-family: "Dunkin", sans-serif;
+    color: #ff80a4;
+}
+.profile-header h2{
+    margin-left: 220px;
+    font-size: 25px;
+    margin-bottom: 10px;
+}
+.list-group {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 60%;
+    margin-left: 30%;
+    border-radius: 100px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 20PX;
+}
