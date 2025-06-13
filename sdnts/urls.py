@@ -128,6 +128,11 @@ urlpatterns = [
     path('correos_admin/', views.correos_admin, name='correos_admin'),
     path('correo/<int:cod_correo>/', views.ver_correo, name='ver_correo'),
     path('correos/enviar_correos_masivos/', views.enviar_correos_masivos, name='enviar_correos_masivos'),
+    #productos
+    path('productos_admin/', views.productos_admin, name='productos_admin'),
+    path('productos_admin/<int:cod_producto>/cambiar_estado/', views.cambiar_estado_producto, name='cambiar_estado_producto'),
+    path('productos_admin/<int:cod_producto>/editar_receta/', views.editar_receta_producto, name='editar_receta_producto'),
+    path('productos_admin/<int:cod_producto>/ver_receta/', views.ver_receta_producto, name='ver_receta_producto'),
 
     
     path('reporte-usuarios-pdf/', views.reporte_usuarios_pdf, name='reporte_usuarios_pdf'),

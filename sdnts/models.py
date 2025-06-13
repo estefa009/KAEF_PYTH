@@ -610,3 +610,15 @@ class Correo(models.Model):
         
         def __str__(self):
             return f"Correo #{self.cod_correo} - {self.destinatario}"
+        
+class RecetaProducto(models.Model):
+    cod_producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='recetas')
+    insumo = models.ForeignKey(Insumo, on_delete=models.CASCADE)
+    cantidad = models.DecimalField('cantidad necesaria', max_digits=10, decimal_places=2)
+    unidad_medida = models.CharField(max_length=10)
+
+    class Meta:
+        unique_together = ('cod_producto', 'insumo')
+
+    def __str__(self):
+        return f"{self.cod_producto} - {self.insumo} ({self.cantidad} {self.unidad_medida})"

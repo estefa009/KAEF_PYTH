@@ -1,0 +1,24 @@
+
+{% block content %}
+<h2>Receta de {{ producto.nomb_pro }}</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Insumo</th>
+            <th>Cantidad</th>
+            <th>Unidad</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in receta %}
+        <tr>
+            <td>{{ r.insumo.nombre }}</td>
+            <td>{{ r.cantidad }}</td>
+            <td>{{ r.unidad_medida }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'editar_receta_producto' producto.cod_producto %}" class="btn btn-warning">Editar Receta</a>
+<a href="{% url 'productos_admin' %}" class="btn btn-secondary">Volver</a>
+{% endblock %}

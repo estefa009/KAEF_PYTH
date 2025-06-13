@@ -882,17 +882,50 @@ def editar_perfildomi(request):
 @login_required
 def editar_usuario(request, cod_usuario):
     usuario = get_object_or_404(Usuario, cod_usuario=cod_usuario)
+    rol_anterior = usuario.rol  # Guardamos el rol actual antes del cambio
 
     if request.method == 'POST':
         form = UsuarioForm(request.POST, instance=usuario)
+
         if form.is_valid():
-            form.save()
+            usuario_actualizado = form.save(commit=False)  # Aún no guardamos en BD
+            nuevo_rol = usuario_actualizado.rol
+
+            # Si el rol cambió, eliminamos el modelo anterior relacionado
+            if rol_anterior != nuevo_rol:
+                # Eliminamos el modelo del rol anterior
+                try:
+                    if rol_anterior == 'CLIENTE' and hasattr(usuario, 'cliente'):
+                        usuario.cliente.delete()
+                    elif rol_anterior == 'DOMI' and hasattr(usuario, 'domiciliario'):
+                        usuario.domiciliario.delete()
+                    elif rol_anterior == 'ADMIN' and hasattr(usuario, 'administrador'):
+                        usuario.administrador.delete()
+                except Exception as e:
+                    print("Error al eliminar modelo anterior:", e)
+
+            # Guardamos el usuario actualizado (ya con nuevo rol)
+            usuario_actualizado.save()
+
+            # Si el rol cambió, creamos el modelo nuevo
+            if rol_anterior != nuevo_rol:
+                try:
+                    if nuevo_rol == 'CLIENTE':
+                        Cliente.objects.create(cod_usua=usuario_actualizado, direc_cliente='Sin dirección')
+                    elif nuevo_rol == 'DOMI':
+                        Domiciliario.objects.create(cod_usua=usuario_actualizado)
+                    elif nuevo_rol == 'ADMIN':
+                        Administrador.objects.create(cod_usua=usuario_actualizado, estado_admin='ACTIVO')
+                except Exception as e:
+                    print("Error al crear modelo nuevo:", e)
+
             messages.success(request, "Usuario actualizado correctamente.")
-            return redirect('dashboard_admin')  # Redirige al dashboard admin
+            return redirect('dashboard_admin')
     else:
         form = UsuarioForm(instance=usuario)
 
     return render(request, 'usuario/editar_usuario.html', {'form': form, 'usuario': usuario})
+
 
 @login_required
 def agregar_usuario(request):
@@ -1105,41 +1138,58 @@ def produccion_admin(request):
     return render(request, 'admin/produccion/produccion_admin.html', {'producciones': producciones})
 
 
+from django.db import transaction
+from django.utils import timezone
+
 def crear_produccion(request):
     if request.method == 'POST':
         form = ProduccionForm(request.POST)
-        salida_form = SalidaForm(request.POST)
-        if form.is_valid() and salida_form.is_valid():
+        if form.is_valid():
             with transaction.atomic():
                 produccion = form.save()
-                # Cambiar estado de la venta asociada
                 venta = produccion.cod_venta
-                venta.estado = 'PREPARACION' 
+                venta.estado = 'PREPARACION'
                 venta.save()
-                salida = salida_form.save(commit=False)
-                salida.cod_produccion = produccion
-                insumo = salida.cod_insumo
-                if insumo.cnt_insumo >= salida.cantidad:
-                    insumo.cnt_insumo -= salida.cantidad
-                    insumo.save()
-                    salida.save()
-                else:
-                    entrada = Entrada(
-                        cod_insumo=insumo,
-                        cnt_entrada=salida.cantidad - insumo.cnt_insumo,
-                        precio_entrada=insumo.precio,
-                        fecha_caducidad=None,
-                        nom_entrada=f"Auto recarga para producción {produccion.cod_produccion}"
-                    )
-                    entrada.save()
-                    insumo.cnt_insumo += entrada.cnt_entrada - salida.cantidad
-                    insumo.save()
-                    salida.save()
-            return redirect('produccion_admin')
+
+                # Obtener los productos relacionados con la venta
+                detalles = venta.detalles.all()
+                for detalle in detalles:
+                    producto = detalle.cod_producto
+                    cantidad_bolsas = detalle.cantidad
+
+                    # Obtener receta predeterminada del producto
+                    recetas = RecetaProducto.objects.filter(cod_producto=producto)
+                    for receta in recetas:
+                        insumo = receta.cod_insumo
+                        cantidad_total = receta.cantidad * cantidad_bolsas
+
+                        if insumo.cnt_insumo >= cantidad_total:
+                            insumo.cnt_insumo -= cantidad_total
+                        else:
+                            # Crear entrada automática si hay insuficiencia
+                            entrada = Entrada.objects.create(
+                                cod_insumo=insumo,
+                                cnt_entrada=cantidad_total - insumo.cnt_insumo,
+                                precio_entrada=insumo.precio,
+                                fecha_caducidad=None,
+                                nom_entrada=f"Auto recarga para producción {produccion.cod_produccion}"
+                            )
+                            insumo.cnt_insumo += entrada.cnt_entrada - cantidad_total
+
+                        insumo.save()
+
+                        # Registrar salida
+                        Salida.objects.create(
+                            cod_produccion=produccion,
+                            cod_insumo=insumo,
+                            cantidad=cantidad_total,
+                        )
+
+                return redirect('produccion_admin')
     else:
         form = ProduccionForm()
-        salida_form = SalidaForm()
-    return render(request, 'admin/produccion/crear_produccion.html', {'form': form, 'salida_form': salida_form})
+
+    return render(request, 'admin/produccion/crear_produccion.html', {'form': form})
 
 def editar_produccion(request, cod_produccion):
     produccion = get_object_or_404(Produccion, pk=cod_produccion)
@@ -1173,8 +1223,11 @@ def cambiar_estado_produccion(request,cod_produccion ):
     venta.save()
     return render(request, 'admin/produccion/cambiar_estado_produccion.html', {'produccion': produccion, 'estados': Produccion.ESTADOS})
 
+
 def asignar_envio_produccion(request, cod_produccion):
-    venta = get_object_or_404(Venta, cod_venta=cod_produccion)
+    produccion = get_object_or_404(Produccion, pk=cod_produccion)
+    venta = produccion.cod_venta  # Relación desde Producción a Venta
+
     if request.method == 'POST':
         form = EnvioForm(request.POST)
         if form.is_valid():
@@ -1183,11 +1236,20 @@ def asignar_envio_produccion(request, cod_produccion):
             envio.fecha_asignacion = timezone.now()
             envio.estado = 'ASIGNADO'
             envio.save()
+
+            # Cambiar el estado de la venta a EN_CAMINO
+            venta.estado = 'EN_CAMINO'
+            venta.save()
+
             return redirect('produccion_admin')
     else:
         form = EnvioForm()
-    return render(request, 'admin/produccion/asignar_envio_produccion.html', {'form': form, 'venta': venta})
 
+    return render(request, 'admin/produccion/asignar_envio_produccion.html', {
+        'form': form,
+        'venta': venta,
+        'produccion': produccion
+    })
 def eliminar_produccion(request, cod_produccion):
     produccion = get_object_or_404(Produccion, pk=cod_produccion)
     if request.method == 'POST':
@@ -1562,14 +1624,6 @@ def eliminar_insumo(request, cod_insumo):
 
 
 
-
-
-@login_required
-def productos_admin(request):
-    """Vista para gestionar productos"""
-    productos = Producto.objects.all()
-    return render(request, 'admin/productos_admin.html', {'productos': productos})
-
 @login_required
 def clientes_admin(request):
     """Vista para gestionar clientes"""
@@ -1741,3 +1795,74 @@ def cargar_datos_view(request):
         return redirect('cargarDatos')  # Redirige para recargar la página y mostrar mensajes
 
     return render(request, 'admin/cargarDatos.html')  # Reemplaza con tu template real
+
+
+#productos
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Producto, RecetaProducto, Insumo
+from .forms import RecetaProductoFormSet # Lo creamos más abajo
+from django.forms import modelformset_factory
+from .forms import RecetaProductoForm
+
+def productos_admin(request):
+    productos = Producto.objects.all().order_by('activo', 'tamano')
+    return render(request, 'admin/productos/productos_admin.html', {'productos': productos})
+
+def cambiar_estado_producto(request, cod_producto):
+    producto = get_object_or_404(Producto, pk=cod_producto)
+    producto.activo = not producto.activo
+    producto.save()
+    return redirect('productos_admin')
+
+from .forms import RecetaProductoFormSet
+
+def ver_receta_producto(request, cod_producto):
+    producto = get_object_or_404(Producto, cod_producto=cod_producto)
+    receta = RecetaProducto.objects.filter(cod_producto=producto)
+    return render(request, 'admin/productos/ver_receta.html', {'producto': producto, 'receta': receta})
+
+
+INSUMOS_BASICOS = [
+    'Huevos',
+    'Azucar',
+    'Sal',
+    'Mantequilla',
+    'Leche Deslactosada',
+    'Harina de trigo',
+    'Polvo para hornear',
+]
+
+
+def editar_receta_producto(request, cod_producto):
+    producto = get_object_or_404(Producto, cod_producto=cod_producto)
+
+    # Obtener los insumos básicos desde la base de datos
+    insumos_basicos = Insumo.objects.filter(nomb_insumo__in=INSUMOS_BASICOS)
+
+    # Crear receta vacía si aún no existe
+    for insumo in insumos_basicos:
+        RecetaProducto.objects.get_or_create(
+            cod_producto=producto,
+            insumo=insumo,
+            defaults={
+                'cantidad': 0,
+                'unidad_medida': 'g',  # o ml, unidades, según el insumo
+            }
+        )
+
+    receta_qs = RecetaProducto.objects.filter(cod_producto=producto)
+
+    if request.method == 'POST':
+        formset = RecetaProductoFormSet(request.POST, queryset=receta_qs)
+        if formset.is_valid():
+            formset.save()
+            return redirect('productos_admin')
+    else:
+        formset = RecetaProductoFormSet(queryset=receta_qs)
+
+    return render(request, 'admin/productos/editar_receta_producto.html', {
+        'producto': producto,
+        'formset': formset
+    })
+
+

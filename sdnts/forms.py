@@ -289,6 +289,38 @@ class SalidaForm(forms.ModelForm):
             'cod_insumo': forms.Select(attrs={'class': 'form-control'}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
         }
-        
+from django import forms
+from .models import RecetaProducto
+from django.forms import modelformset_factory
+
+# Definir insumos básicos por nombre (puedes usar ID si prefieres)
+INSUMOS_BASICOS = [
+    'Huevos',
+    'Azúcar',
+    'Sal',
+    'Mantequilla',
+    'Leche',
+    'Harina de trigo',
+    'Polvo para hornear',
+]
+
+class RecetaProductoForm(forms.ModelForm):
+    class Meta:
+        model = RecetaProducto
+        fields = ['cantidad', 'unidad_medida']
+
+RecetaProductoFormSet = modelformset_factory(
+    RecetaProducto,
+    form=RecetaProductoForm,
+    extra=0,
+    can_delete=False  # no se pueden borrar insumos
+)
+
+RecetaProductoFormSet = modelformset_factory(
+    RecetaProducto,
+    fields=('insumo', 'cantidad', 'unidad_medida'),
+    extra=1,
+    can_delete=True
+)
 
 
