@@ -802,7 +802,7 @@ border-radius: 100px;
     max-height: 50vh; /* usa la mitad de la altura de la pantalla */
     overflow-y: auto;
     margin-left: 35px;
-    border-radius: 50px;
+    border-radius: 20px;
 }
 
 .totalPagar {

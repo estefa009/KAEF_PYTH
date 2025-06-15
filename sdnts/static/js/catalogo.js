@@ -695,7 +695,7 @@ document.getElementById('btnPagar')?.addEventListener('click', function () {
                 </div>
             `).join('')}
         </div>
-        <div class="text-right">
+        <div class="text-left">
             <b>Subtotal:</b> $${subtotal.toFixed(2)}<br>
             <b>IVA (19%):</b> $${iva.toFixed(2)}<br>
             <b>Total:</b> $${total.toFixed(2)}
