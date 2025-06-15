@@ -181,6 +181,7 @@ class DetalleVentaForm(forms.ModelForm):
         if fecha_entrega and fecha_entrega.date() < fecha_minima:
             raise forms.ValidationError("La fecha de entrega debe ser al menos 3 días después de hoy.")
         return fecha_entrega
+    
 
 class CombinacionProductoForm(forms.ModelForm):
     class Meta:
@@ -197,6 +198,22 @@ class CombinacionProductoForm(forms.ModelForm):
             'cod_glaseado_1': forms.Select(attrs={'class': 'form-control'}),
             'cod_topping_1': forms.Select(attrs={'class': 'form-control'}),
         }
+
+from django.forms import modelformset_factory
+from .models import DetalleVenta, CombinacionProducto    
+CombinacionProductoFormSet = modelformset_factory(
+    CombinacionProducto,
+    form=CombinacionProductoForm,
+    extra=1,
+    can_delete=True
+)
+DetalleVentaFormSet = modelformset_factory(
+    DetalleVenta,
+    form=DetalleVentaForm,
+    extra=1,
+    can_delete=True
+)
+
 
 class PagoForm(forms.ModelForm):
     class Meta:

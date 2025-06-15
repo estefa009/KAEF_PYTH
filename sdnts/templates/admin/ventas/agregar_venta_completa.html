@@ -23,23 +23,32 @@
         {{ venta_form.as_p }}
 
         <h4>Productos en la Venta</h4>
-        {{ detalle_formset.management_form }}
-        {% for form in detalle_formset %}
-            <div class="border rounded p-3 mb-3 bg-light detalle-form">
+        <div id="detalle-form-container">
+            {{ detalle_formset.management_form }}
+            {% for form in detalle_formset %}
+                <div class="border rounded p-3 mb-3 bg-light detalle-form position-relative">
                 {{ form.as_p }}
+                <button type="button" class="btn btn-sm btn-danger eliminar-detalle position-absolute top-0 end-0 m-2">Eliminar</button>
             </div>
-        {% endfor %}
+
+            {% endfor %}
+        </div>
+        <button type="button" class="btn btn-outline-primary mb-3" id="agregar-detalle">Agregar otro producto</button>
 
         <h4>Combinaciones Personalizadas</h4>
-        {{ combinacion_formset.management_form }}
-        {% for form in combinacion_formset %}
-            <div class="border rounded p-3 mb-3 bg-light combinacion-form">
-                {{ form.cod_producto.label_tag }} {{ form.cod_producto }}
-                {{ form.cod_sabor_masa_1.label_tag }} {{ form.cod_sabor_masa_1 }}
-                {{ form.cod_glaseado_1.label_tag }} {{ form.cod_glaseado_1 }}
-                {{ form.cod_topping_1.label_tag }} {{ form.cod_topping_1 }}
-            </div>
-        {% endfor %}
+        <p><strong>Nota:</strong> Debes agregar una combinación por cada dona (según la cantidad de productos).</p>
+
+        <div id="combinacion-form-container">
+            {{ combinacion_formset.management_form }}
+            {% for form in combinacion_formset %}
+                <div class="border rounded p-3 mb-3 bg-light combinacion-form">
+                    {{ form.cod_producto.label_tag }} {{ form.cod_producto }}
+                    {{ form.cod_sabor_masa_1.label_tag }} {{ form.cod_sabor_masa_1 }}
+                    {{ form.cod_glaseado_1.label_tag }} {{ form.cod_glaseado_1 }}
+                    {{ form.cod_topping_1.label_tag }} {{ form.cod_topping_1 }}
+                </div>
+            {% endfor %}
+        </div>
 
         <h4>Totales</h4>
         <p>Subtotal: $<span id="subtotal">0.00</span></p>
@@ -55,40 +64,46 @@
 </div>
 
 <script>
-    const precios = {{ precios_productos|safe }};
+const precios = {{ precios_productos|safe }};
 
-    document.addEventListener('DOMContentLoaded', function () {
-        function actualizarTotales() {
-            let subtotal = 0;
+document.addEventListener('DOMContentLoaded', function () {
+    let detalleIndex = {{ detalle_formset.total_form_count }};
+    let combinacionIndex = {{ combinacion_formset.total_form_count }};
+    const detalleContainer = document.getElementById('detalle-form-container');
+    const combinacionContainer = document.getElementById('combinacion-form-container');
+    const agregarBtn = document.getElementById('agregar-detalle');
+    const detalleTemplate = document.querySelector('.detalle-form');
+    const combinacionTemplate = document.querySelector('.combinacion-form');
 
-            document.querySelectorAll('.detalle-form').forEach((form, index) => {
-                const productoSelect = form.querySelector('select[name$="cod_producto"]');
-                const cantidadInput = form.querySelector('input[name$="cantidad"]');
-                const precioInput = form.querySelector('input[name$="precio_unitario"]');
+    agregarBtn.addEventListener('click', function () {
+        const newForm = detalleTemplate.cloneNode(true);
+        newForm.querySelectorAll('input, select').forEach(input => {
+            const newName = input.name.replace(/-\d+-/, `-${detalleIndex}-`);
+            const newId = input.id.replace(/-\d+-/, `-${detalleIndex}-`);
+            input.name = newName;
+            input.id = newId;
+            if (input.type !== 'hidden') input.value = '';
+        });
 
-                if (productoSelect && cantidadInput && precioInput) {
-                    const cantidad = parseFloat(cantidadInput.value) || 0;
-                    const precio = parseFloat(precioInput.value) || 0;
-                    subtotal += cantidad * precio;
-                }
-            });
-
-            const iva = subtotal * 0.19;
-            const total = subtotal + iva;
-
-            document.getElementById('subtotal').textContent = subtotal.toFixed(2);
-            document.getElementById('iva').textContent = iva.toFixed(2);
-            document.getElementById('total').textContent = total.toFixed(2);
-
-            // Actualizar campo de monto_total si existe
-            const montoTotalInput = document.querySelector('input[name$="monto_total"]');
-            if (montoTotalInput) {
-                montoTotalInput.value = total.toFixed(2);
-            }
+        // Asegurar que el botón eliminar esté presente
+        if (!newForm.querySelector('.eliminar-detalle')) {
+            const btnEliminar = document.createElement('button');
+            btnEliminar.type = 'button';
+            btnEliminar.className = 'btn btn-sm btn-danger eliminar-detalle position-absolute top-0 end-0 m-2';
+            btnEliminar.textContent = 'Eliminar';
+            newForm.appendChild(btnEliminar);
         }
 
-        // Asociar eventos a cada formulario de detalle
-        document.querySelectorAll('.detalle-form').forEach((form, index) => {
+        detalleContainer.appendChild(newForm);
+        detalleIndex++;
+        document.getElementById('id_detalle-TOTAL_FORMS').value = detalleIndex;
+
+        bindDetalleEvents();
+        bindEliminarEventos();
+    });
+
+    function bindDetalleEvents() {
+        document.querySelectorAll('.detalle-form').forEach((form) => {
             const productoSelect = form.querySelector('select[name$="cod_producto"]');
             const cantidadInput = form.querySelector('input[name$="cantidad"]');
             const precioInput = form.querySelector('input[name$="precio_unitario"]');
@@ -104,44 +119,86 @@
             }
 
             if (cantidadInput) {
-                cantidadInput.addEventListener('input', actualizarTotales);
+                cantidadInput.addEventListener('input', () => {
+                    actualizarTotales();
+                    actualizarCombinaciones();
+                });
             }
 
             if (precioInput) {
                 precioInput.addEventListener('input', actualizarTotales);
             }
         });
+    }
 
-        // Calcular al cargar por si hay datos precargados
+    function bindEliminarEventos() {
+        document.querySelectorAll('.eliminar-detalle').forEach(boton => {
+            boton.removeEventListener('click', handleEliminar);
+            boton.addEventListener('click', handleEliminar);
+        });
+    }
+
+    function handleEliminar(event) {
+        const form = event.target.closest('.detalle-form');
+        form.remove();
+        detalleIndex = document.querySelectorAll('.detalle-form').length;
+        document.getElementById('id_detalle-TOTAL_FORMS').value = detalleIndex;
         actualizarTotales();
-    });
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Calcular fecha mínima: hoy + 3 días
-    const hoy = new Date();
-    hoy.setDate(hoy.getDate() + 3);
-    const yyyy = hoy.getFullYear();
-    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
-    const dd = String(hoy.getDate()).padStart(2, '0');
-    const hh = String(hoy.getHours()).padStart(2, '0');
-    const min = String(hoy.getMinutes()).padStart(2, '0');
+        actualizarCombinaciones();
+    }
 
-    // Formato para input type="datetime-local"
-    const fechaMinima = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+    function actualizarTotales() {
+        let subtotal = 0;
 
-    // Aplicar a todos los campos de tipo datetime-local
-    document.querySelectorAll('input[type="datetime-local"]').forEach(input => {
-        input.min = fechaMinima;
-    });
+        document.querySelectorAll('.detalle-form').forEach(form => {
+            const cantidadInput = form.querySelector('input[name$="cantidad"]');
+            const precioInput = form.querySelector('input[name$="precio_unitario"]');
+            const cantidad = parseFloat(cantidadInput.value) || 0;
+            const precio = parseFloat(precioInput.value) || 0;
+            subtotal += cantidad * precio;
+        });
 
-    // También aplica a campos de tipo date si los tienes
-    document.querySelectorAll('input[type="date"]').forEach(input => {
-        input.min = `${yyyy}-${mm}-${dd}`;
-    });
+        const iva = subtotal * 0.19;
+        const total = subtotal + iva;
+
+        document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+        document.getElementById('iva').textContent = iva.toFixed(2);
+        document.getElementById('total').textContent = total.toFixed(2);
+
+        const montoTotalInput = document.querySelector('input[name$="monto_total"]');
+        if (montoTotalInput) {
+            montoTotalInput.value = total.toFixed(2);
+        }
+    }
+
+    function actualizarCombinaciones() {
+        let totalCantidad = 0;
+        document.querySelectorAll('.detalle-form').forEach(form => {
+            const cantidadInput = form.querySelector('input[name$="cantidad"]');
+            totalCantidad += parseInt(cantidadInput.value) || 0;
+        });
+
+        combinacionContainer.querySelectorAll('.combinacion-form').forEach(form => form.remove());
+
+        for (let i = 0; i < totalCantidad; i++) {
+            const newForm = combinacionTemplate.cloneNode(true);
+            newForm.querySelectorAll('input, select').forEach(input => {
+                input.name = input.name.replace(/-\d+-/, `-${i}-`);
+                input.id = input.id.replace(/-\d+-/, `-${i}-`);
+                if (input.type !== 'hidden') input.value = '';
+            });
+            combinacionContainer.appendChild(newForm);
+        }
+
+        document.getElementById('id_combinacion-TOTAL_FORMS').value = totalCantidad;
+    }
+
+    bindDetalleEvents();
+    bindEliminarEventos();
+    actualizarTotales();
+    actualizarCombinaciones();
 });
 </script>
-
 
 </body>
 </html>

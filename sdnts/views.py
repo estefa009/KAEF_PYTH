@@ -1034,83 +1034,91 @@ def ventas_admin(request):
 from django.shortcuts import render, redirect
 from django.forms import modelformset_factory
 from .models import Venta, DetalleVenta, Pago, CombinacionProducto
-from .forms import VentaForm, DetalleVentaForm, PagoForm, CombinacionProductoForm
+from .forms import VentaForm, DetalleVentaForm, PagoForm, CombinacionProductoForm, CombinacionProductoFormSet, DetalleVentaFormSet
 from django.db import transaction
 from  decimal import Decimal
+from django.contrib import messages
 
+
+@login_required
+@transaction.atomic
 def agregar_venta_completa(request):
-    DetalleFormSet = modelformset_factory(DetalleVenta, form=DetalleVentaForm, extra=1)
-    CombinacionFormSet = modelformset_factory(CombinacionProducto, form=CombinacionProductoForm, extra=1)
-
     if request.method == 'POST':
         venta_form = VentaForm(request.POST)
-        detalle_formset = DetalleFormSet(request.POST, prefix='detalle')
-        combinacion_formset = CombinacionFormSet(request.POST, prefix='combo')
+        detalle_formset = DetalleVentaFormSet(request.POST, prefix='detalle')
+        combinacion_formset = CombinacionProductoFormSet(request.POST, prefix='combinacion')
         pago_form = PagoForm(request.POST)
 
-        if venta_form.is_valid() and detalle_formset.is_valid() and pago_form.is_valid() and combinacion_formset.is_valid():
-            with transaction.atomic():
-                venta = venta_form.save(commit=False)
+        if venta_form.is_valid() and detalle_formset.is_valid() and combinacion_formset.is_valid() and pago_form.is_valid():
+            # Calcular la cantidad total de donas vendidas
+            cantidad_total = sum(
+                form.cleaned_data.get('cantidad', 0)
+                for form in detalle_formset
+                if form.cleaned_data and not form.cleaned_data.get('DELETE', False)
+            )
 
-                subtotal = Decimal('0.00')
+            cantidad_combinaciones = sum(
+                1 for form in combinacion_formset
+                if form.cleaned_data and not form.cleaned_data.get('DELETE', False)
+            )
 
-                for form in detalle_formset:
-                    cod_producto = form.cleaned_data['cod_producto']
-                    cantidad = form.cleaned_data['cantidad']
-                    prec_pro = cod_producto.prec_pro  # Tomar precio del producto
-                    subtotal += prec_pro * cantidad
+            if cantidad_combinaciones != cantidad_total:
+                messages.error(
+                    request,
+                    f"Debes agregar exactamente {cantidad_total} combinaciones. Has agregado {cantidad_combinaciones}."
+                )
+            else:
+                with transaction.atomic():
+                    venta = venta_form.save(commit=False)
+                    venta.save()
 
-                iva = subtotal * Decimal('0.19')
-                total = subtotal + iva
+                    subtotal = Decimal('0.00')
+                    for form in detalle_formset:
+                        if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                            detalle = form.save(commit=False)
+                            detalle.cod_venta = venta
+                            detalle.save()
+                            subtotal += detalle.cantidad * detalle.precio_unitario
 
-                venta.subtotal = subtotal
-                venta.iva = iva
-                venta.total = total
-                venta.save()
+                    iva = subtotal * Decimal('0.19')
+                    total = subtotal + iva
 
-                for form in detalle_formset:
-                    cod_producto = form.cleaned_data['cod_producto']
-                    cantidad = form.cleaned_data['cantidad']
-                    precio_unitario = cod_producto.prec_pro  # <--- USAR prec_pro
+                    venta.subtotal = subtotal
+                    venta.iva = iva
+                    venta.total = total
+                    venta.save()
 
-                    detalle = form.save(commit=False)
-                    detalle.cod_venta = venta
-                    detalle.precio_unitario = precio_unitario
-                    detalle.subtotal = precio_unitario * cantidad
-                    detalle.save()
+                    for form in combinacion_formset:
+                        if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                            combinacion = form.save(commit=False)
+                            combinacion.cod_venta = venta
+                            combinacion.save()
 
-                for form, detalle_form in zip(combinacion_formset, detalle_formset):
-                    combinacion = form.save(commit=False)
-                    combinacion.cod_venta = venta
-                    combinacion.cod_producto = detalle_form.cleaned_data['cod_producto']
-                    combinacion.save()
+                    pago = pago_form.save(commit=False)
+                    pago.cod_venta = venta
+                    pago.save()
 
-                pago = pago_form.save(commit=False)
-                pago.cod_venta = venta
-                pago.monto_total = total
-                pago.save()
-
-            return redirect('ventas_admin')
-
+                    messages.success(request, "Venta creada correctamente.")
+                    return redirect('ventas_admin')
+        else:
+            messages.error(request, "Revisa todos los campos. Hay errores en el formulario.")
     else:
         venta_form = VentaForm()
-        detalle_formset = DetalleFormSet(queryset=DetalleVenta.objects.none(), prefix='detalle')
-        combinacion_formset = CombinacionFormSet(queryset=CombinacionProducto.objects.none(), prefix='combo')
+        detalle_formset = DetalleVentaFormSet(prefix='detalle', queryset=DetalleVenta.objects.none(), initial=[{}])
+        combinacion_formset = CombinacionProductoFormSet(prefix='combinacion', queryset=CombinacionProducto.objects.none(), initial=[{}])
         pago_form = PagoForm()
-        productos = Producto.objects.all()
-        precios_productos = {str(p.pk): str(p.prec_pro) for p in productos}
+
+    productos = Producto.objects.filter(activo=True)
+    precios = {str(p.cod_producto): str(p.prec_pro) for p in productos}
 
     return render(request, 'admin/ventas/agregar_venta_completa.html', {
         'venta_form': venta_form,
         'detalle_formset': detalle_formset,
         'combinacion_formset': combinacion_formset,
         'pago_form': pago_form,
-        'productos': Producto.objects.all(), 
         'productos': productos,
-        'precios_productos': precios_productos,
+        'precios_productos': precios,
     })
-
-
 @login_required
 def detalle_ventas(request, venta_id):
     venta = get_object_or_404(Venta, pk=venta_id)
