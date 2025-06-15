@@ -133,6 +133,7 @@ urlpatterns = [
     path('productos_admin/<int:cod_producto>/cambiar_estado/', views.cambiar_estado_producto, name='cambiar_estado_producto'),
     path('productos_admin/<int:cod_producto>/editar_receta/', views.editar_receta_producto, name='editar_receta_producto'),
     path('productos_admin/<int:cod_producto>/ver_receta/', views.ver_receta_producto, name='ver_receta_producto'),
+    path('productos_admin/<int:cod_producto>/generar_receta_base/', views.generar_receta_base, name='generar_receta_base'),
 
     
     path('reporte-usuarios-pdf/', views.reporte_usuarios_pdf, name='reporte_usuarios_pdf'),

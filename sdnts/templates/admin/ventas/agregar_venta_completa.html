@@ -10,35 +10,15 @@
     <link rel="stylesheet" href="{% static 'css/admin.css' %}">
     <link rel="stylesheet" href="{% static 'css/menu.css' %}">
     <link rel="stylesheet" href="{% static 'css/agregar_venta.css' %}">
-    <script>
-        function calcularTotales() {
-            let subtotal = 0;
-            document.querySelectorAll('.detalle-form').forEach((form, index) => {
-                const cantidad = parseFloat(form.querySelector('[name$="cantidad"]').value) || 0;
-                const precio = parseFloat(form.querySelector('[name$="precio_unitario"]').value) || 0;
-                subtotal += cantidad * precio;
-            });
-            const iva = subtotal * 0.19;
-            const total = subtotal + iva;
-
-            document.getElementById('subtotal').textContent = subtotal.toFixed(2);
-            document.getElementById('iva').textContent = iva.toFixed(2);
-            document.getElementById('total').textContent = total.toFixed(2);
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('input').forEach(input => {
-                input.addEventListener('input', calcularTotales);
-            });
-        });
-    </script>
 </head>
 <body>
-    {% include "includes/nav_admin.html" %}
+{% include "includes/nav_admin.html" %}
+
 <div class="container mt-5">
     <h2>Agregar Venta Completa</h2>
     <form method="post">
         {% csrf_token %}
+
         <h4>Datos de la Venta</h4>
         {{ venta_form.as_p }}
 
@@ -61,7 +41,6 @@
             </div>
         {% endfor %}
 
-
         <h4>Totales</h4>
         <p>Subtotal: $<span id="subtotal">0.00</span></p>
         <p>IVA (19%): $<span id="iva">0.00</span></p>
@@ -76,22 +55,93 @@
 </div>
 
 <script>
-    // Mapea productos con tallas, puedes hacerlo desde tu vista o pasar por contexto
-    const productosConTalla = {
-        {% for producto in productos %}
-            "{{ producto.pk }}": "{{ producto.tamano }}",
-        {% endfor %}
-    };
+    const precios = {{ precios_productos|safe }};
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const combinacionForms = document.querySelectorAll(".combinacion-form");
+    document.addEventListener('DOMContentLoaded', function () {
+        function actualizarTotales() {
+            let subtotal = 0;
 
-        combinacionForms.forEach((form) => {
+            document.querySelectorAll('.detalle-form').forEach((form, index) => {
+                const productoSelect = form.querySelector('select[name$="cod_producto"]');
+                const cantidadInput = form.querySelector('input[name$="cantidad"]');
+                const precioInput = form.querySelector('input[name$="precio_unitario"]');
+
+                if (productoSelect && cantidadInput && precioInput) {
+                    const cantidad = parseFloat(cantidadInput.value) || 0;
+                    const precio = parseFloat(precioInput.value) || 0;
+                    subtotal += cantidad * precio;
+                }
+            });
+
+            const iva = subtotal * 0.19;
+            const total = subtotal + iva;
+
+            document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+            document.getElementById('iva').textContent = iva.toFixed(2);
+            document.getElementById('total').textContent = total.toFixed(2);
+
+            // Actualizar campo de monto_total si existe
+            const montoTotalInput = document.querySelector('input[name$="monto_total"]');
+            if (montoTotalInput) {
+                montoTotalInput.value = total.toFixed(2);
+            }
+        }
+
+        // Asociar eventos a cada formulario de detalle
+        document.querySelectorAll('.detalle-form').forEach((form, index) => {
             const productoSelect = form.querySelector('select[name$="cod_producto"]');
-            
+            const cantidadInput = form.querySelector('input[name$="cantidad"]');
+            const precioInput = form.querySelector('input[name$="precio_unitario"]');
+
+            if (productoSelect && precioInput) {
+                productoSelect.addEventListener('change', function () {
+                    const productoId = this.value;
+                    if (precios[productoId]) {
+                        precioInput.value = precios[productoId];
+                        actualizarTotales();
+                    }
+                });
+            }
+
+            if (cantidadInput) {
+                cantidadInput.addEventListener('input', actualizarTotales);
+            }
+
+            if (precioInput) {
+                precioInput.addEventListener('input', actualizarTotales);
+            }
         });
+
+        // Calcular al cargar por si hay datos precargados
+        actualizarTotales();
     });
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Calcular fecha mínima: hoy + 3 días
+    const hoy = new Date();
+    hoy.setDate(hoy.getDate() + 3);
+    const yyyy = hoy.getFullYear();
+    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dd = String(hoy.getDate()).padStart(2, '0');
+    const hh = String(hoy.getHours()).padStart(2, '0');
+    const min = String(hoy.getMinutes()).padStart(2, '0');
+
+    // Formato para input type="datetime-local"
+    const fechaMinima = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+
+    // Aplicar a todos los campos de tipo datetime-local
+    document.querySelectorAll('input[type="datetime-local"]').forEach(input => {
+        input.min = fechaMinima;
+    });
+
+    // También aplica a campos de tipo date si los tienes
+    document.querySelectorAll('input[type="date"]').forEach(input => {
+        input.min = `${yyyy}-${mm}-${dd}`;
+    });
+});
+</script>
+
 
 </body>
 </html>

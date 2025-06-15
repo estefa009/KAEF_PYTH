@@ -147,11 +147,20 @@ class CambiarContrasenaForm(PasswordChangeForm):
 # ventas
 from django import forms
 from .models import Venta, DetalleVenta, Pago, CombinacionProducto
+from datetime import date, timedelta
 
 class VentaForm(forms.ModelForm):
     class Meta:
         model = Venta
         exclude = ['subtotal', 'iva', 'total']
+
+    def clean_fecha_entrega(self):
+        fecha_entrega = self.cleaned_data.get('fecha_entrega')
+        fecha_minima = date.today() + timedelta(days=3)
+        if fecha_entrega and fecha_entrega < fecha_minima:
+            raise forms.ValidationError("La fecha de entrega debe ser al menos 3 días después de hoy.")
+        return fecha_entrega
+from datetime import date, timedelta
 
 class DetalleVentaForm(forms.ModelForm):
     class Meta:
@@ -160,6 +169,18 @@ class DetalleVentaForm(forms.ModelForm):
         widgets = {
             'fecha_entrega': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        fecha_minima = (date.today() + timedelta(days=3)).isoformat()
+        self.fields['fecha_entrega'].widget.attrs['min'] = fecha_minima
+
+    def clean_fecha_entrega(self):
+        fecha_entrega = self.cleaned_data.get('fecha_entrega')
+        fecha_minima = date.today() + timedelta(days=3)
+        if fecha_entrega and fecha_entrega.date() < fecha_minima:
+            raise forms.ValidationError("La fecha de entrega debe ser al menos 3 días después de hoy.")
+        return fecha_entrega
 
 class CombinacionProductoForm(forms.ModelForm):
     class Meta:

@@ -1037,6 +1037,7 @@ from .models import Venta, DetalleVenta, Pago, CombinacionProducto
 from .forms import VentaForm, DetalleVentaForm, PagoForm, CombinacionProductoForm
 from django.db import transaction
 from  decimal import Decimal
+
 def agregar_venta_completa(request):
     DetalleFormSet = modelformset_factory(DetalleVenta, form=DetalleVentaForm, extra=1)
     CombinacionFormSet = modelformset_factory(CombinacionProducto, form=CombinacionProductoForm, extra=1)
@@ -1051,12 +1052,15 @@ def agregar_venta_completa(request):
             with transaction.atomic():
                 venta = venta_form.save(commit=False)
 
-                # Calcular totales
-                subtotal = sum([
-                    form.cleaned_data['precio_unitario'] * form.cleaned_data['cantidad']
-                    for form in detalle_formset
-                ])
-                iva = subtotal * Decimal (0.19)
+                subtotal = Decimal('0.00')
+
+                for form in detalle_formset:
+                    cod_producto = form.cleaned_data['cod_producto']
+                    cantidad = form.cleaned_data['cantidad']
+                    prec_pro = cod_producto.prec_pro  # Tomar precio del producto
+                    subtotal += prec_pro * cantidad
+
+                iva = subtotal * Decimal('0.19')
                 total = subtotal + iva
 
                 venta.subtotal = subtotal
@@ -1065,8 +1069,14 @@ def agregar_venta_completa(request):
                 venta.save()
 
                 for form in detalle_formset:
+                    cod_producto = form.cleaned_data['cod_producto']
+                    cantidad = form.cleaned_data['cantidad']
+                    precio_unitario = cod_producto.prec_pro  # <--- USAR prec_pro
+
                     detalle = form.save(commit=False)
                     detalle.cod_venta = venta
+                    detalle.precio_unitario = precio_unitario
+                    detalle.subtotal = precio_unitario * cantidad
                     detalle.save()
 
                 for form, detalle_form in zip(combinacion_formset, detalle_formset):
@@ -1087,6 +1097,8 @@ def agregar_venta_completa(request):
         detalle_formset = DetalleFormSet(queryset=DetalleVenta.objects.none(), prefix='detalle')
         combinacion_formset = CombinacionFormSet(queryset=CombinacionProducto.objects.none(), prefix='combo')
         pago_form = PagoForm()
+        productos = Producto.objects.all()
+        precios_productos = {str(p.pk): str(p.prec_pro) for p in productos}
 
     return render(request, 'admin/ventas/agregar_venta_completa.html', {
         'venta_form': venta_form,
@@ -1094,7 +1106,10 @@ def agregar_venta_completa(request):
         'combinacion_formset': combinacion_formset,
         'pago_form': pago_form,
         'productos': Producto.objects.all(), 
+        'productos': productos,
+        'precios_productos': precios_productos,
     })
+
 
 @login_required
 def detalle_ventas(request, venta_id):
@@ -1202,8 +1217,9 @@ def editar_produccion(request, cod_produccion):
         form = ProduccionForm(instance=produccion)
     return render(request, 'admin/produccion/editar_produccion.html', {'form': form, 'produccion': produccion})
 
-def cambiar_estado_produccion(request,cod_produccion ):
+def cambiar_estado_produccion(request, cod_produccion):
     produccion = get_object_or_404(Produccion, pk=cod_produccion)
+
     if request.method == 'POST':
         nuevo = request.POST.get('estado')
         if nuevo in dict(Produccion.ESTADOS):
@@ -1211,17 +1227,23 @@ def cambiar_estado_produccion(request,cod_produccion ):
             if nuevo == 'FINALIZADO':
                 produccion.fecha_fin = timezone.now()
             produccion.save()
+
+            # Mover esto aquí para que se ejecute al cambiar el estado
+            venta = produccion.cod_venta
+            if nuevo == 'EN_PROCESO':
+                venta.estado = 'PREPARACION'
+            elif nuevo == 'FINALIZADO':
+                venta.estado = 'EN_CAMINO'
+            elif nuevo == 'PENDIENTE':
+                venta.estado = 'PENDIENTE'
+            venta.save()
+
         return redirect('produccion_admin')
-    # Actualizar el estado de la venta asociada según el estado de la producción
-    venta = produccion.cod_venta
-    if produccion.estado == 'EN_PROCESO':
-        venta.estado = 'PREPARACION'
-    elif produccion.estado == 'FINALIZADO':
-        venta.estado = 'EN_CAMINO'  
-    elif produccion.estado == 'PENDIENTE':
-        venta.estado = 'PENDIENTE'
-    venta.save()
-    return render(request, 'admin/produccion/cambiar_estado_produccion.html', {'produccion': produccion, 'estados': Produccion.ESTADOS})
+
+    return render(request, 'admin/produccion/cambiar_estado_produccion.html', {
+        'produccion': produccion,
+        'estados': Produccion.ESTADOS
+    })
 
 
 def asignar_envio_produccion(request, cod_produccion):
@@ -1827,7 +1849,7 @@ INSUMOS_BASICOS = [
     'Azucar',
     'Sal',
     'Mantequilla',
-    'Leche Deslactosada',
+    'Leche',
     'Harina de trigo',
     'Polvo para hornear',
 ]
@@ -1866,3 +1888,38 @@ def editar_receta_producto(request, cod_producto):
     })
 
 
+
+def generar_receta_base(request, cod_producto):
+    producto = get_object_or_404(Producto, cod_producto=cod_producto)
+
+    # Elimina receta anterior si existe
+    RecetaProducto.objects.filter(cod_producto=producto).delete()
+
+    # Ingredientes base para XS
+    ingredientes_base = [
+        ('Azucar', 50, 'Gramos'),
+        ('Sal', 1, 'Gramos'),
+        ('Huevos', 1, 'Unidad'),
+        ('Mantequilla', 15, 'Gramos'),
+        ('Leche', 100, 'Litros'),
+        ('Harina de trigo', 100, 'Gramos'),
+        ('Polvo para hornear', 5, 'Gramos'),
+    ]
+
+    tamano = producto.tamano.upper()
+    multiplicador = {'XS': 1, 'S': 2, 'M': 3, 'L': 4}.get(tamano, 1)
+
+    for nombre_insumo, cantidad_base, unidad in ingredientes_base:
+        try:
+            insumo = Insumo.objects.get(nomb_insumo__iexact=nombre_insumo)
+            RecetaProducto.objects.create(
+                cod_producto=producto,
+                insumo=insumo,
+                cantidad=cantidad_base * multiplicador,
+                unidad_medida=unidad
+            )
+        except Insumo.DoesNotExist:
+            messages.error(request, f"No se encontró el insumo '{nombre_insumo}'.")
+
+    messages.success(request, "Receta base generada correctamente.")
+    return redirect('editar_receta_producto', cod_producto=producto.cod_producto)
