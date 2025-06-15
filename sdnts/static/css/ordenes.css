@@ -17,7 +17,7 @@ body {
     margin: 0;
     font-family: 'Century Gothic', sans-serif;
     color: var(--texto-oscuro);
-    background: url(../Image/fondo.jpg) no-repeat center center fixed;
+    background-color: white;
     background-size: cover;
     text-align: center;
     position: relative;
@@ -306,4 +306,101 @@ tr:hover {
 .Cerrar:hover {
     background-color: var(--rosa-oscuro);
     color: white;
+}
+/* Contenedor de la tabla */
+.table {
+    border: 3px solid #ffb6c1;
+    border-radius: 30px;
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 20px;
+}
+
+/* Título */
+.ptable {
+    color: #ff80a4;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* Encabezados */
+.table thead th {
+    background-color: #ff80a4;
+    color: white;
+    text-align: center;
+    border: 2px solid #ffb6c1;
+    padding: 12px;
+}
+
+/* Cuerpo de tabla */
+.table tbody td {
+    background-color: #f5f7f8;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 10px;
+    border: 1px solid #eee;
+}
+
+/* Botones */
+.table .btn {
+    font-size: 0.8rem;
+    padding: 5px 8px;
+    border-radius: 10px;
+}
+
+/* Botones de exportar */
+#downloadPdf, #downloadWord, #downloadExcel, .btn-pink {
+    margin-right: 8px;
+}
+
+/* Select de filtro */
+#filtroEstado {
+    border-color: #ffb6c1;
+    border-radius: 10px;
+}
+
+/* Badges de estado */
+.status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    border-radius: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+.status-pending {
+    background-color: #ffc107; /* Amarillo */
+}
+
+.status-in-progress {
+    background-color: #0d6efd; /* Azul */
+}
+
+.status-completed {
+    background-color: #198754; /* Verde */
+}
+
+.status-cancelled {
+    background-color: #dc3545; /* Rojo */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ptable {
+        font-size: 1.2rem;
+    }
+
+    .table thead th,
+    .table tbody td {
+        font-size: 0.8rem;
+        padding: 6px;
+    }
+
+    .table .btn {
+        font-size: 0.75rem;
+        padding: 4px 6px;
+    }
 }

@@ -3,7 +3,7 @@ body {
     margin: 0;
     font-family: 'Century Gothic', sans-serif;
     color: #000;
-    background-image: url(../Image/fondo.jpg);
+    background-color: white;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -167,5 +167,65 @@ border-radius: 40px;
         left: 0;
         width: 100%;
         height: auto;
+    }
+}
+/* Tabla de categorías */
+.table {
+    border: 3px solid #ffb6c1;
+    border-radius: 30px;
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 20px;
+}
+
+/* Encabezado */
+.table thead th {
+    background-color: #ff80a4;
+    color: white;
+    text-align: center;
+    border: 2px solid #ffb6c1;
+    padding: 12px;
+}
+
+/* Filas del cuerpo */
+.table tbody td,
+.table tbody th {
+    background-color: #fffafa;
+    color: #555;
+    text-align: center;
+    font-style: italic;
+    padding: 10px;
+    border: 1px solid #f1f1f1;
+}
+
+/* Fila sin datos */
+.table tbody td[colspan] {
+    background-color: #f8f9fa;
+    color: gray;
+    font-style: italic;
+}
+
+/* Botón de eliminar */
+.table .btn-danger {
+    background-color: #ff4d6d;
+    border: none;
+    border-radius: 12px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .table thead th,
+    .table tbody td,
+    .table tbody th {
+        font-size: 0.85rem;
+        padding: 8px;
+    }
+
+    .table .btn-danger {
+        font-size: 0.75rem;
+        padding: 5px 8px;
     }
 }

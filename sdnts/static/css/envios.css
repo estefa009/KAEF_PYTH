@@ -3,7 +3,7 @@ body {
     margin: 0;
     font-family: 'Century Gothic', sans-serif;
     color: #000;
-    background-image: url(../Image/fondo.jpg);
+    background-color: white;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -163,4 +163,84 @@ text-decoration: none;
 .btn-outline-pink:hover {
     background-color: #ff69b4;
     color: white;
+}
+/* Estilo para la tabla de envíos */
+.table {
+    border: 3px solid #ffb6c1;
+    border-radius: 30px;
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 20px;
+}
+
+/* Encabezado de tabla */
+.table thead th {
+    background-color: #ff80a4;
+    color: white;
+    text-align: center;
+    border: 2px solid #ffb6c1;
+    padding: 12px;
+}
+
+/* Celdas del cuerpo */
+.table tbody td {
+    background-color: #f5f7f8;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 10px;
+    border: 1px solid #eee;
+}
+
+/* Botones */
+.table .btn {
+    font-size: 0.8rem;
+    padding: 5px 8px;
+    border-radius: 10px;
+}
+
+/* Badge para estado */
+.table .badge {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+    background-color: #198754; /* verde por defecto */
+}
+
+/* Puedes personalizar más estados si necesitas */
+.badge-pendiente {
+    background-color: #ffc107; /* amarillo */
+    color: black;
+}
+.badge-en-proceso {
+    background-color: #0d6efd; /* azul */
+}
+.badge-finalizado {
+    background-color: #198754; /* verde */
+}
+.badge-cancelado {
+    background-color: #dc3545; /* rojo */
+}
+
+/* Mensaje de tabla vacía */
+.table tbody td[colspan] {
+    font-style: italic;
+    color: gray;
+    background-color: #f5f7f8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .table thead th,
+    .table tbody td {
+        font-size: 0.8rem;
+        padding: 6px;
+    }
+
+    .table .btn {
+        font-size: 0.75rem;
+        padding: 4px 6px;
+    }
 }

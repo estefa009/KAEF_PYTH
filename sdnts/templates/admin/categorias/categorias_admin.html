@@ -29,6 +29,24 @@
 
 
 <div class="d-flex justify-content-between p-4">
+    <!-- Formulario para agregar categoría -->
+  <div class="agregar border p-4 rounded shadow bg-light" style="min-width: 300px;">
+    <form action="{% url 'agregar_categoria' %}" method="post">
+      {% csrf_token %}
+      <h4 class="text-center mb-4">Agregar Categoría</h4>
+      <div class="mb-3">
+        <label for="nom_categoria" class="form-label">Nombre</label>
+        <input type="text" name="nom_categoria" id="nom_categoria" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="descripcion" class="form-label">Descripción (opcional)</label>
+        <input type="text" name="descripcion" id="descripcion" class="form-control">
+      </div>
+      <div class="d-flex justify-content-center">
+        <button type="submit" class="btn btn-success">Agregar</button>
+      </div>
+    </form>
+  </div>
   <!-- Tabla de categorías -->
   <div class="table-responsive me-3">
     <table class="table table-striped table-bordered">
@@ -66,24 +84,6 @@
     </table>
   </div>
 
-  <!-- Formulario para agregar categoría -->
-  <div class="agregar border p-4 rounded shadow bg-light" style="min-width: 300px;">
-    <form action="{% url 'agregar_categoria' %}" method="post">
-      {% csrf_token %}
-      <h4 class="text-center mb-4">Agregar Categoría</h4>
-      <div class="mb-3">
-        <label for="nom_categoria" class="form-label">Nombre</label>
-        <input type="text" name="nom_categoria" id="nom_categoria" class="form-control" required>
-      </div>
-      <div class="mb-3">
-        <label for="descripcion" class="form-label">Descripción (opcional)</label>
-        <input type="text" name="descripcion" id="descripcion" class="form-control">
-      </div>
-      <div class="d-flex justify-content-center">
-        <button type="submit" class="btn btn-success">Agregar</button>
-      </div>
-    </form>
-  </div>
 </div>
 
 </body>

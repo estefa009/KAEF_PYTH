@@ -3,7 +3,7 @@ body {
     margin: 0;
     font-family: 'Century Gothic', sans-serif;
     color: #000;
-    background-image: url(../Image/fondo.jpg);
+    background-color: white;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -113,6 +113,71 @@ text-decoration: none;
 .btn-success:hover {
     background-color: #45a049; /* Un tono más oscuro en hover */
 }
+/* Tabla de proveedores */
+.table {
+    border: 3px solid #ffb6c1;
+    border-radius: 30px;
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 20px;
+}
 
+/* Encabezado */
+.table thead th {
+    background-color: #ff80a4;
+    color: white;
+    text-align: center;
+    border: 2px solid #ffb6c1;
+    padding: 12px;
+}
+
+/* Filas del cuerpo */
+.table tbody td {
+    background-color: #fdfdfe;
+    color: #666;
+    text-align: center;
+    font-style: italic;
+    padding: 10px;
+    border: 1px solid #eee;
+}
+
+/* Estilo para celdas vacías */
+.table tbody td[colspan] {
+    color: gray;
+    font-style: italic;
+    background-color: #f8f9fa;
+}
+
+/* Botones */
+.table .btn {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    border-radius: 10px;
+}
+
+.table .btn-warning {
+    background-color: #f0ad4e;
+    border: none;
+}
+
+.table .btn-danger {
+    background-color: #d9534f;
+    border: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .table thead th,
+    .table tbody td {
+        font-size: 0.85rem;
+        padding: 8px;
+    }
+
+    .table .btn {
+        font-size: 0.75rem;
+        padding: 5px 8px;
+    }
+}
 
 
