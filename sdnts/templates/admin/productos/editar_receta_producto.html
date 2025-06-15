@@ -13,11 +13,20 @@
     <link rel="stylesheet" href="{% static 'css/menu.css' %}">
 </head>
 
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="alert alert-{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
 <body>
     {% include "includes/nav_admin.html" %}
 
     {% block content %}
     <h2 class="mb-4">Editar Receta para {{ producto.nomb_pro }}</h2>
+    <a href="{% url 'generar_receta_base' producto.cod_producto %}" class="btn btn-warning mb-3">Generar receta base</a>
 
     <form method="post">
         {% csrf_token %}

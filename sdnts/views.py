@@ -1034,68 +1034,91 @@ def ventas_admin(request):
 from django.shortcuts import render, redirect
 from django.forms import modelformset_factory
 from .models import Venta, DetalleVenta, Pago, CombinacionProducto
-from .forms import VentaForm, DetalleVentaForm, PagoForm, CombinacionProductoForm
+from .forms import VentaForm, DetalleVentaForm, PagoForm, CombinacionProductoForm, CombinacionProductoFormSet, DetalleVentaFormSet
 from django.db import transaction
 from  decimal import Decimal
-def agregar_venta_completa(request):
-    DetalleFormSet = modelformset_factory(DetalleVenta, form=DetalleVentaForm, extra=1)
-    CombinacionFormSet = modelformset_factory(CombinacionProducto, form=CombinacionProductoForm, extra=1)
+from django.contrib import messages
 
+
+@login_required
+@transaction.atomic
+def agregar_venta_completa(request):
     if request.method == 'POST':
         venta_form = VentaForm(request.POST)
-        detalle_formset = DetalleFormSet(request.POST, prefix='detalle')
-        combinacion_formset = CombinacionFormSet(request.POST, prefix='combo')
+        detalle_formset = DetalleVentaFormSet(request.POST, prefix='detalle')
+        combinacion_formset = CombinacionProductoFormSet(request.POST, prefix='combinacion')
         pago_form = PagoForm(request.POST)
 
-        if venta_form.is_valid() and detalle_formset.is_valid() and pago_form.is_valid() and combinacion_formset.is_valid():
-            with transaction.atomic():
-                venta = venta_form.save(commit=False)
+        if venta_form.is_valid() and detalle_formset.is_valid() and combinacion_formset.is_valid() and pago_form.is_valid():
+            # Calcular la cantidad total de donas vendidas
+            cantidad_total = sum(
+                form.cleaned_data.get('cantidad', 0)
+                for form in detalle_formset
+                if form.cleaned_data and not form.cleaned_data.get('DELETE', False)
+            )
 
-                # Calcular totales
-                subtotal = sum([
-                    form.cleaned_data['precio_unitario'] * form.cleaned_data['cantidad']
-                    for form in detalle_formset
-                ])
-                iva = subtotal * Decimal (0.19)
-                total = subtotal + iva
+            cantidad_combinaciones = sum(
+                1 for form in combinacion_formset
+                if form.cleaned_data and not form.cleaned_data.get('DELETE', False)
+            )
 
-                venta.subtotal = subtotal
-                venta.iva = iva
-                venta.total = total
-                venta.save()
+            if cantidad_combinaciones != cantidad_total:
+                messages.error(
+                    request,
+                    f"Debes agregar exactamente {cantidad_total} combinaciones. Has agregado {cantidad_combinaciones}."
+                )
+            else:
+                with transaction.atomic():
+                    venta = venta_form.save(commit=False)
+                    venta.save()
 
-                for form in detalle_formset:
-                    detalle = form.save(commit=False)
-                    detalle.cod_venta = venta
-                    detalle.save()
+                    subtotal = Decimal('0.00')
+                    for form in detalle_formset:
+                        if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                            detalle = form.save(commit=False)
+                            detalle.cod_venta = venta
+                            detalle.save()
+                            subtotal += detalle.cantidad * detalle.precio_unitario
 
-                for form, detalle_form in zip(combinacion_formset, detalle_formset):
-                    combinacion = form.save(commit=False)
-                    combinacion.cod_venta = venta
-                    combinacion.cod_producto = detalle_form.cleaned_data['cod_producto']
-                    combinacion.save()
+                    iva = subtotal * Decimal('0.19')
+                    total = subtotal + iva
 
-                pago = pago_form.save(commit=False)
-                pago.cod_venta = venta
-                pago.monto_total = total
-                pago.save()
+                    venta.subtotal = subtotal
+                    venta.iva = iva
+                    venta.total = total
+                    venta.save()
 
-            return redirect('ventas_admin')
+                    for form in combinacion_formset:
+                        if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                            combinacion = form.save(commit=False)
+                            combinacion.cod_venta = venta
+                            combinacion.save()
 
+                    pago = pago_form.save(commit=False)
+                    pago.cod_venta = venta
+                    pago.save()
+
+                    messages.success(request, "Venta creada correctamente.")
+                    return redirect('ventas_admin')
+        else:
+            messages.error(request, "Revisa todos los campos. Hay errores en el formulario.")
     else:
         venta_form = VentaForm()
-        detalle_formset = DetalleFormSet(queryset=DetalleVenta.objects.none(), prefix='detalle')
-        combinacion_formset = CombinacionFormSet(queryset=CombinacionProducto.objects.none(), prefix='combo')
+        detalle_formset = DetalleVentaFormSet(prefix='detalle', queryset=DetalleVenta.objects.none(), initial=[{}])
+        combinacion_formset = CombinacionProductoFormSet(prefix='combinacion', queryset=CombinacionProducto.objects.none(), initial=[{}])
         pago_form = PagoForm()
+
+    productos = Producto.objects.filter(activo=True)
+    precios = {str(p.cod_producto): str(p.prec_pro) for p in productos}
 
     return render(request, 'admin/ventas/agregar_venta_completa.html', {
         'venta_form': venta_form,
         'detalle_formset': detalle_formset,
         'combinacion_formset': combinacion_formset,
         'pago_form': pago_form,
-        'productos': Producto.objects.all(), 
+        'productos': productos,
+        'precios_productos': precios,
     })
-
 @login_required
 def detalle_ventas(request, venta_id):
     venta = get_object_or_404(Venta, pk=venta_id)
@@ -1202,8 +1225,9 @@ def editar_produccion(request, cod_produccion):
         form = ProduccionForm(instance=produccion)
     return render(request, 'admin/produccion/editar_produccion.html', {'form': form, 'produccion': produccion})
 
-def cambiar_estado_produccion(request,cod_produccion ):
+def cambiar_estado_produccion(request, cod_produccion):
     produccion = get_object_or_404(Produccion, pk=cod_produccion)
+
     if request.method == 'POST':
         nuevo = request.POST.get('estado')
         if nuevo in dict(Produccion.ESTADOS):
@@ -1211,17 +1235,23 @@ def cambiar_estado_produccion(request,cod_produccion ):
             if nuevo == 'FINALIZADO':
                 produccion.fecha_fin = timezone.now()
             produccion.save()
+
+            # Mover esto aquí para que se ejecute al cambiar el estado
+            venta = produccion.cod_venta
+            if nuevo == 'EN_PROCESO':
+                venta.estado = 'PREPARACION'
+            elif nuevo == 'FINALIZADO':
+                venta.estado = 'EN_CAMINO'
+            elif nuevo == 'PENDIENTE':
+                venta.estado = 'PENDIENTE'
+            venta.save()
+
         return redirect('produccion_admin')
-    # Actualizar el estado de la venta asociada según el estado de la producción
-    venta = produccion.cod_venta
-    if produccion.estado == 'EN_PROCESO':
-        venta.estado = 'PREPARACION'
-    elif produccion.estado == 'FINALIZADO':
-        venta.estado = 'EN_CAMINO'  
-    elif produccion.estado == 'PENDIENTE':
-        venta.estado = 'PENDIENTE'
-    venta.save()
-    return render(request, 'admin/produccion/cambiar_estado_produccion.html', {'produccion': produccion, 'estados': Produccion.ESTADOS})
+
+    return render(request, 'admin/produccion/cambiar_estado_produccion.html', {
+        'produccion': produccion,
+        'estados': Produccion.ESTADOS
+    })
 
 
 def asignar_envio_produccion(request, cod_produccion):
@@ -1827,7 +1857,7 @@ INSUMOS_BASICOS = [
     'Azucar',
     'Sal',
     'Mantequilla',
-    'Leche Deslactosada',
+    'Leche',
     'Harina de trigo',
     'Polvo para hornear',
 ]
@@ -1866,3 +1896,38 @@ def editar_receta_producto(request, cod_producto):
     })
 
 
+
+def generar_receta_base(request, cod_producto):
+    producto = get_object_or_404(Producto, cod_producto=cod_producto)
+
+    # Elimina receta anterior si existe
+    RecetaProducto.objects.filter(cod_producto=producto).delete()
+
+    # Ingredientes base para XS
+    ingredientes_base = [
+        ('Azucar', 50, 'Gramos'),
+        ('Sal', 1, 'Gramos'),
+        ('Huevos', 1, 'Unidad'),
+        ('Mantequilla', 15, 'Gramos'),
+        ('Leche', 100, 'Litros'),
+        ('Harina de trigo', 100, 'Gramos'),
+        ('Polvo para hornear', 5, 'Gramos'),
+    ]
+
+    tamano = producto.tamano.upper()
+    multiplicador = {'XS': 1, 'S': 2, 'M': 3, 'L': 4}.get(tamano, 1)
+
+    for nombre_insumo, cantidad_base, unidad in ingredientes_base:
+        try:
+            insumo = Insumo.objects.get(nomb_insumo__iexact=nombre_insumo)
+            RecetaProducto.objects.create(
+                cod_producto=producto,
+                insumo=insumo,
+                cantidad=cantidad_base * multiplicador,
+                unidad_medida=unidad
+            )
+        except Insumo.DoesNotExist:
+            messages.error(request, f"No se encontró el insumo '{nombre_insumo}'.")
+
+    messages.success(request, "Receta base generada correctamente.")
+    return redirect('editar_receta_producto', cod_producto=producto.cod_producto)
