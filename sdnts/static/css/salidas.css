@@ -1,0 +1,66 @@
+/* Estilo general de la tabla */
+.table {
+    border: 3px solid #ffb6c1;
+    border-radius: 30px;
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 20px;
+}
+
+/* Encabezado */
+.table thead th {
+    background-color: #ff80a4;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    padding: 12px;
+    border: 2px solid #ffb6c1;
+    vertical-align: middle;
+}
+
+/* Celdas del cuerpo */
+.table tbody td {
+    background-color: #fffafa;
+    color: #444;
+    text-align: center;
+    font-style: italic;
+    padding: 10px;
+    border: 1px solid #f2f2f2;
+    vertical-align: middle;
+}
+
+/* Botón eliminar */
+.table .btn-danger {
+    background-color: #ff4d6d;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    padding: 6px 10px;
+}
+
+/* Fila vacía */
+.table tbody td[colspan] {
+    background-color: #f9f9f9;
+    color: gray;
+    font-style: italic;
+}
+
+/* Hover */
+.table-striped tbody tr:hover {
+    background-color: #ffe4ec;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .table thead th,
+    .table tbody td {
+        font-size: 0.85rem;
+        padding: 8px;
+    }
+
+    .table .btn {
+        font-size: 0.75rem;
+        padding: 5px 8px;
+    }
+}

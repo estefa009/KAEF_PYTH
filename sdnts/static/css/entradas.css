@@ -3,7 +3,7 @@ body {
     margin: 0;
     font-family: 'Century Gothic', sans-serif;
     color: #000;
-    background-image: url(../Image/fondo.jpg);
+    background-color: white;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -116,5 +116,79 @@ text-decoration: none;
     background-color: #45a049;
 }
 
+/* Tabla de entradas de insumos */
+.table {
+    border: 3px solid #ffb6c1;
+    border-radius: 30px;
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 20px;
+}
+
+/* Encabezado */
+.table thead th {
+    background-color: #ff80a4;
+    color: white;
+    text-align: center;
+    border: 2px solid #ffb6c1;
+    padding: 12px;
+    vertical-align: middle;
+}
+
+/* Cuerpo de tabla */
+.table tbody td {
+    background-color: #fffafa;
+    color: #555;
+    text-align: center;
+    font-style: italic;
+    padding: 10px;
+    border: 1px solid #f1f1f1;
+    vertical-align: middle;
+}
+
+/* Botones */
+.table .btn-primary,
+.table .btn-danger {
+    border-radius: 12px;
+    font-size: 0.85rem;
+    padding: 6px 10px;
+}
+
+.table .btn-primary {
+    background-color: #6f42c1;
+    border: none;
+}
+
+.table .btn-danger {
+    background-color: #ff4d6d;
+    border: none;
+}
+
+/* Fila vacía */
+.table tbody td[colspan] {
+    background-color: #f8f9fa;
+    color: gray;
+    font-style: italic;
+}
+
+/* Hover */
+.table-hover tbody tr:hover {
+    background-color: #ffe4ec;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .table thead th,
+    .table tbody td {
+        font-size: 0.85rem;
+        padding: 8px;
+    }
+
+    .table .btn {
+        font-size: 0.75rem;
+        padding: 5px 8px;
+    }
+}
 
 

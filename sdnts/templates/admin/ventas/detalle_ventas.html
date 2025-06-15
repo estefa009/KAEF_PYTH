@@ -1,99 +1,147 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle de Venta #{{ venta.cod_venta }}</title>
+    <link rel="icon" type="image/ico" href="{% static 'icon/2.ico' %}">
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Century Gothic', sans-serif;
             background-image: url('../Image/fondo.jpg');
             background-size: cover;
             background-attachment: fixed;
             background-position: center;
             margin: 0;
             padding: 20px;
-            color: #333;
+            color: #5a3a4f;
         }
-        
+
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 30px auto;
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 240, 245, 0.97);
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(255, 182, 193, 0.35);
         }
-        
+
         h2 {
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
+            color: #ff69b4;
+            border-bottom: 2px dashed #ffa6c9;
             padding-bottom: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
         }
-        
+
         h3 {
-            color: #3498db;
-            margin-top: 30px;
+            color: #ec407a;
+            margin-top: 35px;
             margin-bottom: 15px;
+            font-size: 1.4rem;
         }
-        
-        .table {
+
+        p {
+            margin: 6px 0;
+            font-size: 1rem;
+        }
+
+        .tabla-productos {
             width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            background-color: white;
+            border: 3px solid #ffb6c1;
+            border-radius: 30px;
+            overflow: hidden;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 25px;
         }
-        
-        .table th, .table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .table th {
-            background-color: #3498db;
+
+        .tabla-productos thead th {
+            background-color: #ff80a4;
             color: white;
+            text-align: center;
+            padding: 12px;
+            border: 3px solid #ffb6c1;
+            font-weight: bold;
+            font-size: 0.95rem;
         }
-        
-        .table tr:nth-child(even) {
-            background-color: #f2f2f2;
+
+        .tabla-productos tbody td {
+            background-color: #f5f7f8;
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            padding: 10px;
+            border: 2px solid #ffb6c1;
+            font-size: 0.93rem;
         }
-        
-        .table tr:hover {
-            background-color: #e6f7ff;
+
+        .tabla-productos tr:hover td {
+            background-color: #ffe6ef;
+            transition: background-color 0.3s ease-in-out;
         }
-        
+
+        .tabla-productos .no-data {
+            text-align: center;
+            font-style: italic;
+            color: gray;
+            background-color: #f5f7f8;
+            padding: 10px;
+        }
+
         hr {
-            border: 0;
+            border: none;
             height: 1px;
-            background: #ddd;
+            background: #f8c6d8;
             margin: 30px 0;
         }
-        
+
         .btn {
             display: inline-block;
-            padding: 10px 20px;
-            background-color: #6c757d;
+            padding: 10px 22px;
+            background-color: #f78fb3;
             color: white;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1rem;
             transition: background-color 0.3s;
         }
-        
+
         .btn:hover {
-            background-color: #5a6268;
+            background-color: #f56ca4;
         }
-        
+
         strong {
-            color: #2c3e50;
+            color: #d63384;
         }
-        
+
         .total {
             font-size: 1.2em;
             font-weight: bold;
             text-align: right;
-            margin-top: 20px;
+            margin-top: 25px;
+            color: #d63384;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px 15px;
+            }
+
+            .tabla-productos th,
+            .tabla-productos td {
+                font-size: 0.9rem;
+                padding: 10px;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+                padding: 12px 0;
+                margin-top: 20px;
+            }
         }
     </style>
 </head>
@@ -109,7 +157,7 @@
         <hr>
 
         <h3>Productos:</h3>
-        <table class="table">
+        <table class="tabla-productos">
             <thead>
                 <tr>
                     <th>Producto</th>
@@ -154,7 +202,7 @@
                 <p><strong>ID de transacción:</strong> {{ venta.pago.transaccion_id }}</p>
             {% endif %}
         {% else %}
-            <p>No se ha registrado un pago para esta venta.</p>
+            <p><em>No se ha registrado un pago para esta venta.</em></p>
         {% endif %}
 
         <a href="{% url 'ventas_admin' %}" class="btn">Volver</a>
