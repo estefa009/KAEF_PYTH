@@ -799,14 +799,17 @@
   </div>
 </div>
 
-<!-- Modal de compra exitosa -->
 <div id="modalCompraExitosa" class="modal hidden">
-  <div class="modal-content modal-content-small modal-compra-exitosa-custom">
-    <span class="close" id="cerrarModalCompra">&times;</span>
-    <div class="infoTotalCarrito"></div>
-    <button id="okCompraExitosa" class="btn btn-success" style="margin-top: 16px; width: 100%;">OK</button>
-  </div>
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Resumen de tu compra</h2>
+        <div class="infoTotalCarrito">
+            <!-- Aquí va el resumen -->
+        </div>
+        <button class="btn btn-success">OK</button>
+    </div>
 </div>
+
 
 <!-- Modal de advertencia reutilizable -->
 <div id="modalAdvertencia" class="modal modal-advertencia hidden">
@@ -853,14 +856,3 @@
   </div>
 </div>
 
-<!-- Modal de resumen de compra -->
-<div class="modal hidden">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Resumen de tu compra</h2>
-        <div class="resumen-detalles">
-            <!-- El contenido se llenará dinámicamente -->
-        </div>
-        <button class="btn btn-success">OK</button>
-    </div>
-</div>

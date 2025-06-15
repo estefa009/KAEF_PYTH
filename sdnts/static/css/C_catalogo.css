@@ -653,7 +653,7 @@ border-radius: 100px;
     display: flex;
     justify-content: space-between; /* Para separar los elementos */
     border-top: 1px solid #ccc; /* Línea superior para separación */
-    padding: 10px;
+    padding: 5px;
 }
 .modal-contentP {
     background-color: #fff;
@@ -686,12 +686,13 @@ border-radius: 100px;
     margin-left: 20px;
 }
 .infoTotalCarrito {
-    flex-basis: 40%; /* Ocupará el 40% del espacio */
+    flex-basis: 45%; /* Ocupará el 40% del espacio */
     display: flex;
-    height: 510px; /* Se ajusta dinámicamente según el contenido */
+    height: 590px; /* Se ajusta dinámicamente según el contenido */
     margin: 0; /* Sin márgenes */
-    padding: 0; /* Sin padding */
+    margin-top: -30px; /* Sin padding */
     overflow: hidden;
+
 }
 
 .botonComprar {
@@ -798,11 +799,12 @@ border-radius: 100px;
     padding-top: 25px;
 }
 .cajita {
-    height: 400px;
-    width: 245px;
+    max-height: 50vh; /* usa la mitad de la altura de la pantalla */
+    overflow-y: auto;
+    margin-left: 35px;
     border-radius: 50px;
-    margin-left: 20px;
 }
+
 .totalPagar {
     height: 20%;
     width: 283px;

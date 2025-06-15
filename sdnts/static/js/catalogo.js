@@ -272,10 +272,11 @@ function showHTML() {
                     <p>${product.descripcion}</p>
                 </div>
                 <div class="acciones-producto-carrito">
-                    <button class="btn-eliminar" data-id="${product.id}">Eliminar</button>
-                </div>`;
+        <span class="btn-decrementar icon-btn" data-id="${product.id}">-</span>
+        <span class="btn-incrementar icon-btn" data-id="${product.id}">+</span>
+    </div>`;
 
-            rowProduct.append(containerProduct);
+                  rowProduct.append(containerProduct);
             total += product.quantity * product.precio;
             totalOfProducts += product.quantity;
         });
@@ -283,19 +284,44 @@ function showHTML() {
         if (valorTotal) valorTotal.innerText = `$${total.toFixed(2)}`;
         if (countProducts) countProducts.innerText = totalOfProducts;
     }
+
+    agregarListenersBotones();
 }
 
-// Evento para eliminar productos del carrito
-if (rowProduct) {
-   rowProduct.addEventListener('click', e => {
-        if (e.target.classList.contains('btn-eliminar') || e.target.classList.contains('icon-close')) {
-            const productId = e.target.getAttribute('data-id');
-            allProducts = allProducts.filter(product => product.id !== productId);
-            localStorage.setItem('cart', JSON.stringify(allProducts)); // <-- Actualiza el localStorage
-            showHTML();
-        }
+
+
+function agregarListenersBotones() {
+    document.querySelectorAll('.btn-incrementar').forEach(button => {
+        button.addEventListener('click', () => {
+            const productId = button.dataset.id;
+            const product = allProducts.find(p => p.id == productId);
+            if (product) {
+                product.quantity += 1;
+                localStorage.setItem('cart', JSON.stringify(allProducts));
+                showHTML();
+            }
+        });
+    });
+
+    document.querySelectorAll('.btn-decrementar').forEach(button => {
+        button.addEventListener('click', () => {
+            const productId = button.dataset.id;
+            const product = allProducts.find(p => p.id == productId);
+            if (product) {
+                if (product.quantity > 1) {
+                    product.quantity -= 1;
+                } else {
+                    const index = allProducts.findIndex(p => p.id == productId);
+                    allProducts.splice(index, 1);
+                }
+                localStorage.setItem('cart', JSON.stringify(allProducts));
+                showHTML();
+            }
+        });
     });
 }
+
+
 
 // Evento para mostrar/ocultar el carrito
 if (btnCart && containerCartProducts) {
@@ -579,63 +605,45 @@ document.addEventListener('DOMContentLoaded', function () {
             event.target.style.display = 'none';
         }
     }
+// Seleccionamos el modal directamente por ID
+// Seleccionamos el modal correcto
+const modalCompraExitosa = document.getElementById('modalCompraExitosa');
+const btnOK = modalCompraExitosa.querySelector('button');
+const btnClose = modalCompraExitosa.querySelector('.close');
 
-    // Manejo del modal de resumen de compra
-    const modalResumen = document.querySelector('.modal');
-    const btnOK = document.querySelector('.modal button');
-    const btnClose = document.querySelector('.modal .close');
-    
-    function cerrarModalResumen() {
-        if (modalResumen) {
-            modalResumen.classList.add('hidden');
-            // Opcional: recargar la página después de cerrar
-            // window.location.reload();
-        }
+function cerrarModalCompra() {
+    modalCompraExitosa.classList.add('hidden');
+    modalCompraExitosa.style.display = 'none';
+    modalCompraExitosa.style.opacity = '0';
+}
+
+// Asignamos los listeners
+btnOK?.addEventListener('click', cerrarModalCompra);
+btnClose?.addEventListener('click', cerrarModalCompra);
+
+// Cerrar al hacer clic fuera del modal
+window.addEventListener('click', function(event) {
+    if (event.target === modalCompraExitosa) {
+        cerrarModalCompra();
     }
+});
+    showHTML();
 
-    // Botón OK
-    btnOK?.addEventListener('click', cerrarModalResumen);
-    
-    // Botón X (close)
-    btnClose?.addEventListener('click', cerrarModalResumen);
 
-    // Cerrar modal al hacer click fuera
-    window.addEventListener('click', function(event) {
-        if (event.target === modalResumen) {
-            cerrarModalResumen();
-        }
-    });
 
-   window.mostrarModalResumen = function(datos) {
-    if (modalResumen) {
-        const contenidoModal = modalResumen.querySelector('.modal-content');
-        if (contenidoModal) {
-            // Actualizar el contenido del modal
-            contenidoModal.innerHTML = `
-                <span class="close">&times;</span>
-                <h2>Resumen de tu compra</h2>
-                <div class="resumen-detalles">
-                    ${datos}
-                </div>
-                <button class="btn btn-success">OK</button>
-            `;
-
-            // 🔁 Reasignar eventos a los nuevos botones
-            const nuevoBtnOK = contenidoModal.querySelector('button');
-            const nuevoBtnClose = contenidoModal.querySelector('.close');
-
-            nuevoBtnOK?.addEventListener('click', cerrarModalResumen);
-            nuevoBtnClose?.addEventListener('click', cerrarModalResumen);
-        }
-
-        modalResumen.classList.remove('hidden');
+// Esta función la llamas cada vez que quieras mostrar el resumen
+window.mostrarModalResumen = function(datos) {
+    const contenidoDetalles = modalResumen.querySelector('.resumen-detalles');
+    if (contenidoDetalles) {
+        contenidoDetalles.innerHTML = datos;
     }
+    modalResumen.classList.remove('hidden');
 };
+
 
 });
 
-// Mostrar estado inicial del carrito
-showHTML();
+
 
 // Funciones para los modales de métodos de pago
 function openModal(modalId) {
