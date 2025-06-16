@@ -142,7 +142,7 @@ urlpatterns = [
     path('eliminar-usuario/<int:usuario_id>/', views.eliminar_usuario, name='eliminar_usuario'),
     path('reporte-usuarios-excel/', views.reporte_usuarios_excel, name='reporte_usuarios_excel'),
     
-    
+    path('procesar_compra/', views.procesar_compra, name='procesar_compra'),
 
 # ...existing code...
     path('procesar_compra/', views.procesar_compra, name='procesar_compra'),

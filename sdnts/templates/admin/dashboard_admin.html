@@ -8,110 +8,403 @@
     <link rel="icon" type="image/ico" href="{% static 'icon/2.ico' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="{% static 'css/admin.css' %}">
     <link rel="stylesheet" href="{% static 'css/menu.css' %}">
-<style>
+    <style>
+        body {
+            background: #f6f7fb;
+        }
+        .dashboard-header {
+            background: #6F3D54FF;
+            background: linear-gradient(90deg, #633F54FF 0%, #f357a8 100%);
+            color: #fff;
+            border-radius: 0 0 32px 32px;
+            padding: 36px 36px 24px 36px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 24px 0 #7b2ff233;
+        }
+        .dashboard-header h1 {
+            font-size: 2.3rem;
+            font-weight: bold;
+            margin-bottom: 0;
+        }
+        .dashboard-header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.85;
+        }
+        .dashboard-cards {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+        .dashboard-card {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 2px 16px 0 #7b2ff222;
+            padding: 28px 32px;
+            min-width: 220px;
+            flex: 1 1 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .dashboard-card .card-title {
+            font-size: 1.1rem;
+            color: #7B375BFF;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .dashboard-card .card-value {
+            font-size: 2.1rem;
+            font-weight: bold;
+            color: #4e4032;
+        }
+        .dashboard-card .card-desc {
+            font-size: 0.98rem;
+            color: #888;
+        }
+        .dashboard-table-card {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 2px 16px 0 #7b2ff222;
+            padding: 24px 24px 12px 24px;
+            margin-top: 24px;
+        }
+        .dashboard-table-card h2 {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #BE5298FF;
+            margin-bottom: 18px;
+        }
+        .table thead th {
+            background: #f6f7fb;
+            color: #711D54FF;
+            border: none;
+        }
+        .table tbody tr {
+            background: #fff;
+        }
+        .table tbody tr:hover {
+            background: #f3e8fd;
+        }
+        .btn-rosa {
+            background: #f357a8;
+            color: #fff;
+            border: none;
+        }
+        .btn-rosa:hover {
+            background: #7b2ff2;
+            color: #fff;
+        }
         .status-badge {
             padding: 5px 10px;
             border-radius: 20px;
             font-size: 0.8rem;
         }
         .status-pending { background-color: #FFF3CD; color: #856404; }
-        .status-in-progress { background-color: #CCE5FF; color: #004085; }
+        .status-in-progress { background-color: #CCE5FF; color: #C0498CFF; }
         .status-completed { background-color: #D4EDDA; color: #155724; }
         .status-cancelled { background-color: #F8D7DA; color: #721C24; }
-        .btn-pink {
-            background-color: #ff69b4;
-            color: white;
+        .dashboard-reports-section {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 2px 16px 0 #7b2ff222;
+            padding: 24px 24px 12px 24px;
+            margin-top: 24px;
         }
-        .btn-pink:hover {
-            background-color: #ff1493;
-            color: white;
+        .dashboard-reports-section h2 {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #C0498CFF;
+            margin-bottom: 18px;
+        }
+        .dashboard-reports-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+        .dashboard-report-card {
+            background: #f6f7fb;
+            border-radius: 18px;
+            box-shadow: 0 1px 8px 0 #7b2ff211;
+            padding: 18px 18px;
+            min-width: 180px;
+            flex: 1 1 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .dashboard-report-card .card-title {
+            font-size: 1.05rem;
+            color: #f357a8;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .dashboard-report-card .btn {
+            margin-top: 8px;
+        }
+        .dashboard-charts-section {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 2px 16px 0 #7b2ff222;
+            padding: 24px 24px 12px 24px;
+            margin-top: 24px;
+        }
+        .dashboard-charts-section h2 {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #C0498CFF;
+            margin-bottom: 18px;
+        }
+        .dashboard-charts-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+        .dashboard-chart-card {
+            background: #f6f7fb;
+            border-radius: 18px;
+            box-shadow: 0 1px 8px 0 #7b2ff211;
+            padding: 18px 18px;
+            min-width: 320px;
+            flex: 1 1 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        @media (max-width: 900px) {
+            .dashboard-cards, .dashboard-charts-grid, .dashboard-reports-grid { flex-direction: column; }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
-    {% include "includes/nav_admin.html" %}
-
-    <!-- Gestión de usuarios -->
-    <div class="tablaa">
-        <div class="row">
-            <h2 class="mb-4">GESTIÓN DE USUARIOS</h2>
-
-            <!-- Botón para agregar usuario -->
-            <a  href="{% url 'agregar_usuario' %}" class="btn btn-rosa me-2 mb-3">
-                <i class="bi bi-person-plus"></i> Agregar Usuario
-            </a>
-            
-
-            <div class="d-flex justify-content-center gap-2">
-                <a href="{% url 'reporte_usuarios_pdf' %}?rol={{ request.GET.rol }}" class="btn btn-danger">
-                <i class="bi bi-file-earmark-pdf"></i> PDF
-                </a>
-                <a href="{% url 'reporte_usuarios_excel' %}?rol={{ request.GET.rol }}" class="btn btn-success">
-                    <i class="bi bi-file-earmark-spreadsheet"></i> Excel
-                </a>
+    {% include "includes/nav_admin.html" %} <br>
+    <div class="container-fluid">
+        <div class="dashboard-cards">
+            <div class="dashboard-card">
+                <div class="card-title">Usuarios registrados</div>
+                <div class="card-value">{{ total_usuarios|default:"0" }}</div>
+                <div class="card-desc">Total de usuarios en la plataforma</div>
             </div>
-            <form method="GET" class="mb-3 d-flex align-items-center form-rosa-pastel">
-             <label for="rol" class="me-2">Filtrar por rol:</label>
-             <select name="rol" id="rol" class="form-select me-2" style="width: auto;">
-                 <option value="">Todos</option>
-                 <option value="ADMIN" {% if request.GET.rol == "ADMIN" %}selected{% endif %}>Administrador</option>
-                 <option value="CLIENTE" {% if request.GET.rol == "CLIENTE" %}selected{% endif %}>Cliente</option>
-                 <option value="DOMI" {% if request.GET.rol == "DOMI" %}selected{% endif %}>Domiciliario</option>
-             </select>
-             <button type="submit" class="btn btn-primary">Aplicar</button>
-           </form>
+            <div class="dashboard-card">
+                <div class="card-title">Clientes</div>
+                <div class="card-value">{{ total_clientes|default:"0" }}</div>
+                <div class="card-desc">Usuarios con rol Cliente</div>
+            </div>
+            <div class="dashboard-card">
+                <div class="card-title">Domiciliarios</div>
+                <div class="card-value">{{ total_domis|default:"0" }}</div>
+                <div class="card-desc">Usuarios con rol Domiciliario</div>
+            </div>
+            <div class="dashboard-card">
+                <div class="card-title">Ventas totales</div>
+                <div class="card-value">${{ total_ventas|default:"0" }}</div>
+                <div class="card-desc">Suma total de ventas</div>
+            </div>
+        </div>
 
+        <!-- NUEVA SECCIÓN DE REPORTES -->
+        <div class="dashboard-reports-section">
+            <h2>Reportes y Exportaciones</h2>
+            <div class="dashboard-reports-grid">
+                <div class="dashboard-report-card">
+                    <div class="card-title">Insumos</div>
+                    <a href="#" class="btn btn-danger btn-sm mb-1 disabled" tabindex="-1" aria-disabled="true">PDF</a>
+                    <a href="#" class="btn btn-success btn-sm disabled" tabindex="-1" aria-disabled="true">Excel</a>
+                </div>
+                <div class="dashboard-report-card">
+                    <div class="card-title">Producción</div>
+                    <a href="#" class="btn btn-danger btn-sm mb-1 disabled" tabindex="-1" aria-disabled="true">PDF</a>
+                    <a href="#" class="btn btn-success btn-sm disabled" tabindex="-1" aria-disabled="true">Excel</a>
+                </div>
+                <div class="dashboard-report-card">
+                    <div class="card-title">Ventas</div>
+                    <a href="#" class="btn btn-danger btn-sm mb-1 disabled" tabindex="-1" aria-disabled="true">PDF</a>
+                    <a href="#" class="btn btn-success btn-sm disabled" tabindex="-1" aria-disabled="true">Excel</a>
+                </div>
+                <div class="dashboard-report-card">
+                    <div class="card-title">Entradas</div>
+                    <a href="#" class="btn btn-danger btn-sm mb-1 disabled" tabindex="-1" aria-disabled="true">PDF</a>
+                    <a href="#" class="btn btn-success btn-sm disabled" tabindex="-1" aria-disabled="true">Excel</a>
+                </div>
+                <div class="dashboard-report-card">
+                    <div class="card-title">Salidas</div>
+                    <a href="#" class="btn btn-danger btn-sm mb-1 disabled" tabindex="-1" aria-disabled="true">PDF</a>
+                    <a href="#" class="btn btn-success btn-sm disabled" tabindex="-1" aria-disabled="true">Excel</a>
+                </div>
+                <div class="dashboard-report-card">
+                    <div class="card-title">Proveedores</div>
+                    <a href="#" class="btn btn-danger btn-sm mb-1 disabled" tabindex="-1" aria-disabled="true">PDF</a>
+                    <a href="#" class="btn btn-success btn-sm disabled" tabindex="-1" aria-disabled="true">Excel</a>
+                </div>
+                <div class="dashboard-report-card">
+                    <div class="card-title">Categorías</div>
+                    <a href="#" class="btn btn-danger btn-sm mb-1 disabled" tabindex="-1" aria-disabled="true">PDF</a>
+                    <a href="#" class="btn btn-success btn-sm disabled" tabindex="-1" aria-disabled="true">Excel</a>
+                </div>
+                <div class="dashboard-report-card">
+                    <div class="card-title">Envíos</div>
+                    <a href="#" class="btn btn-danger btn-sm mb-1 disabled" tabindex="-1" aria-disabled="true">PDF</a>
+                    <a href="#" class="btn btn-success btn-sm disabled" tabindex="-1" aria-disabled="true">Excel</a>
+                </div>
+                <div class="dashboard-report-card">
+                    <div class="card-title">Producción</div>
+                    <a href="#" class="btn btn-danger btn-sm mb-1 disabled" tabindex="-1" aria-disabled="true">PDF</a>
+                    <a href="#" class="btn btn-success btn-sm disabled" tabindex="-1" aria-disabled="true">Excel</a>
+                </div>
+            </div>
+        </div>
 
+        <!-- NUEVA SECCIÓN DE GRÁFICAS -->
+        <div class="dashboard-charts-section">
+            <h2>Gráficas de Ventas</h2>
+            <div class="dashboard-charts-grid">
+                <div class="dashboard-chart-card">
+                    <canvas id="ventasMensualesChart"></canvas>
+                </div>
+                <div class="dashboard-chart-card">
+                    <canvas id="ventasPorProductoChart"></canvas>
+                </div>
+            </div>
+        </div>
 
-            <!-- Tabla de usuarios -->
-             <div class="table-responsive">
-    <table class="table tabla-usuarios">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Email</th>
-                <th>Rol</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if usuarios %}
-                {% for usuario in usuarios %}
-                    <tr>
-                        <td>{{ usuario.cod_usuario }}</td>
-                        <td>{{ usuario.nom_usua }}</td>
-                        <td>{{ usuario.apell_usua }}</td>
-                        <td>{{ usuario.email }}</td>
-                        <td>{{ usuario.get_rol_display }}</td>
-                        <td>
-                            <a href="{% url 'editar_usuario' cod_usuario=usuario.cod_usuario %}" class="btn btn-rosa me-2">
-                                <i class="bi bi-pencil"></i> Editar
-                            </a>
-                            <a href="{% url 'eliminar_usuario' cod_usuario=usuario.cod_usuario %}"
-                               onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?');"
-                               class="btn btn-danger">
-                                Eliminar
-                            </a>
-                        </td>
-                    </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="6" class="no-data py-3">No hay usuarios disponibles.</td>
-                </tr>
-            {% endif %}
-        </tbody>
-    </table>
-</div>
-
+        <div class="dashboard-table-card">
+            <h2>Gestión de Usuarios</h2>
+            <div class="d-flex justify-content-between mb-3">
+                <div>
+                    <a href="{% url 'agregar_usuario' %}" class="btn btn-rosa me-2 mb-2">
+                        <i class="bi bi-person-plus"></i> Agregar Usuario
+                    </a>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'reporte_usuarios_pdf' %}?rol={{ request.GET.rol }}" class="btn btn-danger">
+                        <i class="bi bi-file-earmark-pdf"></i> PDF
+                    </a>
+                    <a href="{% url 'reporte_usuarios_excel' %}?rol={{ request.GET.rol }}" class="btn btn-success">
+                        <i class="bi bi-file-earmark-spreadsheet"></i> Excel
+                    </a>
+                </div>
+            </div>
+            <form method="GET" class="mb-3 d-flex align-items-center">
+                <label for="rol" class="me-2">Filtrar por rol:</label>
+                <select name="rol" id="rol" class="form-select me-2" style="width: auto;">
+                    <option value="">Todos</option>
+                    <option value="ADMIN" {% if rol_actual == "ADMIN" %}selected{% endif %}>Administrador</option>
+                    <option value="CLIENTE" {% if rol_actual == "CLIENTE" %}selected{% endif %}>Cliente</option>
+                    <option value="DOMI" {% if rol_actual == "DOMI" %}selected{% endif %}>Domiciliario</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Aplicar</button>
+            </form>
+            <div class="table-responsive">
+                <table class="table tabla-usuarios">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if usuarios %}
+                            {% for usuario in usuarios %}
+                                <tr>
+                                    <td>{{ usuario.cod_usuario }}</td>
+                                    <td>{{ usuario.nom_usua }}</td>
+                                    <td>{{ usuario.apell_usua }}</td>
+                                    <td>{{ usuario.email }}</td>
+                                    <td>
+                                        <span class="status-badge 
+                                            {% if usuario.rol == 'ADMIN' %}status-in-progress
+                                            {% elif usuario.rol == 'CLIENTE' %}status-completed
+                                            {% elif usuario.rol == 'DOMI' %}status-pending
+                                            {% endif %}">
+                                            {{ usuario.get_rol_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'editar_usuario' cod_usuario=usuario.cod_usuario %}" class="btn btn-rosa me-2">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </a>
+                                        <a href="{% url 'eliminar_usuario' cod_usuario=usuario.cod_usuario %}"
+                                           onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?');"
+                                           class="btn btn-danger">
+                                            Eliminar
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="no-data py-3">No hay usuarios disponibles.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Gráfica de ventas mensuales
+    const ventasMensualesData = {{ ventas_mensuales|safe }};
+    const ventasMensualesLabels = ventasMensualesData.labels || [];
+    const ventasMensualesValores = ventasMensualesData.data || [];
+    const ctx1 = document.getElementById('ventasMensualesChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: ventasMensualesLabels,
+            datasets: [{
+                label: 'Ventas por mes',
+                data: ventasMensualesValores,
+                backgroundColor: '#f357a8',
+                borderRadius: 8,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                title: { display: true, text: 'Ventas por Mes', color: '#7b2ff2', font: { size: 18 } }
+            },
+            scales: {
+                x: { ticks: { color: '#7b2ff2' } },
+                y: { beginAtZero: true, ticks: { color: '#7b2ff2' } }
+            }
+        }
+    });
 
+    // Gráfica de ventas por producto
+    const ventasPorProductoData = {{ ventas_por_producto|safe }};
+    const ventasPorProductoLabels = ventasPorProductoData.labels || [];
+    const ventasPorProductoValores = ventasPorProductoData.data || [];
+    const ctx2 = document.getElementById('ventasPorProductoChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'pie',
+        data: {
+            labels: ventasPorProductoLabels,
+            datasets: [{
+                label: 'Ventas por Producto',
+                data: ventasPorProductoValores,
+                backgroundColor: [
+                    '#7b2ff2', '#f357a8', '#ffb347', '#4e4032', '#fc6998', '#ffc0cb'
+                ],
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#7b2ff2' } },
+                title: { display: true, text: 'Ventas por Producto', color: '#7b2ff2', font: { size: 18 } }
+            }
+        }
+    });
+    </script>
 </body>
-
 </html>

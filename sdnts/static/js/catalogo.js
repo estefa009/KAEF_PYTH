@@ -903,7 +903,7 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', async f
                 if (info) {
                     info.innerHTML = `
                         <div style="display:flex;align-items:center;justify-content:center;min-height:120px;">
-                            <div style="font-size:2em;color:#fc6998;font-family:'Dunkin',Arial,sans-serif;text-align:center;">
+                            <div style="font-size:2em;color:#3C2D31FF;font-family:'Dunkin',Arial,sans-serif;text-align:center;">
                                 <b>¡Compra Exitosa!</b>
                             </div>
                         </div>
