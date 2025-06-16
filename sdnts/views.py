@@ -945,6 +945,10 @@ def dashboard_admin(request):
     total_usuarios = Usuario.objects.count()
     ventas_recientes = Venta.objects.order_by('-fecha_hora')[:5]
     produccion_reciente = Produccion.objects.order_by('-fecha_inicio')[:3]
+    total_clientes = Usuario.objects.filter(rol='CLIENTE').count()
+    total_domis = Usuario.objects.filter(rol='DOMI').count()
+    total_ventas = Venta.objects.count()
+   
 
     rol = request.GET.get('rol')  # Captura el rol desde el formulario
 
