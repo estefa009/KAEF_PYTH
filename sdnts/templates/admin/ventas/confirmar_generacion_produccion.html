@@ -1,0 +1,52 @@
+{% block content %}
+<div class="container mt-5">
+    <h2>Confirmar Producción para Venta #{{ venta.cod_venta }}</h2>
+    <p class="text-muted">Se descontarán los siguientes insumos:</p>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Insumo</th>
+                <th>Requerido</th>
+                <th>Stock Actual</th>
+                <th>Unidad</th>
+                <th>Disponibilidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for nombre, data in insumos_requeridos.items %}
+                {% if data.cantidad > data.stock %}
+                    <tr class="table-danger">
+                {% else %}
+                    <tr>
+                {% endif %}
+                    <td>{{ nombre }}</td>
+                    <td>{{ data.cantidad }}</td>
+                    <td>{{ data.stock }}</td>
+                    <td>{{ data.unidad }}</td>
+                    <td>
+                        {% if data.cantidad > data.stock %}
+                            <strong class="text-danger">Insuficiente</strong>
+                        {% else %}
+                            <span class="text-success">Disponible</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if hay_stock_suficiente %}
+        <form method="post" action="{% url 'generar_produccion_confirmada' venta.cod_venta %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Confirmar y Generar Producción</button>
+            <a href="{% url 'ventas_admin' %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    {% else %}
+        <div class="alert alert-danger">
+            No se puede generar la producción porque no hay stock suficiente de todos los insumos.
+        </div>
+        <a href="{% url 'ventas_admin' %}" class="btn btn-secondary">Volver</a>
+    {% endif %}
+</div>
+{% endblock %}

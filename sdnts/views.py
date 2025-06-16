@@ -1008,7 +1008,7 @@ from django.db.models import Sum
 
 @login_required
 def ventas_admin(request):
-    ventas_list = Venta.objects.all().order_by('-fecha_hora')
+    ventas_list = Venta.objects.select_related('produccion').all().order_by('-fecha_hora')  # <-- se añade select_related
 
     # Paginación
     paginator = Paginator(ventas_list, 10)  # 10 ventas por página
@@ -1034,7 +1034,6 @@ def ventas_admin(request):
     }
 
     return render(request, 'admin/ventas/ventas_admin.html', context)
-
 from django.shortcuts import render, redirect
 from django.forms import modelformset_factory
 from .models import Venta, DetalleVenta, Pago, CombinacionProducto
@@ -1162,61 +1161,113 @@ from django.db import transaction
 @login_required
 def produccion_admin(request):
     producciones = Produccion.objects.select_related('cod_venta').all()
-    return render(request, 'admin/produccion/produccion_admin.html', {'producciones': producciones})
+    ventas = Venta.objects.all()  # ✅ con paréntesis
+    venta = ventas.first()        # ✅ ahora sí es queryset
+
+    context = {
+        'producciones': producciones,
+        'venta': venta,           # ✅ agregar al context
+    }
+    return render(request, 'admin/produccion/produccion_admin.html', context)
 
 
 from django.db import transaction
 from django.utils import timezone
+from datetime import datetime
 
-def crear_produccion(request):
-    if request.method == 'POST':
-        form = ProduccionForm(request.POST)
-        if form.is_valid():
-            with transaction.atomic():
-                produccion = form.save()
-                venta = produccion.cod_venta
-                venta.estado = 'PREPARACION'
-                venta.save()
+def confirmar_generacion_produccion(request, cod_venta):
+    venta = get_object_or_404(Venta, cod_venta=cod_venta)
+    detalles = DetalleVenta.objects.filter(cod_venta=venta)
 
-                # Obtener los productos relacionados con la venta
-                detalles = venta.detalles.all()
-                for detalle in detalles:
-                    producto = detalle.cod_producto
-                    cantidad_bolsas = detalle.cantidad
+    insumos_requeridos = {}
 
-                    # Obtener receta predeterminada del producto
-                    recetas = RecetaProducto.objects.filter(cod_producto=producto)
-                    for receta in recetas:
-                        insumo = receta.cod_insumo
-                        cantidad_total = receta.cantidad * cantidad_bolsas
+    for detalle in detalles:
+        producto = detalle.cod_producto
+        cantidad = detalle.cantidad
 
-                        if insumo.cnt_insumo >= cantidad_total:
-                            insumo.cnt_insumo -= cantidad_total
-                        else:
-                            # Crear entrada automática si hay insuficiencia
-                            entrada = Entrada.objects.create(
-                                cod_insumo=insumo,
-                                cnt_entrada=cantidad_total - insumo.cnt_insumo,
-                                precio_entrada=insumo.precio,
-                                fecha_caducidad=None,
-                                nom_entrada=f"Auto recarga para producción {produccion.cod_produccion}"
-                            )
-                            insumo.cnt_insumo += entrada.cnt_entrada - cantidad_total
+        # Insumos de receta base
+        receta = RecetaProducto.objects.filter(cod_producto=producto)
+        for r in receta:
+            insumo = r.insumo
+            key = insumo.nomb_insumo
+            insumos_requeridos.setdefault(key, {"cantidad": 0, "stock": insumo.cnt_insumo, "unidad": insumo.unidad_medida})
+            insumos_requeridos[key]["cantidad"] += r.cantidad * cantidad
 
-                        insumo.save()
+        # Insumos por personalización
+        combinaciones = CombinacionProducto.objects.filter(cod_detalle=detalle)
+        for c in combinaciones:
+            for insumo in [c.cod_sabor_masa_1, c.cod_glaseado_1, c.cod_topping_1]:
+                if insumo:
+                    key = insumo.nomb_insumo
+                    insumos_requeridos.setdefault(key, {"cantidad": 0, "stock": insumo.cnt_insumo, "unidad": insumo.unidad_medida})
+                    insumos_requeridos[key]["cantidad"] += 1
 
-                        # Registrar salida
-                        Salida.objects.create(
-                            cod_produccion=produccion,
-                            cod_insumo=insumo,
-                            cantidad=cantidad_total,
-                        )
+    # Verificar si hay stock suficiente
+    hay_stock_suficiente = all(data["cantidad"] <= data["stock"] for data in insumos_requeridos.values())
 
-                return redirect('produccion_admin')
-    else:
-        form = ProduccionForm()
+    context = {
+        'venta': venta,
+        'insumos_requeridos': insumos_requeridos,
+        'hay_stock_suficiente': hay_stock_suficiente,
+    }
+    return render(request, 'admin/ventas/confirmar_generacion_produccion.html', context)
 
-    return render(request, 'admin/produccion/crear_produccion.html', {'form': form})
+
+@transaction.atomic
+def generar_produccion_por_venta(request, cod_venta):
+    venta = get_object_or_404(Venta, cod_venta=cod_venta)
+
+    if hasattr(venta, 'produccion'):
+        messages.warning(request, "Ya se ha generado una producción para esta venta.")
+        return redirect('ventas_admin')
+
+    # Crear la producción
+    produccion = Produccion.objects.create(
+        cod_venta=venta,
+        fecha_inicio=datetime.now()
+    )
+
+    insumos_necesarios = {}
+
+    # 1. Agregar insumos de la receta base
+    detalles = DetalleVenta.objects.filter(cod_venta=venta)
+    for detalle in detalles:
+        receta = RecetaProducto.objects.filter(cod_producto=detalle.cod_producto)
+        for item in receta:
+            cantidad_total = item.cantidad * detalle.cantidad
+            insumos_necesarios[item.insumo_id] = insumos_necesarios.get(item.insumo_id, 0) + cantidad_total
+
+    # 2. Agregar insumos de personalización
+    for detalle in detalles:
+        combinaciones = CombinacionProducto.objects.filter(cod_detalle=detalle)
+        for combo in combinaciones:
+            for insumo_id in [combo.cod_sabor_masa_1_id, combo.cod_glaseado_1_id, combo.cod_topping_1_id]:
+                insumos_necesarios[insumo_id] = insumos_necesarios.get(insumo_id, 0) + 1
+
+    # 3. Validar si hay stock suficiente
+    faltantes = []
+    for insumo_id, cantidad in insumos_necesarios.items():
+        insumo = Insumo.objects.get(pk=insumo_id)
+        if insumo.cnt_insumo < cantidad:
+            faltantes.append(f"{insumo.nomb_insumo} (faltan {cantidad - insumo.cnt_insumo:.2f})")
+
+    if faltantes:
+        messages.error(request, "Stock insuficiente para:\n" + "\n".join(faltantes))
+        return redirect('ventas_admin')
+
+    # 4. Crear salidas y descontar del stock
+    for insumo_id, cantidad in insumos_necesarios.items():
+        insumo = Insumo.objects.get(pk=insumo_id)
+        Salida.objects.create(
+            cod_produccion=produccion,
+            cod_insumo=insumo,
+            cantidad=cantidad
+        )
+        insumo.cnt_insumo -= cantidad
+        insumo.save()
+
+    messages.success(request, "Producción generada y stock actualizado correctamente.")
+    return redirect('produccion_admin')
 
 def editar_produccion(request, cod_produccion):
     produccion = get_object_or_404(Produccion, pk=cod_produccion)
@@ -1497,20 +1548,17 @@ def agregar_categoria(request):
 
         if CategoriaInsumo.objects.filter(nom_categoria__iexact=nom_categoria).exists():
             messages.warning(request, 'Ya existe una categoría con ese nombre.')
-        else:
-            CategoriaInsumo.objects.create(
-                nom_categoria=nom_categoria,
-                descripcion=descripcion if descripcion else None
-            )
-            messages.success(request, 'Categoría agregada exitosamente.')
+            return redirect('agregar_categoria')
         
-        return redirect('categorias_admin')  # Cambia por el nombre correcto de tu ruta
+        CategoriaInsumo.objects.create(
+            nom_categoria=nom_categoria,
+            descripcion=descripcion or None
+        )
+        messages.success(request, 'Categoría agregada exitosamente.')
+        return redirect('categorias_admin')
 
-    # Para métodos GET también puedes mostrar la tabla de categorías
-    categorias = CategoriaInsumo.objects.all()
-    return render(request, 'admin/categorias/categorias_admin.html', {
-        'categorias': categorias
-    })
+    return render(request, 'admin/categorias/agregar_categoria.html')
+
 
 def eliminar_categoria(request, cod_categoria):
     categoria = get_object_or_404(CategoriaInsumo, cod_categoria=cod_categoria)
