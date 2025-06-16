@@ -1,6 +1,7 @@
-#from .forms import UserProfileForm  # Agrega esta línea al inicio del archivo o antes de la vista
 import base64
 from datetime import timezone
+from pickle import GET
+from urllib import request
 from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
@@ -8,7 +9,7 @@ from django.utils.html import strip_tags
 import openpyxl
 from django.shortcuts import render,redirect
 from django.contrib.auth import logout
-from sdnts.models import CategoriaInsumo, DetalleVenta, Entrada, Envio, Produccion, Proveedor, Salida, Usuario,Producto, Carrito, CarritoItem, Venta,Domiciliario,Cliente,Pago
+from sdnts.models import CategoriaInsumo, DetalleVenta, Entrada, Envio, Produccion, Proveedor, Salida, Usuario, Producto, Carrito, CarritoItem, Venta, Domiciliario, Cliente, Pago, Notificacion
 from django.contrib.auth import views as auth_views
 from django.urls import reverse, reverse_lazy
 import json
@@ -18,7 +19,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .forms import CargarDatosForm, PerfilAdminForm, CambiarContrasenaForm, RegistroUsuarioForm,UsuarioForm # Asume que tienes este formulario creado
+from .forms import CargarDatosForm, PerfilAdminForm, CambiarContrasenaForm, RegistroUsuarioForm, UsuarioForm # Asume que tienes este formulario creado
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from sdnts.models import SaborMasa, Glaseado, Topping, CombinacionProducto, Usuario
@@ -468,7 +469,6 @@ from django.http import JsonResponse
 @login_required
 @csrf_exempt
 def procesar_compra(request):
-    import traceback
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
@@ -619,6 +619,13 @@ def procesar_compra(request):
                     'subtotal': float(d.precio_unitario) * d.cantidad
                 })
 
+            # Cuando la compra se realiza exitosamente:
+            # Busca todos los administradores
+            admins = Usuario.objects.filter(rol='ADMIN')
+            mensaje = f"Nuevo pedido realizado por {request.user.nom_usua} {request.user.apell_usua}."
+            for admin in admins:
+                Notificacion.objects.create(usuario=admin, mensaje=mensaje)
+
             return JsonResponse({
                 'success': True,
                 'venta': {
@@ -712,81 +719,6 @@ def procesar_compra(request):
         })
 
     return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
-
-@login_required
-def exportar_excel(request):
-    usuario = request.user
-    fecha_desde = request.GET.get('desde')
-    fecha_hasta = request.GET.get('hasta')
-
-    envios = Envio.objects.filter(domiciliario__usuario=usuario)
-    if fecha_desde:
-        envios = envios.filter(fecha_hora_entrega__date__gte=fecha_desde)
-    if fecha_hasta:
-        envios = envios.filter(fecha_hora_entrega__date__lte=fecha_hasta)
-
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.append(["Código", "Fecha Entrega", "Tarifa", "Estado"])
-
-    for envio in envios:
-        ws.append([envio.cod_envio, str(envio.fecha_hora_entrega), envio.tarifa, envio.estado])
-
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename="historial_envios.xlsx"'
-    wb.save(response)
-    return response
-
-    
-@login_required    
-def exportar_pdf(request):
-    usuario = request.user
-    fecha_desde = request.GET.get('desde')
-    fecha_hasta = request.GET.get('hasta')
-
-    envios = Envio.objects.filter(cod_domi=usuario.domiciliario).order_by('fecha_entrega')
-
-    if fecha_desde not in [None, '', 'None']:
-        envios = envios.filter(fecha_entrega__date__gte=fecha_desde)
-
-    if fecha_hasta not in [None, '', 'None']:
-        envios = envios.filter(fecha_entrega__date__lte=fecha_hasta)
-
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="historial_envios.pdf"'
-
-    p = canvas.Canvas(response)
-    y = 800
-    p.setFont("Helvetica-Bold", 14)
-    p.drawString(100, y, "Historial de Envíos")
-    y -= 30
-
-    p.setFont("Helvetica", 10)
-    for envio in envios:
-        fecha_str = envio.fecha_entrega.strftime("%Y-%m-%d %H:%M") if envio.fecha_entrega else "Sin entregar"
-        p.drawString(100, y, f"{envio.cod_envio} | {fecha_str} | {envio.tarifa_envio} | {envio.estado}")
-        y -= 20
-        if y < 50:
-            p.showPage()
-            y = 800
-            p.setFont("Helvetica", 10)
-
-    p.save()
-    return response
-
-
-
-class NoCacheMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        response = self.get_response(request)
-        response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
-        response['Pragma'] = 'no-cache'
-        response['Expires'] = '0'
-        return response
-
 
 @login_required
 def mis_domicilios(request):
@@ -942,31 +874,89 @@ def agregar_usuario(request):
 
 @login_required
 def dashboard_admin(request):
+    # Conteos principales
     total_usuarios = Usuario.objects.count()
-    ventas_recientes = Venta.objects.order_by('-fecha_hora')[:5]
-    produccion_reciente = Produccion.objects.order_by('-fecha_inicio')[:3]
     total_clientes = Usuario.objects.filter(rol='CLIENTE').count()
     total_domis = Usuario.objects.filter(rol='DOMI').count()
     total_ventas = Venta.objects.count()
-   
+    monto_total_ventas = Venta.objects.aggregate(total=Sum('total'))['total'] or 0
 
-    rol = request.GET.get('rol')  # Captura el rol desde el formulario
+    ventas_recientes = Venta.objects.select_related('cod_cliente').order_by('-fecha_hora')[:5]
+    produccion_reciente = Produccion.objects.select_related('cod_venta').order_by('-fecha_inicio')[:3]
 
-    if rol:
-        usuarios = Usuario.objects.filter(rol=rol)
-    else:
-        usuarios = Usuario.objects.all()
+    rol = request.GET.get('rol')
+    usuarios = Usuario.objects.filter(rol=rol) if rol else Usuario.objects.all()
+
+    # Gráfica: Ventas por mes (últimos 6 meses, por monto)
+    from collections import OrderedDict
+    import calendar
+    from django.utils import timezone
+
+    hoy = timezone.now()
+    meses = []
+    for i in range(5, -1, -1):
+        y = hoy.year
+        m = hoy.month - i
+        if m <= 0:
+            y -= 1
+            m += 12
+        meses.append((y, m))
+    ventas_mensuales = OrderedDict()
+    for y, m in meses:
+        label = f"{calendar.month_abbr[m]} {y}"
+        ventas_mensuales[label] = 0
+    ventas_qs = Venta.objects.filter(fecha_hora__gte=hoy.replace(day=1) - timezone.timedelta(days=180))
+    for v in ventas_qs:
+        label = f"{calendar.month_abbr[v.fecha_hora.month]} {v.fecha_hora.year}"
+        if label in ventas_mensuales:
+            ventas_mensuales[label] += float(v.total)
+    ventas_mensuales_data = {
+        "labels": list(ventas_mensuales.keys()),
+        "data": list(ventas_mensuales.values())
+    }
+
+    # Gráfica: Ventas por producto (cantidad vendida)
+    ventas_por_producto = (
+        DetalleVenta.objects.values('cod_producto__nomb_pro')
+        .annotate(total=Sum('cantidad'))
+        .order_by('-total')
+    )
+    ventas_por_producto_data = {
+        "labels": [v['cod_producto__nomb_pro'] for v in ventas_por_producto],
+        "data": [v['total'] for v in ventas_por_producto]
+    }
+
+    # Gráfica: Clientes con más compras (top 7)
+    from django.db.models import Count
+    clientes_top_qs = (
+        Venta.objects.values('cod_cliente__cod_usua__nom_usua', 'cod_cliente__cod_usua__apell_usua')
+        .annotate(compras=Count('cod_venta'))
+        .order_by('-compras')[:7]
+    )
+    clientes_top_labels = [
+        f"{c['cod_cliente__cod_usua__nom_usua']} {c['cod_cliente__cod_usua__apell_usua']}"
+        for c in clientes_top_qs
+    ]
+    clientes_top_data = {
+        "labels": clientes_top_labels,
+        "data": [c['compras'] for c in clientes_top_qs]
+    }
 
     context = {
         'total_usuarios': total_usuarios,
+        'total_clientes': total_clientes,
+        'total_domis': total_domis,
+        'total_ventas': total_ventas,
+        'total_ventas_monto': monto_total_ventas,
         'ventas_recientes': ventas_recientes,
         'produccion_reciente': produccion_reciente,
         'usuarios': usuarios,
-        'rol_actual': rol,  # para mantener el filtro seleccionado
+        'rol_actual': rol,
+        'ventas_mensuales': ventas_mensuales_data,
+        'ventas_por_producto': ventas_por_producto_data,
+        'clientes_top': clientes_top_data,
     }
-
     return render(request, 'admin/dashboard_admin.html', context)
-
 
 @login_required
 def perfil_admin(request):
@@ -1035,7 +1025,7 @@ def ventas_admin(request):
 
     return render(request, 'admin/ventas/ventas_admin.html', context)
 from django.shortcuts import render, redirect
-from django.forms import modelformset_factory
+from django.forms import DurationField, modelformset_factory
 from .models import Venta, DetalleVenta, Pago, CombinacionProducto
 from .forms import VentaForm, DetalleVentaForm, PagoForm, CombinacionProductoForm, CombinacionProductoFormSet, DetalleVentaFormSet
 from django.db import transaction
@@ -1720,6 +1710,177 @@ def domiciliarios_admin(request):
     domiciliarios = Domiciliario.objects.select_related('cod_usua').all()
     return render(request, 'admin/domiciliarios_admin.html', {'domiciliarios': domiciliarios})
 
+    
+def actualizar_usuario(request):
+    if request.method == 'POST':
+        cod_usuario = request.POST.get('codUsuario')
+        nombre = request.POST.get('nomUsua')
+        apellido = request.POST.get('apellUsua')
+        email = request.POST.get('emailUsua')
+        rol = request.POST.get('rol')
+
+        usuario = get_object_or_404(Usuario, pk=cod_usuario)
+        usuario.nom_usua = nombre
+        usuario.apell_usua = apellido
+        usuario.email_usua = email
+        usuario.rol = rol
+        usuario.save()
+
+        return redirect(request.META.get('HTTP_REFERER', '/'))  # Redirige a la misma página
+    
+def eliminar_usuario(request, cod_usuario):
+      usuario = get_object_or_404(Usuario, pk=cod_usuario)
+      usuario.delete()
+      return redirect(request.META.get('HTTP_REFERER', '/'))
+      return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+from django.contrib.auth.hashers import make_password
+import csv
+
+def cargar_datos_view(request):
+    if request.method == 'POST':
+        archivo = request.FILES.get('archivo')
+
+        # Validar extensión
+        if not archivo.name.endswith('.csv'):
+            messages.error(request, 'El archivo debe tener extensión .csv')
+            return redirect('cargarDatos')
+
+        try:
+            decoded_file = archivo.read().decode('utf-8').splitlines()
+            reader = csv.DictReader(decoded_file)
+
+            for fila in reader:
+                Usuario.objects.update_or_create(
+                    email=fila['email'],
+                    defaults={
+                        'nom_usua': fila['nombre'],
+                        'apell_usua': fila['apellido'],
+                        'password': make_password(fila['contraseña']),
+                        'rol': fila['rol'].upper(),  # Asegura que el rol esté en mayúsculas
+                    }
+                )
+
+            messages.success(request, 'Datos cargados exitosamente.')
+        except Exception as e:
+            messages.error(request, f'Error al procesar el archivo: {e}')
+
+        return redirect('cargarDatos')  # Redirige para recargar la página y mostrar mensajes
+
+    return render(request, 'admin/cargarDatos.html')  # Reemplaza con tu template real
+
+
+#productos
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Producto, RecetaProducto, Insumo
+from .forms import RecetaProductoFormSet # Lo creamos más abajo
+from django.forms import modelformset_factory
+from .forms import RecetaProducto
+
+def productos_admin(request):
+    productos = Producto.objects.all().order_by('activo', 'tamano')
+    return render(request, 'admin/productos/productos_admin.html', {'productos': productos})
+
+def cambiar_estado_producto(request, cod_producto):
+    producto = get_object_or_404(Producto, pk=cod_producto)
+    producto.activo = not producto.activo
+    producto.save()
+    return redirect('productos_admin')
+
+from .forms import RecetaProductoFormSet
+
+def ver_receta_producto(request, cod_producto):
+    producto = get_object_or_404(Producto, cod_producto=cod_producto)
+    receta = RecetaProducto.objects.filter(cod_producto=producto)
+    return render(request, 'admin/productos/ver_receta.html', {'producto': producto, 'receta': receta})
+
+
+INSUMOS_BASICOS = [
+
+    'Huevos',
+    'Azucar',
+    'Sal',
+    'Mantequilla',
+    'Leche',
+    'Harina de trigo',
+    'Polvo para hornear',
+]
+
+
+def editar_receta_producto(request, cod_producto):
+    producto = get_object_or_404(Producto, cod_producto=cod_producto)
+
+    # Obtener los insumos básicos desde la base de datos
+    insumos_basicos = Insumo.objects.filter(nomb_insumo__in=INSUMOS_BASICOS)
+
+    # Crear receta vacía si aún no existe
+    for insumo in insumos_basicos:
+        RecetaProducto.objects.get_or_create(
+            cod_producto=producto,
+            insumo=insumo,
+            defaults={
+                'cantidad': 0,
+                'unidad_medida': 'g',  # o ml, unidades, según el insumo
+            }
+        )
+
+    receta_qs = RecetaProducto.objects.filter(cod_producto=producto)
+
+    if request.method == 'POST':
+        formset = RecetaProductoFormSet(request.POST, queryset=receta_qs)
+        if formset.is_valid():
+            formset.save()
+            return redirect('productos_admin')
+    else:
+        formset = RecetaProductoFormSet(queryset=receta_qs)
+
+    return render(request, 'admin/productos/editar_receta_producto.html', {
+        'producto': producto,
+        'formset': formset
+    })
+
+
+
+def generar_receta_base(request, cod_producto):
+    producto = get_object_or_404(Producto, cod_producto=cod_producto)
+
+    # Elimina receta anterior si existe
+    RecetaProducto.objects.filter(cod_producto=producto).delete()
+
+    # Ingredientes base para XS
+    ingredientes_base = [
+        ('Azucar', 50, 'Gramos'),
+        ('Sal', 1, 'Gramos'),
+        ('Huevos', 1, 'Unidad'),
+        ('Mantequilla', 15, 'Gramos'),
+        ('Leche', 100, 'Litros'),
+        ('Harina de trigo', 100, 'Gramos'),
+        ('Polvo para hornear', 5, 'Gramos'),
+    ]
+
+    tamano = producto.tamano.upper()
+    multiplicador = {'XS': 1, 'S': 2, 'M': 3, 'L': 4}.get(tamano, 1)
+
+    for nombre_insumo, cantidad_base, unidad in ingredientes_base:
+        try:
+            insumo = Insumo.objects.get(nomb_insumo__iexact=nombre_insumo)
+            RecetaProducto.objects.create(
+                cod_producto=producto,
+                insumo=insumo,
+                cantidad=cantidad_base * multiplicador,
+                unidad_medida=unidad
+            )
+        except Insumo.DoesNotExist:
+            messages.error(request, f"No se encontró el insumo '{nombre_insumo}'.")
+
+    messages.success(request, "Receta base generada correctamente.")
+    return redirect('editar_receta_producto', cod_producto=producto.cod_producto)
+
+
+
+
+
 
 def reporte_usuarios_pdf(request):
     # Estadísticas: contar cuántos usuarios hay por rol
@@ -1812,174 +1973,278 @@ def guardar_usuario(request):
         password = request.POST['passwUsua']
         rol = request.POST['rol']
         activo = request.POST['activo']
+        # Aquí deberías guardar el usuario, ejemplo:
+        # Usuario.objects.create(...)
+        # ...existing code...
 
-        # Aquí va tu lógica para guardar el usuario
-        print(nombre, apellido, email, password, rol, activo)
+@login_required
+def exportar_excel(request):
+    usuario = request.user
+    fecha_desde = request.GET.get('desde')
+    fecha_hasta = request.GET.get('hasta')
 
-        return redirect('/')  # redirige a donde quieras
-    
-    
-def actualizar_usuario(request):
-    if request.method == 'POST':
-        cod_usuario = request.POST.get('codUsuario')
-        nombre = request.POST.get('nomUsua')
-        apellido = request.POST.get('apellUsua')
-        email = request.POST.get('emailUsua')
-        rol = request.POST.get('rol')
+    envios = Envio.objects.filter(cod_domi=usuario.domiciliario)
+    if fecha_desde:
+        envios = envios.filter(fecha_entrega__date__gte=fecha_desde)
+    if fecha_hasta:
+        envios = envios.filter(fecha_entrega__date__lte=fecha_hasta)
 
-        usuario = get_object_or_404(Usuario, pk=cod_usuario)
-        usuario.nom_usua = nombre
-        usuario.apell_usua = apellido
-        usuario.email_usua = email
-        usuario.rol = rol
-        usuario.save()
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.append(["Código", "Fecha Entrega", "Tarifa", "Estado"])
 
-        return redirect(request.META.get('HTTP_REFERER', '/'))  # Redirige a la misma página
-    
-def eliminar_usuario(request, cod_usuario):
-      usuario = get_object_or_404(Usuario, pk=cod_usuario)
-      usuario.delete()
-      return redirect(request.META.get('HTTP_REFERER', '/'))
-      return redirect(request.META.get('HTTP_REFERER', '/'))
+    for envio in envios:
+        ws.append([envio.cod_envio, str(envio.fecha_entrega), envio.tarifa_envio, envio.estado])
 
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="historial_envios.xlsx"'
+    wb.save(response)
+    return response
 
-from django.contrib.auth.hashers import make_password
-import csv
+@login_required
+def exportar_pdf(request):
+    usuario = request.user
+    fecha_desde = request.GET.get('desde')
+    fecha_hasta = request.GET.get('hasta')
+    envios = Envio.objects.filter(cod_domi=usuario.domiciliario).order_by('fecha_entrega')
 
-def cargar_datos_view(request):
-    if request.method == 'POST':
-        archivo = request.FILES.get('archivo')
+    if fecha_desde not in [None, '', 'None']:
+        envios = envios.filter(fecha_entrega__date__gte=fecha_desde)
+    if fecha_hasta not in [None, '', 'None']:
+        envios = envios.filter(fecha_entrega__date__lte=fecha_hasta)
 
-        # Validar extensión
-        if not archivo.name.endswith('.csv'):
-            messages.error(request, 'El archivo debe tener extensión .csv')
-            return redirect('cargarDatos')
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="historial_envios.pdf"'
+    p = canvas.Canvas(response)
+    y = 800
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(100, y, "Historial de Envíos")
+    y -= 30
+    p.setFont("Helvetica", 10)
+    for envio in envios:
+        fecha_str = envio.fecha_entrega.strftime("%Y-%m-%d %H:%M") if envio.fecha_entrega else "Sin entregar"
+        p.drawString(100, y, f"{envio.cod_envio} | {fecha_str} | {envio.tarifa_envio} | {envio.estado}")
+        y -= 20
+        if y < 50:
+            p.showPage()
+            y = 800
+            p.setFont("Helvetica", 10)
+    p.save()
+    return response
 
-        try:
-            decoded_file = archivo.read().decode('utf-8').splitlines()
-            reader = csv.DictReader(decoded_file)
+class NoCacheMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+    def __call__(self, request):
+        response = self.get_response(request)
+        response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
+        return response
 
-            for fila in reader:
-                Usuario.objects.update_or_create(
-                    email=fila['email'],
-                    defaults={
-                        'nom_usua': fila['nombre'],
-                        'apell_usua': fila['apellido'],
-                        'password': make_password(fila['contraseña']),
-                        'rol': fila['rol'].upper(),  # Asegura que el rol esté en mayúsculas
-                    }
-                )
+# ----------- REPORTES PDF (GRÁFICO DE BARRAS) -----------
 
-            messages.success(request, 'Datos cargados exitosamente.')
-        except Exception as e:
-            messages.error(request, f'Error al procesar el archivo: {e}')
+@login_required
+def reporte_insumo(request):
+    insumos = Insumo.objects.all()
+    nombres = [i.nomb_insumo for i in insumos]
+    cantidades = [i.cnt_insumo for i in insumos]
+    plt.figure(figsize=(8, 4))
+    plt.bar(nombres, cantidades, color='#fc6998')
+    plt.title('Cantidad de Insumos')
+    plt.xlabel('Insumo')
+    plt.ylabel('Cantidad')
+    plt.xticks(rotation=30, ha='right')
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    grafico_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    buf.close()
+    plt.close()
+    context = {'insumos': insumos, 'grafico_base64': grafico_base64}
+    html_string = render_to_string('reportes/reporte_insumo.html', context)
+    pdf_file = HTML(string=html_string).write_pdf()
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="reporte_insumos.pdf"'
+    return response
 
-        return redirect('cargarDatos')  # Redirige para recargar la página y mostrar mensajes
+@login_required
+def reporte_entradas(request):
+    entradas = Entrada.objects.all()
+    fechas = [e.fecha_hora_entrada.strftime('%Y-%m-%d') for e in entradas]
+    cantidades = [e.cnt_entrada for e in entradas]
+    plt.figure(figsize=(8, 4))
+    plt.bar(fechas, cantidades, color='#fc6998')
+    plt.title('Entradas de Insumos')
+    plt.xlabel('Fecha')
+    plt.ylabel('Cantidad')
+    plt.xticks(rotation=30, ha='right')
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    grafico_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    buf.close()
+    plt.close()
+    context = {'entradas': entradas, 'grafico_base64': grafico_base64}
+    html_string = render_to_string('reportes/reporte_entradas.html', context)
+    pdf_file = HTML(string=html_string).write_pdf()
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="reporte_entradas.pdf"'
+    return response
 
-    return render(request, 'admin/cargarDatos.html')  # Reemplaza con tu template real
+@login_required
+def reporte_salidas(request):
+    salidas = Salida.objects.all()
+    fechas = [s.fecha_hora_salida.strftime('%Y-%m-%d') for s in salidas]
+    cantidades = [s.cantidad for s in salidas]
+    plt.figure(figsize=(8, 4))
+    plt.bar(fechas, cantidades, color='#fc6998')
+    plt.title('Salidas de Insumos')
+    plt.xlabel('Fecha')
+    plt.ylabel('Cantidad')
+    plt.xticks(rotation=30, ha='right')
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    grafico_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    buf.close()
+    plt.close()
+    context = {'salidas': salidas, 'grafico_base64': grafico_base64}
+    html_string = render_to_string('reportes/reporte_salidas.html', context)
+    pdf_file = HTML(string=html_string).write_pdf()
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="reporte_salidas.pdf"'
+    return response
 
+@login_required
+def reporte_ventas(request):
+    ventas = Venta.objects.all()
+    fechas = [v.fecha_hora.strftime('%Y-%m-%d') for v in ventas]
+    totales = [float(v.total) for v in ventas]
+    plt.figure(figsize=(8, 4))
+    plt.bar(fechas, totales, color='#fc6998')
+    plt.title('Ventas')
+    plt.xlabel('Fecha')
+    plt.ylabel('Total ($)')
+    plt.xticks(rotation=30, ha='right')
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    grafico_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    buf.close()
+    plt.close()
+    context = {'ventas': ventas, 'grafico_base64': grafico_base64}
+    html_string = render_to_string('reportes/reporte_ventas.html', context)
+    pdf_file = HTML(string=html_string).write_pdf()
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="reporte_ventas.pdf"'
+    return response
 
-#productos
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Producto, RecetaProducto, Insumo
-from .forms import RecetaProductoFormSet # Lo creamos más abajo
-from django.forms import modelformset_factory
-from .forms import RecetaProductoForm
+@login_required
+def reporte_produccion(request):
+    producciones = Produccion.objects.all()
+    estados = [p.get_estado_display() for p in producciones]
+    from collections import Counter
+    conteo = Counter(estados)
+    plt.figure(figsize=(6, 4))
+    plt.bar(conteo.keys(), conteo.values(), color='#fc6998')
+    plt.title('Estados de Producción')
+    plt.xlabel('Estado')
+    plt.ylabel('Cantidad')
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    grafico_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    buf.close()
+    plt.close()
+    context = {'producciones': produccion, 'grafico_base64': grafico_base64}
+    html_string = render_to_string('reportes/reporte_produccion.html', context)
+    pdf_file = HTML(string=html_string).write_pdf()
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="reporte_produccion.pdf"'
+    return response
 
-def productos_admin(request):
-    productos = Producto.objects.all().order_by('activo', 'tamano')
-    return render(request, 'admin/productos/productos_admin.html', {'productos': productos})
+@login_required
+def reporte_proveedores(request):
+    proveedores = Proveedor.objects.all()
+    nombres = [p.nom_proveedor for p in proveedores]
+    entradas = [p.entradas.count() for p in proveedores]
+    plt.figure(figsize=(8, 4))
+    plt.bar(nombres, entradas, color='#fc6998')
+    plt.title('Entradas por Proveedor')
+    plt.xlabel('Proveedor')
+    plt.ylabel('Entradas')
+    plt.xticks(rotation=30, ha='right')
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    grafico_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    buf.close()
+    plt.close()
+    context = {'proveedores': proveedores, 'grafico_base64': grafico_base64}
+    html_string = render_to_string('reportes/reporte_proveedores.html', context)
+    pdf_file = HTML(string=html_string).write_pdf()
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="reporte_proveedores.pdf"'
+    return response
 
-def cambiar_estado_producto(request, cod_producto):
-    producto = get_object_or_404(Producto, pk=cod_producto)
-    producto.activo = not producto.activo
-    producto.save()
-    return redirect('productos_admin')
+@login_required
+def reporte_envios(request):
+    envios = Envio.objects.all()
+    estados = [e.get_estado_display() for e in envios]
+    from collections import Counter
+    conteo = Counter(estados)
+    plt.figure(figsize=(6, 4))
+    plt.bar(conteo.keys(), conteo.values(), color='#fc6998')
+    plt.title('Estados de Envíos')
+    plt.xlabel('Estado')
+    plt.ylabel('Cantidad')
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    grafico_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    buf.close()
+    plt.close()
+    context = {'envios': envios, 'grafico_base64': grafico_base64}
+    html_string = render_to_string('reportes/reporte_envios.html', context)
+    pdf_file = HTML(string=html_string).write_pdf()
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="reporte_envios.pdf"'
+    return response
 
-from .forms import RecetaProductoFormSet
+@login_required
+def reporte_categorias(request):
+    categorias = CategoriaInsumo.objects.all()
+    nombres = [c.nom_categoria for c in categorias]
+    insumos_count = [c.insumos.count() for c in categorias]
+    plt.figure(figsize=(8, 4))
+    plt.bar(nombres, insumos_count, color='#fc6998')
+    plt.title('Cantidad de Insumos por Categoría')
+    plt.xlabel('Categoría')
+    plt.ylabel('Cantidad de Insumos')
+    plt.xticks(rotation=30, ha='right')
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    grafico_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    buf.close()
+    plt.close()
+    context = {'categorias': categorias, 'grafico_base64': grafico_base64}
+    html_string = render_to_string('reportes/reporte_categorias.html', context)
+    pdf_file = HTML(string=html_string).write_pdf()
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="reporte_categorias.pdf"'
+    return response
 
-def ver_receta_producto(request, cod_producto):
-    producto = get_object_or_404(Producto, cod_producto=cod_producto)
-    receta = RecetaProducto.objects.filter(cod_producto=producto)
-    return render(request, 'admin/productos/ver_receta.html', {'producto': producto, 'receta': receta})
-
-
-INSUMOS_BASICOS = [
-    'Huevos',
-    'Azucar',
-    'Sal',
-    'Mantequilla',
-    'Leche',
-    'Harina de trigo',
-    'Polvo para hornear',
-]
-
-
-def editar_receta_producto(request, cod_producto):
-    producto = get_object_or_404(Producto, cod_producto=cod_producto)
-
-    # Obtener los insumos básicos desde la base de datos
-    insumos_basicos = Insumo.objects.filter(nomb_insumo__in=INSUMOS_BASICOS)
-
-    # Crear receta vacía si aún no existe
-    for insumo in insumos_basicos:
-        RecetaProducto.objects.get_or_create(
-            cod_producto=producto,
-            insumo=insumo,
-            defaults={
-                'cantidad': 0,
-                'unidad_medida': 'g',  # o ml, unidades, según el insumo
-            }
-        )
-
-    receta_qs = RecetaProducto.objects.filter(cod_producto=producto)
-
-    if request.method == 'POST':
-        formset = RecetaProductoFormSet(request.POST, queryset=receta_qs)
-        if formset.is_valid():
-            formset.save()
-            return redirect('productos_admin')
-    else:
-        formset = RecetaProductoFormSet(queryset=receta_qs)
-
-    return render(request, 'admin/productos/editar_receta_producto.html', {
-        'producto': producto,
-        'formset': formset
-    })
-
-
-
-def generar_receta_base(request, cod_producto):
-    producto = get_object_or_404(Producto, cod_producto=cod_producto)
-
-    # Elimina receta anterior si existe
-    RecetaProducto.objects.filter(cod_producto=producto).delete()
-
-    # Ingredientes base para XS
-    ingredientes_base = [
-        ('Azucar', 50, 'Gramos'),
-        ('Sal', 1, 'Gramos'),
-        ('Huevos', 1, 'Unidad'),
-        ('Mantequilla', 15, 'Gramos'),
-        ('Leche', 100, 'Litros'),
-        ('Harina de trigo', 100, 'Gramos'),
-        ('Polvo para hornear', 5, 'Gramos'),
-    ]
-
-    tamano = producto.tamano.upper()
-    multiplicador = {'XS': 1, 'S': 2, 'M': 3, 'L': 4}.get(tamano, 1)
-
-    for nombre_insumo, cantidad_base, unidad in ingredientes_base:
-        try:
-            insumo = Insumo.objects.get(nomb_insumo__iexact=nombre_insumo)
-            RecetaProducto.objects.create(
-                cod_producto=producto,
-                insumo=insumo,
-                cantidad=cantidad_base * multiplicador,
-                unidad_medida=unidad
-            )
-        except Insumo.DoesNotExist:
-            messages.error(request, f"No se encontró el insumo '{nombre_insumo}'.")
-
-    messages.success(request, "Receta base generada correctamente.")
-    return redirect('editar_receta_producto', cod_producto=producto.cod_producto)
+@login_required
+def notificaciones_admin(request):
+    notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha')
+    return render(request, 'admin/notificaciones.html', {'notificaciones': notificaciones})

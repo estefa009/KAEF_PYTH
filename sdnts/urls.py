@@ -81,8 +81,6 @@ urlpatterns = [
     path('produccion/estado/<int:cod_produccion>/', views.cambiar_estado_produccion, name='cambiar_estado_produccion'),
     path('produccion/asignar-envio/<int:cod_produccion>/', views.asignar_envio_produccion, name='asignar_envio_produccion'),
     path('produccion/eliminar/<int:cod_produccion>/', views.eliminar_produccion, name='eliminar_produccion'),
-    path('ventas/<int:cod_venta>/confirmar-produccion/', views.confirmar_generacion_produccion, name='confirmar_generacion_produccion'),
-    path('produccion/<int:cod_venta>/generar-produccion/', views.generar_produccion_por_venta, name='generar_produccion_confirmada'),
 
     
     
@@ -136,16 +134,33 @@ urlpatterns = [
     path('productos_admin/<int:cod_producto>/ver_receta/', views.ver_receta_producto, name='ver_receta_producto'),
     path('productos_admin/<int:cod_producto>/generar_receta_base/', views.generar_receta_base, name='generar_receta_base'),
 
-    
-    path('reporte-usuarios-pdf/', views.reporte_usuarios_pdf, name='reporte_usuarios_pdf'),
-    path('guardar/', views.guardar_usuario, name='guardar_usuario'),
-    path('actualizar-usuario/', views.actualizar_usuario, name='actualizar_usuario'),
-    path('eliminar-usuario/<int:usuario_id>/', views.eliminar_usuario, name='eliminar_usuario'),
-    path('reporte-usuarios-excel/', views.reporte_usuarios_excel, name='reporte_usuarios_excel'),
-    
-    path('procesar_compra/', views.procesar_compra, name='procesar_compra'),
 
-# ...existing code...
-    path('procesar_compra/', views.procesar_compra, name='procesar_compra'),
-# ...existing code...
+    
+    # Reportes de inventario
+    path('reporte_insumo/', views.reporte_insumo, name='reporte_insumo'),
+    path('reporte_entradas/', views.reporte_entradas, name='reporte_entradas'),
+    path('reporte_salidas/', views.reporte_salidas, name='reporte_salidas'),
+    
+    # Reportes de producción
+    path('produccion/', views.reporte_produccion, name='reporte_produccion'),
+    path('categorias/', views.reporte_categorias, name='reporte_categorias'),
+
+    # Reportes de ventas y envíos
+    path('ventas/', views.reporte_ventas, name='reporte_ventas'),
+    path('envios/', views.reporte_envios, name='reporte_envios'),
+    
+    # Reportes de proveedores
+    path('proveedores/', views.reporte_proveedores, name='reporte_proveedores'),
+    
+    # Reporte de usuarios
+    path('usuarios/', views.reporte_usuarios_pdf, name='usuarios_pdf'),
+
+    path('notificaciones/', views.notificaciones_admin, name='notificaciones_admin'),
+
+    
+    # ...
 ]
+    
+    # ...
+
+

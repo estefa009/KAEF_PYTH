@@ -502,3 +502,179 @@ main h1 {
     .botones {
         margin-right: 13%;
     }
+
+
+
+
+
+
+
+
+
+
+      body {
+            background: #f6f7fb;
+        }
+        .dashboard-header {
+            background: #6F3D54FF;
+            background: linear-gradient(90deg, #633F54FF 0%, #f357a8 100%);
+            color: #fff;
+            border-radius: 0 0 32px 32px;
+            padding: 36px 36px 24px 36px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 24px 0 #7b2ff233;
+        }
+        .dashboard-header h1 {
+            font-size: 2.3rem;
+            font-weight: bold;
+            margin-bottom: 0;
+        }
+        .dashboard-header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.85;
+        }
+        .dashboard-cards {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+        .dashboard-card {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 2px 16px 0 #7b2ff222;
+            padding: 28px 32px;
+            min-width: 220px;
+            flex: 1 1 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .dashboard-card .card-title {
+            font-size: 1.1rem;
+            color: #7B375BFF;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .dashboard-card .card-value {
+            font-size: 2.1rem;
+            font-weight: bold;
+            color: #4e4032;
+        }
+        .dashboard-card .card-desc {
+            font-size: 0.98rem;
+            color: #888;
+        }
+        .dashboard-table-card {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 2px 16px 0 #7b2ff222;
+            padding: 24px 24px 12px 24px;
+            margin-top: 24px;
+        }
+        .dashboard-table-card h2 {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #BE5298FF;
+            margin-bottom: 18px;
+        }
+        .table thead th {
+            background: #f6f7fb;
+            color: #711D54FF;
+            border: none;
+        }
+        .table tbody tr {
+            background: #fff;
+        }
+        .table tbody tr:hover {
+            background: #f3e8fd;
+        }
+        .btn-rosa {
+            background: #f357a8;
+            color: #fff;
+            border: none;
+        }
+        .btn-rosa:hover {
+            background: #7b2ff2;
+            color: #fff;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .status-pending { background-color: #FFF3CD; color: #856404; }
+        .status-in-progress { background-color: #CCE5FF; color: #C0498CFF; }
+        .status-completed { background-color: #D4EDDA; color: #155724; }
+        .status-cancelled { background-color: #F8D7DA; color: #721C24; }
+        .dashboard-reports-section {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 2px 16px 0 #7b2ff222;
+            padding: 24px 24px 12px 24px;
+            margin-top: 24px;
+        }
+        .dashboard-reports-section h2 {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #C0498CFF;
+            margin-bottom: 18px;
+        }
+        .dashboard-reports-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+        .dashboard-report-card {
+            background: #f6f7fb;
+            border-radius: 18px;
+            box-shadow: 0 1px 8px 0 #7b2ff211;
+            padding: 18px 18px;
+            min-width: 180px;
+            flex: 1 1 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .dashboard-report-card .card-title {
+            font-size: 1.05rem;
+            color: #f357a8;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .dashboard-report-card .btn {
+            margin-top: 8px;
+        }
+        .dashboard-charts-section {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 2px 16px 0 #7b2ff222;
+            padding: 24px 24px 12px 24px;
+            margin-top: 24px;
+        }
+        .dashboard-charts-section h2 {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #C0498CFF;
+            margin-bottom: 18px;
+        }
+        .dashboard-charts-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+        .dashboard-chart-card {
+            background: #f6f7fb;
+            border-radius: 18px;
+            box-shadow: 0 1px 8px 0 #7b2ff211;
+            padding: 18px 18px;
+            min-width: 320px;
+            flex: 1 1 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        @media (max-width: 900px) {
+            .dashboard-cards, .dashboard-charts-grid, .dashboard-reports-grid { flex-direction: column; }
+        }

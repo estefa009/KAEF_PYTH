@@ -643,3 +643,16 @@ class RecetaProducto(models.Model):
         return f"{self.cod_producto} - {self.insumo} ({self.cantidad} {self.unidad_medida})"
     def __str__(self):
         return f"{self.cod_producto} - {self.insumo} ({self.cantidad} {self.unidad_medida})"
+
+class Notificacion(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='notificaciones')
+    mensaje = models.CharField(max_length=255)
+    leida = models.BooleanField(default=False)
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Notificación'
+        verbose_name_plural = 'Notificaciones'
+
+    def __str__(self):
+        return f"Notificación para {self.usuario.email}: {self.mensaje[:30]}"

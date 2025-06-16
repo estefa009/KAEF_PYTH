@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Proveedores</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h2 { color: #fc6998; }
+        table { width: 100%; border-collapse: collapse; margin-top: 18px; }
+        th, td { border: 1px solid #ccc; padding: 7px 12px; text-align: left; }
+        th { background: #ffe0ec; }
+        .grafico-container { text-align: center; margin: 30px 0 20px 0; }
+        .grafico-img { max-width: 500px; max-height: 300px; }
+    </style>
+</head>
+<body>
+    <h2>Reporte de Proveedores</h2>
+    <div class="grafico-container">
+        {% if grafico_base64 %}
+            <img src="data:image/png;base64,{{ grafico_base64 }}" alt="Gráfico de proveedores" class="grafico-img">
+        {% endif %}
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Dirección</th>
+                <th>Email</th>
+                <th>Novedad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for proveedor in proveedores %}
+            <tr>
+                <td>{{ proveedor.cod_proveedor }}</td>
+                <td>{{ proveedor.nom_proveedor }}</td>
+                <td>{{ proveedor.telefono_proveedor }}</td>
+                <td>{{ proveedor.direccion_proveedor }}</td>
+                <td>{{ proveedor.email_proveedor }}</td>
+                <td>{{ proveedor.novedad_proveedor }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

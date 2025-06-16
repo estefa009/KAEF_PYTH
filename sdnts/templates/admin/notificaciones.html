@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notificaciones</title>
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+</head>
+<body>
+    <h2>Notificaciones</h2>
+    <ul>
+        {% for n in notificaciones %}
+            <li {% if not n.leida %}style="font-weight:bold;"{% endif %}>
+                {{ n.mensaje }} <small>{{ n.fecha|date:"d/m/Y H:i" }}</small>
+            </li>
+        {% empty %}
+            <li>No hay notificaciones.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

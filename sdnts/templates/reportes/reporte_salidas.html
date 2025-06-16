@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Salidas</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h2 { color: #fc6998; }
+        table { width: 100%; border-collapse: collapse; margin-top: 18px; }
+        th, td { border: 1px solid #ccc; padding: 7px 12px; text-align: left; }
+        th { background: #ffe0ec; }
+        .grafico-container { text-align: center; margin: 30px 0 20px 0; }
+        .grafico-img { max-width: 500px; max-height: 300px; }
+    </style>
+</head>
+<body>
+    <h2>Reporte de Salidas</h2>
+    <div class="grafico-container">
+        {% if grafico_base64 %}
+            <img src="data:image/png;base64,{{ grafico_base64 }}" alt="Gráfico de salidas" class="grafico-img">
+        {% endif %}
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Producción</th>
+                <th>Insumo</th>
+                <th>Cantidad</th>
+                <th>Fecha Salida</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for salida in salidas %}
+            <tr>
+                <td>{{ salida.cod_salida }}</td>
+                <td>{{ salida.cod_produccion.cod_produccion }}</td>
+                <td>{{ salida.cod_insumo.nomb_insumo }}</td>
+                <td>{{ salida.cantidad }}</td>
+                <td>{{ salida.fecha_hora_salida }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
