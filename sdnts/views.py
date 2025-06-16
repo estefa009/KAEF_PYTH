@@ -1170,7 +1170,6 @@ def produccion_admin(request):
 from django.db import transaction
 from django.utils import timezone
 from datetime import datetime
-
 def confirmar_generacion_produccion(request, cod_venta):
     venta = get_object_or_404(Venta, cod_venta=cod_venta)
     detalles = DetalleVenta.objects.filter(cod_venta=venta)
@@ -1186,17 +1185,30 @@ def confirmar_generacion_produccion(request, cod_venta):
         for r in receta:
             insumo = r.insumo
             key = insumo.nomb_insumo
-            insumos_requeridos.setdefault(key, {"cantidad": 0, "stock": insumo.cnt_insumo, "unidad": insumo.unidad_medida})
+            insumos_requeridos.setdefault(key, {
+                "cantidad": 0,
+                "stock": insumo.cnt_insumo,
+                "unidad": insumo.unidad_medida
+            })
             insumos_requeridos[key]["cantidad"] += r.cantidad * cantidad
 
         # Insumos por personalización
-        combinaciones = CombinacionProducto.objects.filter(cod_detalle=detalle)
-        for c in combinaciones:
-            for insumo in [c.cod_sabor_masa_1, c.cod_glaseado_1, c.cod_topping_1]:
-                if insumo:
-                    key = insumo.nomb_insumo
-                    insumos_requeridos.setdefault(key, {"cantidad": 0, "stock": insumo.cnt_insumo, "unidad": insumo.unidad_medida})
-                    insumos_requeridos[key]["cantidad"] += 1
+            combinaciones = CombinacionProducto.objects.filter(cod_detalle=detalle)
+            for c in combinaciones:
+                for componente in [c.cod_sabor_masa_1, c.cod_glaseado_1, c.cod_topping_1]:
+                    if componente and componente.insumo:
+                        insumo = componente.insumo
+                        key = insumo.nomb_insumo
+                        insumos_requeridos.setdefault(key, {
+                            "cantidad": 0,
+                            "stock": insumo.cnt_insumo,
+                            "unidad": insumo.unidad_medida,
+                            "fuente": set()
+                        })
+                        insumos_requeridos[key]["cantidad"] += 1  # 1 por cada unidad vendida
+                        insumos_requeridos[key]["fuente"].add("Personalización")
+
+
 
     # Verificar si hay stock suficiente
     hay_stock_suficiente = all(data["cantidad"] <= data["stock"] for data in insumos_requeridos.values())
