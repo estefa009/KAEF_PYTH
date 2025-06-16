@@ -942,6 +942,7 @@ def dashboard_admin(request):
         "data": [c['compras'] for c in clientes_top_qs]
     }
 
+    noti_count = request.user.notificaciones.filter(leida=False).count()
     context = {
         'total_usuarios': total_usuarios,
         'total_clientes': total_clientes,
@@ -955,6 +956,7 @@ def dashboard_admin(request):
         'ventas_mensuales': ventas_mensuales_data,
         'ventas_por_producto': ventas_por_producto_data,
         'clientes_top': clientes_top_data,
+        'noti_count': noti_count,
     }
     return render(request, 'admin/dashboard_admin.html', context)
 
