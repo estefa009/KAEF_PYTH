@@ -159,6 +159,8 @@ urlpatterns = [
 
     path('notificaciones/', views.notificaciones_admin, name='notificaciones_admin'),
 
+    path('procesar_compra/', views.procesar_compra, name='procesar_compra'),
+
     
     # ...
 ]

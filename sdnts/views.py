@@ -1978,6 +1978,7 @@ def generar_receta_base(request, cod_producto):
 
 def reporte_usuarios_pdf(request):
     # Estadísticas: contar cuántos usuarios hay por rol
+   
     roles = ['ADMIN', 'CLIENTE', 'DOMI']
     conteo_roles = [Usuario.objects.filter(rol=rol).count() for rol in roles]
 
