@@ -1201,7 +1201,7 @@ def confirmar_generacion_produccion(request, cod_venta):
                             "unidad": insumo.unidad_medida,
                             "fuente": set()
                         })
-                        insumos_requeridos[key]["cantidad"] += 1  # 1 por cada unidad vendida
+                        insumos_requeridos[key]["cantidad"] += cantidad  # 1 por cada unidad vendida
                         insumos_requeridos[key]["fuente"].add("Personalización")
 
 
@@ -1216,62 +1216,140 @@ def confirmar_generacion_produccion(request, cod_venta):
     }
     return render(request, 'admin/ventas/confirmar_generacion_produccion.html', context)
 
+from django.forms import modelform_factory
+from django.forms import formset_factory
+from django.forms import modelform_factory
+from django.forms import formset_factory
+
+def seleccionar_combinaciones_admin(request, cod_venta):
+    venta = get_object_or_404(Venta, cod_venta=cod_venta)
+    detalles = DetalleVenta.objects.filter(cod_venta=venta)
+
+    masas = SaborMasa.objects.all()
+    glaseados = Glaseado.objects.all()
+    toppings = Topping.objects.all()
+
+    if request.method == 'POST':
+        combinaciones = []
+
+        index = 0
+        for detalle in detalles:
+            for i in range(detalle.cantidad):
+                masa_id = request.POST.get(f'masa_{index}')
+                glaseado_id = request.POST.get(f'glaseado_{index}')
+                topping_id = request.POST.get(f'topping_{index}')
+
+                if not (masa_id and glaseado_id and topping_id):
+                    messages.error(request, "Debes seleccionar todas las combinaciones.")
+                    return redirect(request.path)
+
+                combinaciones.append({
+                    'detalle_id': detalle.id,
+                    'masa_id': masa_id,
+                    'glaseado_id': glaseado_id,
+                    'topping_id': topping_id,
+                })
+                index += 1
+
+        request.session['combinaciones'] = combinaciones
+        return redirect('generar_produccion_admin', cod_venta=venta.cod_venta)
+
+    unidades = []
+    for detalle in detalles:
+        for i in range(detalle.cantidad):
+            unidades.append({
+                'detalle': detalle,
+                'numero': i + 1,
+            })
+
+    context = {
+        'venta': venta,
+        'unidades': unidades,
+        'masas': masas,
+        'glaseados': glaseados,
+        'toppings': toppings,
+    }
+    return render(request, 'admin/ventas/seleccionar_combinaciones.html', context)
+
 
 @transaction.atomic
-def generar_produccion_por_venta(request, cod_venta):
+def generar_produccion_confirmada(request, cod_venta):
     venta = get_object_or_404(Venta, cod_venta=cod_venta)
 
-    if hasattr(venta, 'produccion'):
-        messages.warning(request, "Ya se ha generado una producción para esta venta.")
-        return redirect('ventas_admin')
+    if request.method == 'POST':
+        if hasattr(venta, 'produccion'):
+            messages.warning(request, "Ya se ha generado una producción para esta venta.")
+            return redirect('ventas_admin')
 
-    # Crear la producción
-    produccion = Produccion.objects.create(
-        cod_venta=venta,
-        fecha_inicio=datetime.now()
-    )
-
-    insumos_necesarios = {}
-
-    # 1. Agregar insumos de la receta base
-    detalles = DetalleVenta.objects.filter(cod_venta=venta)
-    for detalle in detalles:
-        receta = RecetaProducto.objects.filter(cod_producto=detalle.cod_producto)
-        for item in receta:
-            cantidad_total = item.cantidad * detalle.cantidad
-            insumos_necesarios[item.insumo_id] = insumos_necesarios.get(item.insumo_id, 0) + cantidad_total
-
-    # 2. Agregar insumos de personalización
-    for detalle in detalles:
-        combinaciones = CombinacionProducto.objects.filter(cod_detalle=detalle)
-        for combo in combinaciones:
-            for insumo_id in [combo.cod_sabor_masa_1_id, combo.cod_glaseado_1_id, combo.cod_topping_1_id]:
-                insumos_necesarios[insumo_id] = insumos_necesarios.get(insumo_id, 0) + 1
-
-    # 3. Validar si hay stock suficiente
-    faltantes = []
-    for insumo_id, cantidad in insumos_necesarios.items():
-        insumo = Insumo.objects.get(pk=insumo_id)
-        if insumo.cnt_insumo < cantidad:
-            faltantes.append(f"{insumo.nomb_insumo} (faltan {cantidad - insumo.cnt_insumo:.2f})")
-
-    if faltantes:
-        messages.error(request, "Stock insuficiente para:\n" + "\n".join(faltantes))
-        return redirect('ventas_admin')
-
-    # 4. Crear salidas y descontar del stock
-    for insumo_id, cantidad in insumos_necesarios.items():
-        insumo = Insumo.objects.get(pk=insumo_id)
-        Salida.objects.create(
-            cod_produccion=produccion,
-            cod_insumo=insumo,
-            cantidad=cantidad
+        # Crear producción
+        produccion = Produccion.objects.create(
+            cod_venta=venta,
+            fecha_inicio=datetime.now()
         )
-        insumo.cnt_insumo -= cantidad
-        insumo.save()
 
-    messages.success(request, "Producción generada y stock actualizado correctamente.")
-    return redirect('produccion_admin')
+        insumos_necesarios = {}
+
+        # Procesar combinaciones por cada detalle y unidad
+        for detalle in DetalleVenta.objects.filter(cod_venta=venta):
+            # Insumos de receta base
+            receta = RecetaProducto.objects.filter(cod_producto=detalle.cod_producto)
+            for item in receta:
+                total = item.cantidad * detalle.cantidad
+                insumos_necesarios[item.insumo_id] = insumos_necesarios.get(item.insumo_id, 0) + total
+
+            # Combos personalizados
+            for i in range(detalle.cantidad):
+                prefijo = f"combinaciones[{detalle.pk}][{i}]"
+                masa_id = request.POST.get(f"{prefijo}[masa]")
+                glaseado_id = request.POST.get(f"{prefijo}[glaseado]")
+                topping_id = request.POST.get(f"{prefijo}[topping]")
+
+                # Guardar combinación
+                combinacion = CombinacionProducto.objects.create(
+                    cod_detalle=detalle,
+                    cod_sabor_masa_1_id=masa_id,
+                    cod_glaseado_1_id=glaseado_id,
+                    cod_topping_1_id=topping_id
+                )
+
+                # Sumar insumos de componentes seleccionados
+                for insumo_id in [
+                    SaborMasa.objects.get(pk=masa_id).insumo_id if masa_id else None,
+                    Glaseado.objects.get(pk=glaseado_id).insumo_id if glaseado_id else None,
+                    Topping.objects.get(pk=topping_id).insumo_id if topping_id else None
+                ]:
+                    if insumo_id:
+                        insumos_necesarios[insumo_id] = insumos_necesarios.get(insumo_id, 0) + 1
+
+        # Verificar stock
+        faltantes = []
+        for insumo_id, requerido in insumos_necesarios.items():
+            insumo = Insumo.objects.get(pk=insumo_id)
+            if insumo.cnt_insumo < requerido:
+                faltantes.append(f"{insumo.nomb_insumo} (faltan {requerido - insumo.cnt_insumo:.2f})")
+
+        if faltantes:
+            messages.error(request, "No hay suficiente stock para:\n" + "\n".join(faltantes))
+            raise transaction.TransactionManagementError  # revierte la transacción
+
+        # Descontar stock y registrar salidas
+        for insumo_id, cantidad in insumos_necesarios.items():
+            insumo = Insumo.objects.get(pk=insumo_id)
+            Salida.objects.create(
+                cod_produccion=produccion,
+                cod_insumo=insumo,
+                cantidad=cantidad
+            )
+            insumo.cnt_insumo -= cantidad
+            insumo.save()
+
+        messages.success(request, "Producción generada exitosamente y stock actualizado.")
+        return redirect('produccion_admin')
+
+    # Si accede por GET (error)
+    messages.error(request, "Acceso inválido.")
+    return redirect('ventas_admin')
+
 
 def editar_produccion(request, cod_produccion):
     produccion = get_object_or_404(Produccion, pk=cod_produccion)

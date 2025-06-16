@@ -1,0 +1,100 @@
+{% block content %}
+<div class="container mt-5">
+    <h2>Generar Producción para Venta #{{ venta.cod_venta }}</h2>
+
+    <h4 class="mt-4">Personalizar Combinaciones por Producto</h4>
+
+    <form method="post" action="{% url 'generar_produccion_confirmada' venta.cod_venta %}">
+        {% csrf_token %}
+
+        {% for detalle in detalles %}
+            <div class="card my-4">
+                <div class="card-header">
+                    <strong>{{ detalle.cod_producto.nomb_producto }}</strong> — {{ detalle.cantidad }} unidad{{ detalle.cantidad|pluralize }}
+                </div>
+                <div class="card-body">
+                    {% for i in "1"|ljust:detalle.cantidad %}
+                        <h6>Unidad {{ forloop.counter }}</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label>Masa:</label>
+                                <select name="combinaciones[{{ detalle.pk }}][{{ forloop.counter0 }}][masa]" class="form-control" required>
+                                    <option value="">-- Seleccionar --</option>
+                                    {% for masa in masas %}
+                                        <option value="{{ masa.pk }}">{{ masa.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Glaseado:</label>
+                                <select name="combinaciones[{{ detalle.pk }}][{{ forloop.counter0 }}][glaseado]" class="form-control" required>
+                                    <option value="">-- Seleccionar --</option>
+                                    {% for glaseado in glaseados %}
+                                        <option value="{{ glaseado.pk }}">{{ glaseado.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Topping:</label>
+                                <select name="combinaciones[{{ detalle.pk }}][{{ forloop.counter0 }}][topping]" class="form-control" required>
+                                    <option value="">-- Seleccionar --</option>
+                                    {% for topping in toppings %}
+                                        <option value="{{ topping.pk }}">{{ topping.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <hr>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+
+        <h4 class="mt-5">Resumen de Insumos Requeridos</h4>
+        <p class="text-muted">Se descontarán los siguientes insumos:</p>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Insumo</th>
+                    <th>Requerido</th>
+                    <th>Stock Actual</th>
+                    <th>Unidad</th>
+                    <th>Disponibilidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nombre, data in insumos_requeridos.items %}
+                    {% if data.cantidad > data.stock %}
+                        <tr class="table-danger">
+                    {% else %}
+                        <tr>
+                    {% endif %}
+                        <td>{{ nombre }}</td>
+                        <td>{{ data.cantidad }}</td>
+                        <td>{{ data.stock }}</td>
+                        <td>{{ data.unidad }}</td>
+                        <td>
+                            {% if data.cantidad > data.stock %}
+                                <strong class="text-danger">Insuficiente</strong>
+                            {% else %}
+                                <span class="text-success">Disponible</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if hay_stock_suficiente %}
+            <button type="submit" class="btn btn-success">Confirmar y Generar Producción</button>
+            <a href="{% url 'ventas_admin' %}" class="btn btn-secondary">Cancelar</a>
+        {% else %}
+            <div class="alert alert-danger">
+                No se puede generar la producción porque no hay stock suficiente de todos los insumos.
+            </div>
+            <a href="{% url 'ventas_admin' %}" class="btn btn-secondary">Volver</a>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}
