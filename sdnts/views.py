@@ -465,6 +465,8 @@ def actualizar_carrito(request):
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.http import JsonResponse
+import traceback
+
 
 @login_required
 @csrf_exempt
@@ -2158,6 +2160,7 @@ def reporte_ventas(request):
     response['Content-Disposition'] = 'attachment; filename="reporte_ventas.pdf"'
     return response
 
+from.models import Produccion
 @login_required
 def reporte_produccion(request):
     producciones = Produccion.objects.all()
@@ -2176,7 +2179,7 @@ def reporte_produccion(request):
     grafico_base64 = base64.b64encode(buf.read()).decode('utf-8')
     buf.close()
     plt.close()
-    context = {'producciones': produccion, 'grafico_base64': grafico_base64}
+    context = {'producciones': producciones, 'grafico_base64': grafico_base64}
     html_string = render_to_string('reportes/reporte_produccion.html', context)
     pdf_file = HTML(string=html_string).write_pdf()
     response = HttpResponse(pdf_file, content_type='application/pdf')

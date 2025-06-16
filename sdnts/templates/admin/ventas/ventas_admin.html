@@ -151,7 +151,13 @@
         }
     </style>
 </head>
+<<<<<<< HEAD
 <body>
+=======
+
+<body>
+
+>>>>>>> 67262276020ce72a3eed3f9fdc54859fd14bb945
     {% include "includes/nav_admin.html" %}
 
     <div class="contenedor">
@@ -246,8 +252,11 @@
                             </a>
                         </td>
                         <td>
-                            <a href="{% url 'editar_estado_venta' venta.cod_venta %}" class="btn btn-warning btn-sm">
+                            <a href="{% url 'editar_estado_venta' venta.cod_venta %}" class="btn btn-warning btn-sm mt-3">
                                 Editar Estado
+                            </a>
+                            <a href="{% url 'confirmar_generacion_produccion' venta.cod_venta %}" class="btn btn-warning btn-sm mt-3">
+                                Confirmar Produccion
                             </a>
                         </td>
                     </tr>

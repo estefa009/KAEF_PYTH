@@ -161,91 +161,10 @@
             <button id="downloadExcel" class="btn btn-outline-success">
                 <i class="bi bi-file-earmark-excel"></i>
             </button>
-            <a href="{% url 'crear_produccion' %}" class="btn btn-pink">
-                <i class="bi bi-plus-circle"></i> Nueva Producción
-            </a>
+            
         </div>
     </div>
 
-<<<<<<< Updated upstream
-        <button style="border-radius: 20px" id="downloadPdf" class="btn btn-outline-danger mt-3">
-            <i class="bi bi-file-earmark-pdf"></i>
-        </button>
-        <button style="border-radius: 20px" id="downloadWord" class="btn btn-outline-primary mt-3">
-            <i class="bi bi-file-earmark-word"></i>
-        </button>
-        <button style="border-radius: 20px" id="downloadExcel" class="btn btn-outline-success mt-3">
-            <i class="bi bi-file-earmark-excel"></i>
-        </button>
-
-        <thead>
-            <tr>
-                <th scope="col">Código</th>
-                <th scope="col">Venta ID</th>
-                <th scope="col">Fecha Inicio</th>
-                <th scope="col">Fecha Fin</th>
-                <th scope="col">Estado</th>
-                <th scope="col">Observaciones</th>
-                <th scope="col">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for produccion in producciones %}
-            <tr>
-                <td>{{ produccion.cod_produccion }}</td>
-                <td>{{ produccion.cod_venta.cod_venta }}</td>
-                <td>{{ produccion.fecha_inicio|date:"d/m/Y H:i" }}</td>
-                <td>
-                    {% if produccion.fecha_fin %}
-                        {{ produccion.fecha_fin|date:"d/m/Y H:i" }}
-                    {% else %}
-                        {% if produccion.estado == 'EN_PROCESO' %} En proceso
-                        {% elif produccion.estado == 'PENDIENTE' %} Pendiente
-                        {% else %} - {% endif %}
-                    {% endif %}
-                </td>
-
-                <td class="estado-columna">
-                    <span class="status-badge 
-                        {% if produccion.estado == 'PENDIENTE' %}status-pending
-                        {% elif produccion.estado == 'EN_PROCESO' %}status-in-progress
-                        {% elif produccion.estado == 'FINALIZADO' %}status-completed
-                        {% else %}status-cancelled{% endif %}">
-                        {{ produccion.get_estado_display }}
-                    </span>
-                </td>
-
-                <td>{{ produccion.observaciones|default:"Sin observaciones" }}</td>
-                <td>
-                    <!-- Botón editar -->
-                     <a href="{% url 'editar_produccion' produccion.cod_produccion %}" class="btn btn-sm btn-outline-primary" >
-                        <i class="bi bi-pencil"></i>
-                     </a>
-                     <!-- Botón cambiar estado -->
-                    <a href="{% url 'cambiar_estado_produccion' produccion.cod_produccion %}" class="btn btn-sm btn-outline-success">
-                        <i class="bi bi-arrow-repeat"></i>
-                    </a>
-                    
-                    {% if produccion.estado == "FINALIZADO" %}
-                        <!-- Botón asignar envío -->
-                    <a href="{% url 'asignar_envio_produccion' produccion.cod_produccion %}" class="btn btn-sm btn-outline-warning">
-                        <i class="bi bi-truck"></i>
-                    </a>
-                    {% endif %}
-
-                        <!-- Botón eliminar -->
-
-                    <a href="{% url 'eliminar_produccion' produccion.cod_produccion %}" class="btn btn-sm btn-outline-danger"
-                        onclick="return confirm('¿Estás seguro de que deseas eliminar esta producción?');">
-                        <i class="bi bi-trash"></i>
-                    </a>
-                
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-=======
     <div class="table-responsive">
         <table id="tablaProducciones" class="table">
             <thead>
@@ -306,7 +225,6 @@
             </tbody>
         </table>
     </div>
->>>>>>> Stashed changes
 </div>
 
 <script>

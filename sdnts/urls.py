@@ -81,8 +81,9 @@ urlpatterns = [
     path('produccion/estado/<int:cod_produccion>/', views.cambiar_estado_produccion, name='cambiar_estado_produccion'),
     path('produccion/asignar-envio/<int:cod_produccion>/', views.asignar_envio_produccion, name='asignar_envio_produccion'),
     path('produccion/eliminar/<int:cod_produccion>/', views.eliminar_produccion, name='eliminar_produccion'),
+    path('ventas/<int:cod_venta>/confirmar-produccion/', views.confirmar_generacion_produccion, name='confirmar_generacion_produccion'),
+    path('ventas/<int:cod_venta>/generar-produccion/', views.generar_produccion_por_venta, name='generar_produccion_confirmada'),
 
-    
     
     #Ventas
     
