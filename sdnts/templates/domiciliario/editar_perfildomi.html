@@ -4,56 +4,129 @@
 <head>
   <meta charset="UTF-8">
   <title>Editar Perfil</title>
+  <link rel="icon" type="image/ico" href="{% static 'icon/2.ico' %}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="{% static 'css/menu.css' %}">
+  <style>
+    body {
+      font-family: 'Century Gothic', sans-serif;
+      background-color: #fff0f5;
+      color: #e75480;
+    }
+
+    .contenedor {
+      max-width: 700px;
+      margin: 30px auto;
+      border-radius: 60px;
+      padding: 40px;
+      background: linear-gradient(to bottom, #ffeef3, #fff9f2);
+    }
+
+    h2 {
+      font-family: "Dunkin", sans-serif;
+      color: #ff80a4;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .form-label {
+      color: #e75480;
+      font-weight: bold;
+    }
+
+    .form-control {
+      border-radius: 20px;
+      border: 2px solid #ffb6c1;
+      font-style: italic;
+    }
+
+    .btn-rosa {
+      background-color: #ff69b4;
+      color: white;
+      border-radius: 30px;
+      padding: 10px 20px;
+      font-weight: bold;
+      border: none;
+    }
+
+    .btn-rosa:hover {
+      background-color: #ff4a94;
+    }
+
+    .btn-volver {
+      background-color: #ffc0cb;
+      border: none;
+      color: #4e4032;
+      border-radius: 30px;
+      padding: 10px 20px;
+      font-weight: bold;
+    }
+
+    .btn-volver:hover {
+      background-color: #f8a5b5;
+    }
+
+    .alert {
+      border-radius: 20px;
+    }
+  </style>
 </head>
-<body class="container mt-5">
-    
-  <h2>Mi Perfil</h2>
-  <hr>
+<body>
+  {% include "includes/nav_admin.html" %}
 
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-success">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
+  <div class="contenedor">
+    <h2><i class="bi bi-person-circle"></i> Editar Perfil</h2>
+    <hr>
 
-  <form method="POST" novalidate>
-  {% csrf_token %}
-  <div class="mb-3">
-    <label for="nom_usua" class="form-label">Nombre:</label>
-    <input type="text" name="nom_usua" id="nom_usua" class="form-control" value="{{ user.nom_usua }}">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-success text-center">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="POST" novalidate>
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <label for="nom_usua" class="form-label">Nombre:</label>
+        <input type="text" name="nom_usua" id="nom_usua" class="form-control" value="{{ user.nom_usua }}">
+      </div>
+
+      <div class="mb-3">
+        <label for="apell_usua" class="form-label">Apellido:</label>
+        <input type="text" name="apell_usua" id="apell_usua" class="form-control" value="{{ user.apell_usua }}">
+      </div>
+
+      <div class="mb-3">
+        <label for="tele_usua" class="form-label">Teléfono:</label>
+        <input type="text" name="tele_usua" id="tele_usua" class="form-control" value="{{ user.tele_usua }}">
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Correo electrónico:</label>
+        <input type="email" name="email" id="email" class="form-control" value="{{ user.email }}">
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Nueva contraseña (opcional):</label>
+        <input type="password" name="password" id="password" class="form-control">
+      </div>
+
+      <div class="mb-3">
+        <label for="confirm_password" class="form-label">Confirmar contraseña:</label>
+        <input type="password" name="confirm_password" id="confirm_password" class="form-control">
+      </div>
+
+      <div class="d-flex justify-content-between mt-4">
+        <button type="submit" class="btn btn-rosa">
+          <i class="bi bi-save"></i> Guardar Cambios
+        </button>
+        <a href="{% url 'mis_domicilios' %}" class="btn btn-volver">
+          <i class="bi bi-arrow-left-circle"></i> Volver
+        </a>
+      </div>
+    </form>
   </div>
-
-  <div class="mb-3">
-    <label for="apell_usua" class="form-label">Apellido:</label>
-    <input type="text" name="apell_usua" id="apell_usua" class="form-control" value="{{ user.apell_usua }}">
-  </div>
-
-  <div class="mb-3">
-    <label for="tele_usua" class="form-label">Teléfono:</label>
-    <input type="text" name="tele_usua" id="tele_usua" class="form-control" value="{{ user.tele_usua }}">
-  </div>
-
-  <div class="mb-3">
-    <label for="email" class="form-label">Correo electrónico:</label>
-    <input type="email" name="email" id="email" class="form-control" value="{{ user.email }}">
-  </div>
-
-  <div class="mb-3">
-    <label for="password" class="form-label">Nueva contraseña (opcional):</label>
-    <input type="password" name="password" id="password" class="form-control">
-  </div>
-
-  <div class="mb-3">
-    <label for="confirm_password" class="form-label">Confirmar contraseña:</label>
-    <input type="password" name="confirm_password" id="confirm_password" class="form-control">
-  </div>
-
-  <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-  <a href="{% url 'mis_domicilios' %}" class="btn btn-secondary">Volver</a>
-</form>
-
-
 </body>
 </html>
