@@ -19,9 +19,10 @@ body {
 .navbar-nav .nav-item .nav-link:last-child {
     margin-right: 0;
 }
+/* Corrige la ruta de la fuente Dunkin para evitar el error 404 */
 @font-face {
     font-family: 'Dunkin';
-    src: url('fonts/Dunkin.otf') format('truetype');
+    src: url('/static/fonts/Dunkin.otf') format('opentype');
 }
 .navbar-collapse {
 padding-right: 300px;
@@ -1333,49 +1334,41 @@ border-radius: 100px;
 }
 
 /* ====== MODAL COMPRA EXITOSA PERSONALIZADO ====== */
-#modalCompraExitosa.modal {
-  display: none;
-  position: fixed;
-  z-index: 2100;
-  left: 0; top: 0; width: 100vw; height: 100vh;
-  background: rgba(91, 66, 73, 0.18);
-  justify-content: center;
-  align-items: center;
-}
-#modalCompraExitosa.show {
-  display: flex;
-}
-.modal-compra-exitosa-custom {
+#modalCompraExitosa .modal-content {
   background: #fff;
   border-radius: 44px;
   box-shadow: 0 8px 32px 0 rgba(252, 105, 152, 0.22), 0 2px 8px 0 #fc6998;
   padding: 36px 36px 28px 36px;
-  max-width: 400px;
-  width: 92vw;
+  max-width: 700px; /* Más ancho */
+  width: 96vw;
   text-align: center;
   position: relative;
   animation: fadeIn 0.3s;
   border: 3px solid #fc6998;
-}
-.modal-compraexitosa-title {
-  color: #4e4032;
   font-family: 'Dunkin', 'Arial Rounded MT Bold', Arial, sans-serif;
-  font-size: 2.1rem;
-  margin-bottom: 12px;
-  letter-spacing: 1px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.modal-compraexitosa-detalles {
-  margin-bottom: 20px;
+
+#modalCompraExitosa .infoTotalCarrito {
+  margin: 18px 0 10px 0;
   color: #695450;
   font-size: 1.08rem;
   background: #fff9f9;
   border-radius: 18px;
   padding: 12px 8px 8px 8px;
   box-shadow: 0 1px 4px 0 #ffc0cb33;
+  max-height: 320px; /* Altura máxima visible */
+  overflow-y: auto;  /* Scroll vertical si hay mucha info */
+  width: 100%;
+  text-align: left;
 }
-.modal-compraexitosa-ok {
-  background: #fc6998;
-  color: #fff;
+
+#modalCompraExitosa button.btn,
+#modalCompraExitosa .btn-success {
+  background: #fc6998 !important;
+  color: #fff !important;
   border: none;
   border-radius: 30px;
   padding: 0.6em 2.2em;
@@ -1384,93 +1377,95 @@ border-radius: 100px;
   margin-top: 10px;
   box-shadow: 0 2px 8px 0 #ffc0cb;
   transition: background 0.2s, color 0.2s, transform 0.15s;
+  display: inline-block;
+  width: auto;
+  min-width: 120px;
+  max-width: 200px;
+  text-align: center;
 }
-.modal-compraexitosa-ok:hover {
-  background: #4e4032;
-  color: #ffc0cb;
+
+#modalCompraExitosa button.btn:hover,
+#modalCompraExitosa .btn-success:hover {
+  background: #4e4032 !important;
+  color: #ffc0cb !important;
   transform: scale(1.04);
 }
-#cerrarModalCompra {
-  position: absolute;
-  top: 18px;
-  right: 28px;
-  font-size: 24px;
-  color: #4e4032;
-  cursor: pointer;
-  z-index: 10;
-  border-radius: 50%;
-  background: #fff9f9;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s, color 0.2s;
-}
-#cerrarModalCompra:hover {
-  background: #fc6998;
-  color: #fff;
-}
-
-/* Estilos para contenedores de método de pago */
-.nequi-container,
-.davi-container {
-    padding: 20px;
-    border-radius: 10px;
-    margin-top: 15px;
-    background-color: #ffc0cb;
-    transition: display 0.3s ease;
-}
-
-/* Estilos para los modales específicos */
-.modal-nequi,
-.modal-davi {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: -100px;
+/* ====== TABLAS DE PERFIL CLIENTE: MIS COMPRAS / MIS PEDIDOS ====== */
+.tabla-pedidos-wrapper {
     width: 100%;
-    height: 150%;
-    background-color: rgba(0,0,0,0.7);
+    overflow-x: auto;
+    margin: 0 auto 30px auto;
+    border-radius: 24px;
+    background: #fff9f9;
+    box-shadow: 0 2px 12px 0 #ffc0cb33;
+    padding: 18px 0 8px 0;
+    max-width: 1100px;
+    max-height: 290px;
+    overflow-y: auto;
 }
 
-.modal-nequi-content,
-.modal-davi-content {
-    background-color: #fff;
-    margin: 15% auto;
-    padding: 20px;
-    border-radius: 1px;
-    width: 150%;
-    max-width: 500px;
-    position: relative;
+.tabla-pedidos {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: transparent;
+    font-family: 'Segoe UI', 'Dunkin', Arial, sans-serif;
+    font-size: 1.08rem;
 }
 
-.close-nequi,
-.close-davi {
-    position: absolute;
-    right: 15px;
-    top: 10px;
-    font-size: 28px;
-    cursor: pointer;
+.tabla-pedidos th, .tabla-pedidos td {
+    padding: 10px 18px;
+    text-align: left;
+    border-bottom: 1.5px solid #ffe0ec;
+    background: transparent;
+    color: #4e4032;
 }
 
-.modal-nequi-img,
-.modal-davi-img {
-    max-width: 150px;
-    margin-bottom: 15px;
+.tabla-pedidos th {
+    background: #ffc0cb;
+    color: #4e4032;
+    font-weight: bold;
+    font-size: 1.1rem;
+    position: sticky;
+    top: 0;
+    z-index: 2;
 }
 
-/* Estilos para los logos */
-.logo-nequi,
-.logo-davi {
-    cursor: pointer;
-    text-align: center;
-    margin-top: -20px;
+.tabla-pedidos tr:last-child td {
+    border-bottom: none;
 }
 
-.imagen-nequi img,
-.imagen-davi img {
-    max-width: 150px;
-    height: auto;
+.tabla-pedidos tr:nth-child(even) td {
+    background: #fff3f8;
+}
+
+.tabla-pedidos tr:hover td {
+    background: #ffe0ec;
+    transition: background 0.2s;
+}
+
+.tabla-pedidos td.estado-pendiente {
+    color: #fc6998;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.tabla-pedidos td.estado-entregado {
+    color: #4e4032;
+    font-weight: bold;
+}
+
+@media (max-width: 900px) {
+    .tabla-pedidos-wrapper {
+        max-width: 100vw;
+        padding: 8px 0 8px 0;
+    }
+    .tabla-pedidos th, .tabla-pedidos td {
+        padding: 8px 8px;
+        font-size: 0.98rem;
+    }
+    .tabla-pedidos {
+        min-width: 480px;
+    }
 }

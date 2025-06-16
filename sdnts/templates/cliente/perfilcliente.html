@@ -52,8 +52,8 @@
                 <div class="settings-content">
                     <div id="perfil" class="content active">
                         {% if ventas %}
-                            <div class="table-responsive">
-                                <table class="table">
+                            <div class="tabla-pedidos-wrapper">
+                                <table class="tabla-pedidos">
                                     <thead>
                                         <tr>
                                             <th>Fecha</th>
@@ -98,12 +98,8 @@
                                                             <td>{{ combinacion.cod_glaseado_1.nombre }}</td>
                                                             <td>{{ combinacion.cod_topping_1.nombre }}</td>
                                                             {% for detalles in venta.detalles.all %}
-                                                               
-                                                               <td>{{ detalles.cantidad }}</td>
-                                                              
+                                                                <td>{{ detalles.cantidad }}</td>
                                                             {% endfor %}
-
-
                                                         </tr>
                                                         {% endfor %}
                                                     </tbody>
@@ -133,8 +129,8 @@
                     <div id="direcciones" class="content">
                         <h2>Mis pedidos</h2>
                         {% if ventas %}
-                            <div class="table-responsive">
-                                <table class="table">
+                            <div class="tabla-pedidos-wrapper">
+                                <table class="tabla-pedidos">
                                     <thead>
                                         <tr>
                                             <th>Fecha de Entraga</th>
@@ -153,13 +149,12 @@
         {% endfor %}
     {% endfor %}
 </tbody>
-
-                                </table>
-                            </div>
-                        {% else %}
-                            <p>No tienes pedidos anteriores.</p>
-                        {% endif %}
-                    </div>
+            </table>
+        </div>
+    {% else %}
+        <p>No tienes pedidos anteriores.</p>
+    {% endif %}
+</div>
 
                     <div id="pago" class="content">
                         <h2>Mi cuenta</h2>

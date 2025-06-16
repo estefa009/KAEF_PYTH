@@ -188,7 +188,7 @@
 }
 
 .row-product {
-    max-height: 400px; /* O la altura que quieras limitar para la lista de productos */
+    max-height: 400px;
     overflow-y: auto;
 }
 

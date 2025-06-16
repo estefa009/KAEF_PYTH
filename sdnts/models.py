@@ -274,6 +274,37 @@ class Venta(models.Model):
     def __str__(self):
         return f"Venta #{self.cod_venta} - {self.cod_cliente}"
 
+    def resumen_json(self):
+        """
+        Devuelve un resumen de la venta con toda la información relevante para el frontend.
+        Incluye datos de pago y detalles de productos.
+        """
+        pago = getattr(self, 'pago', None)
+        detalles = self.detalles.all()
+        detalles_list = []
+        for det in detalles:
+            detalles_list.append({
+                "producto": det.cod_producto.nomb_pro,
+                "cantidad": det.cantidad,
+                "precio_unitario": float(det.precio_unitario),
+                "subtotal": float(det.subtotal),
+                "fecha_entrega": det.fecha_entrega.strftime('%Y-%m-%d') if det.fecha_entrega else "",
+                "descripcion": str(det.cod_producto)
+            })
+        return {
+            "cod_venta": self.cod_venta,
+            "fecha_hora": self.fecha_hora.strftime('%Y-%m-%d'),
+            "subtotal": float(self.subtotal),
+            "iva": float(self.iva),
+            "total": float(self.total),
+            "estado": self.estado,
+            "direccion_entrega": self.direccion_entrega,
+            "observaciones": self.observaciones,
+            "metodo_pago": pago.metodo_pago if pago else "",
+            "transaccion_id": pago.transaccion_id if pago else "",
+            "detalles": detalles_list
+        }
+
 class DetalleVenta(models.Model):
     """
     Modelo para los detalles de productos en cada venta
@@ -620,5 +651,7 @@ class RecetaProducto(models.Model):
     class Meta:
         unique_together = ('cod_producto', 'insumo')
 
+    def __str__(self):
+        return f"{self.cod_producto} - {self.insumo} ({self.cantidad} {self.unidad_medida})"
     def __str__(self):
         return f"{self.cod_producto} - {self.insumo} ({self.cantidad} {self.unidad_medida})"

@@ -892,7 +892,7 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', async f
                 localStorage.removeItem('cart');
                 showHTML();
                 document.getElementById('modalP').style.display = 'none';
-                // Mostrar modal de compra exitosa y resumen
+                // Mostrar modal de compra exitosa SOLO con texto centrado (sin imagen)
                 const modal = document.getElementById('modalCompraExitosa');
                 if (!modal) {
                     console.error('No se encontró el modalCompraExitosa en el DOM');
@@ -900,52 +900,22 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', async f
                     return;
                 }
                 const info = modal.querySelector('.infoTotalCarrito');
-                if (!info) {
-                    console.error('No se encontró el elemento .infoTotalCarrito dentro del modalCompraExitosa');
-                    modal.innerHTML += '<div style="color:red; background:#fff3cd; border:1px solid #f5c6cb; padding:10px;">No se encontró el elemento .infoTotalCarrito</div>';
-                } else if (data.venta) {
-                    let detalles = data.venta.detalles || [];
-                    let productosHTML = `<h3>Resumen de tu compra</h3>
-<table style='width:100%;margin-bottom:10px;'>
-<thead>
-<tr>
-<th style='text-align:left;'>Producto</th>
-<th>Cant.</th>
-<th>Unitario</th>
-<th>Subtotal</th>
-</tr>
-</thead>
-<tbody>`;
-                    detalles.forEach(det => {
-                        productosHTML += `<tr>
-<td>${det.producto}</td>
-<td style='text-align:center;'>${det.cantidad}</td>
-<td style='text-align:right;'>$${Number(det.precio_unitario).toLocaleString()}</td>
-<td style='text-align:right;'>$${Number(det.subtotal).toLocaleString()}</td>
-</tr>`;
-                    });
-                    productosHTML += `</tbody></table>`;
-                    productosHTML += `<div style='text-align:left;'>
-<b>Subtotal:</b> $${Number(data.venta.subtotal).toLocaleString()}<br>
-<b>IVA (19%):</b> $${Number(data.venta.iva).toLocaleString()}<br>
-<b>Total:</b> $${Number(data.venta.total).toLocaleString()}<br>
-<b>Dirección:</b> ${data.venta.direccion}
-</div>`;
-                    info.innerHTML = productosHTML;
-                } else {
-                    info.innerHTML = '<div style="color:red;">No se recibió resumen de venta del backend.</div>';
+                if (info) {
+                    info.innerHTML = `
+                        <div style="display:flex;align-items:center;justify-content:center;min-height:120px;">
+                            <div style="font-size:2em;color:#fc6998;font-family:'Dunkin',Arial,sans-serif;text-align:center;">
+                                <b>¡Compra Exitosa!</b>
+                            </div>
+                        </div>
+                    `;
                 }
-                // Mostrar el modal correctamente (remover hidden y usar display flex)
                 modal.classList.remove('hidden');
                 modal.classList.add('show');
                 modal.style.display = 'flex';
                 modal.style.opacity = '1';
                 modal.style.zIndex = '9999';
-                // Forzar repaint para asegurar visibilidad
                 void modal.offsetWidth;
-                // Scroll al modal para asegurar visibilidad
                 modal.scrollIntoView({behavior: 'smooth', block: 'center'});
-                // Actualizar el contador del carrito en el nav si existe
                 if (typeof showHTML === 'function') showHTML();
             } else {
                 alert('Error al procesar la compra: ' + (data.error || ''));
@@ -953,7 +923,7 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', async f
         })
         .catch(error => {
             alert('Ocurrió un error al procesar la compra: ' + error);
-            document.body.insertAdjacentHTML('beforeend', `<div style="color:red; background:#fff3cd; border:1px solid #f5c6cb; padding:10px; position:fixed; top:10px; right:10px; z-index:9999;">Error: ${error}</div>`);
+            document.body.insertAdjacentHTML('beforeend', `<div style="color:red; background:#fff3cd; border:1px solid #f5c6cb; padding:10px, position:fixed, top:10px, right:10px, z-index:9999;">Error: ${error}</div>`);
             console.error('Error en fetch:', error);
         });
 });
@@ -974,21 +944,41 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// Cerrar el modal de compra exitosa
-const cerrarModalCompra = document.getElementById('cerrarModalCompra');
-const okCompraExitosa = document.getElementById('okCompraExitosa');
+// Cerrar el modal de compra exitosa y recargar la página correctamente
 function cerrarModalCompraExitosa() {
     const modal = document.getElementById('modalCompraExitosa');
     if (modal) {
+        // Oculta el modal ANTES de recargar la página
         modal.classList.add('hidden');
         modal.classList.remove('show');
         modal.style.display = 'none';
-        // Refrescar el carrito y la página completamente
-        location.reload();
+        modal.style.opacity = '0';
+        // Limpia el carrito visualmente
+        localStorage.removeItem('cart');
+        // Espera un pequeño tiempo para asegurar que el modal se oculte antes de recargar
+        setTimeout(() => {
+            window.location.reload(true);
+        }, 100);
     }
 }
-cerrarModalCompra?.addEventListener('click', cerrarModalCompraExitosa);
-okCompraExitosa?.addEventListener('click', cerrarModalCompraExitosa);
+
+// Asigna los listeners al botón OK y la X del modal de compra exitosa
+document.addEventListener('DOMContentLoaded', function() {
+    // Solo asigna listeners, NO muestres el modal ni lo toques aquí
+    const modalCompraExitosa = document.getElementById('modalCompraExitosa');
+    if (modalCompraExitosa) {
+        modalCompraExitosa.classList.remove('show');
+        modalCompraExitosa.classList.add('hidden');
+        modalCompraExitosa.style.display = 'none';
+        modalCompraExitosa.style.opacity = '0';
+        // Listeners para cerrar el modal SOLO cuando está visible
+        modalCompraExitosa.querySelector('button')?.addEventListener('click', cerrarModalCompraExitosa);
+        modalCompraExitosa.querySelector('.close')?.addEventListener('click', cerrarModalCompraExitosa);
+    }
+    // Solo carga el carrito, no muestres ni toques el modal de compra exitosa aquí
+    showHTML();
+});
+
 
 // Modal personalizado para agregado al carrito
 function mostrarModalAgregadoCarrito(producto) {
@@ -1020,3 +1010,71 @@ function mostrarModalAgregadoCarrito(producto) {
     }
     document.addEventListener('keydown', cerrarEscape);
 }
+
+// 1. Asegúrate de que el input de fecha tenga el atributo "min" correctamente
+//    y que el modal de fecha esté en el HTML con el id correcto ("modalFecha" y "inputFecha").
+
+// 2. Cuando abras el modal de fecha, asegúrate de establecer el valor mínimo:
+function getFechaFromModal(minDateStr) {
+    return new Promise((resolve, reject) => {
+        const modal = document.getElementById('modalFecha');
+        const input = document.getElementById('inputFecha');
+        const confirm = document.getElementById('confirmFecha');
+        const cancel = document.getElementById('cancelFecha');
+        const close = document.getElementById('closeFecha');
+
+        function cleanup() {
+            confirm.removeEventListener('click', onConfirm);
+            cancel.removeEventListener('click', onCancel);
+            close.removeEventListener('click', onCancel);
+            modal.classList.add('hidden');
+        }
+        function onConfirm(e) {
+            e.preventDefault();
+            if (input.value && input.value >= minDateStr) {
+                cleanup();
+                resolve(input.value);
+            } else {
+                input.focus();
+                input.classList.add('input-error');
+            }
+        }
+        function onCancel(e) {
+            e.preventDefault();
+            cleanup();
+            resolve(null);
+        }
+        input.classList.remove('input-error');
+        input.value = '';
+        input.setAttribute('min', minDateStr); // Esto es correcto
+        modal.classList.remove('hidden');
+        input.focus();
+        confirm.addEventListener('click', onConfirm);
+        cancel.addEventListener('click', onCancel);
+        close.addEventListener('click', onCancel);
+    });
+}
+
+// 3. Cuando abras el modal de dirección, asegúrate de que el input tenga el id correcto ("inputDireccion").
+
+// 4. El flujo correcto para la compra es:
+//    - El usuario da click en "Comprar" (btnAgregarProducto)
+//    - Se abre el modal de dirección y luego el de fecha
+//    - Se valida el método de pago y la referencia
+//    - Se envía el fetch al backend
+//    - Si todo sale bien, se muestra el modal de compra exitosa
+
+// 5. Si el modal de compra exitosa aparece vacío o no se recarga bien:
+//    - Asegúrate de que el backend responde con los datos de la venta (data.venta)
+//    - Asegúrate de que el código que llena el resumen (info.innerHTML = productosHTML) se ejecuta
+//    - Si el modal sigue visible tras recargar, revisa que el HTML no tenga la clase "show" ni "display:flex" tras el reload
+
+// 6. Si el input de fecha aparece vacío o no deja seleccionar fechas, revisa en el HTML que el input tenga el atributo "min" y que el valor sea una fecha válida (YYYY-MM-DD).
+
+// 7. Si el modal de dirección o fecha no aparece, revisa que los IDs en el HTML coincidan con los usados en JS.
+
+// 8. Si el fetch no envía los datos, revisa en la consola del navegador si hay errores de JavaScript.
+
+// 9. Si el resumen de compra aparece vacío, revisa en la consola del navegador el valor de "data" después del fetch.
+
+// 10. Si nada de esto funciona, abre la consola del navegador (F12) y revisa los errores de JavaScript y la respuesta del backend.
