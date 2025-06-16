@@ -1,0 +1,107 @@
+/* Fondo general */
+body {
+    background: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #ff80a4;
+}
+
+/* Contenedor principal */
+.tablaa {
+    background-color: #fff8fb;
+    padding: 30px;
+    border-radius: 60px;
+    box-shadow: 0 10px 20px rgba(255, 182, 193, 0.2);
+    max-width: 800px;
+    margin: 3rem auto;
+}
+
+/* Título */
+h2 {
+    text-align: center;
+    font-family: "Dunkin", sans-serif;
+    font-weight: bold;
+    color: #ff80a4;
+    margin-bottom: 30px;
+    padding: 12px 20px;
+}
+
+/* Etiquetas */
+label {
+    color: #ff80a4;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+/* Input de archivo */
+input[type="file"] {
+    background-color: #fff;
+    border: 2px solid #ffc0cb;
+    border-radius: 30px;
+    padding: 10px;
+    font-style: italic;
+    color: #555;
+    width: 100%;
+}
+
+input[type="file"]:focus {
+    border-color: #ff85a2;
+    box-shadow: 0 0 0 4px rgba(255, 133, 162, 0.3);
+    outline: none;
+}
+
+/* Texto de ayuda */
+.form-text {
+    color: #a64b6b;
+    font-style: italic;
+}
+
+/* Botón */
+.btn-primary {
+    background-color: #ff85a2;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 25px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 6px 15px rgba(255, 182, 193, 0.3);
+}
+
+.btn-primary:hover {
+    background-color: #ff5b8a;
+}
+
+/* Alertas */
+.alert {
+    border-radius: 30px;
+    padding: 15px 20px;
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 2px solid #c3e6cb;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 2px solid #f5c6cb;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tablaa {
+        padding: 20px;
+        border-radius: 40px;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+    }
+
+    .btn-primary {
+        width: 100%;
+        margin-top: 15px;
+    }
+}

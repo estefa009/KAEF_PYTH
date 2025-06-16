@@ -1,320 +1,157 @@
-/* ============ VARIABLES Y ESTILOS BASE ============ */
-:root {
-    --rosa-principal: #fc6998;
-    --rosa-claro: #f8bbd0;
-    --rosa-oscuro: #d81b60;
-    --rosa-pastel: #f06292;
-    --gris-claro: #f3f0f0;
-    --gris-medio: #d3d3d3;
-    --texto-oscuro: #333;
-    --texto-claro: #fff;
-    --borde-redondeado: 25px;
-}
-
-/* ============ ESTILOS GENERALES ============ */
+/* ======== Estilos generales ======== */
 body {
-    padding: 0;
-    margin: 0;
-    font-family: 'Century Gothic', sans-serif;
-    color: var(--texto-oscuro);
-    background-color: white;
-    background-size: cover;
-    text-align: center;
-    position: relative;
-    min-height: 100vh;
+    background-color: #fff0f5;
+    font-family: 'Segoe UI', 'Gill Sans', sans-serif;
+    color: #ff80a4;
 }
 
-/* Capa de transparencia */
-body::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--rosa-principal);
-    opacity: 0.2;
-    z-index: -1;
+/* ======== Título ======== */
+.ptable {
+    font-weight: bold;
+    color: #ff80a4;
+    margin-top: 1rem;
 }
 
-/* Asegura que todo el contenido esté sobre el overlay */
-main, header, footer, .content {
-    position: relative;
-    z-index: 1;
+/* ======== Tabla ======== */
+.table {
+    background-color: #fff;
+    border-radius: 30px;
+    box-shadow: 0 8px 20px rgba(255, 182, 193, 0.3);
+    overflow: hidden;
+    margin-top: 2rem;
 }
 
-/* ============ ESTILOS DEL HEADER/MAIN ============ */
-main {
-    background-color: var(--texto-claro);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px 30px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-main h1, main h4, main h5 {
-    margin: 10px 0;
-    color: var(--rosa-oscuro);
-}
-
-main h4 {
-    margin-left: 100px;
-}
-
-main h5 {
-    margin-left: 100px;
-}
-
-/* ============ BARRA DE BÚSQUEDA ============ */
-.search-form {
-    display: flex;
-    align-items: center;
-    position: relative;
-}
-
-main input {
-    padding: 8px 15px;
-    border-radius: var(--borde-redondeado);
-    border: none;
-    background-color: var(--gris-claro);
-    width: 250px;
-    transition: all 0.3s ease;
-}
-
-main input:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px var(--rosa-claro);
-}
-
-main button[type="submit"] {
-    position: absolute;
-    right: 10px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--rosa-oscuro);
-}
-
-/* ============ ICONOS DE USUARIO ============ */
-.icons {
-    display: flex;
-    align-items: center;
-    margin-left: 100px;
-}
-
-.icons i {
-    margin: 0 15px;
-    color: var(--rosa-oscuro);
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: color 0.3s ease;
-}
-
-.icons i:hover {
-    color: var(--rosa-principal);
-}
-
-.icons p {
-    margin: 0;
+.table thead {
+    background-color: #ffeef3;
+    color: #ff5a91;
     font-weight: bold;
 }
 
-/* ============ TABLA PRINCIPAL ============ */
-.table {
-    width: 80%;
-    margin: 30px auto;
-    background-color: var(--texto-claro);
-    border-radius: var(--borde-redondeado);
-    padding: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+.table th,
+.table td {
+    vertical-align: middle;
+    text-align: center;
 }
 
-.table h4.ptable {
-    color: var(--rosa-oscuro);
-    margin-bottom: 20px;
-    text-align: left;
-    padding-left: 20px;
-}
-
-.buscador_tab {
-    padding: 8px 15px;
-    width: 200px;
-    border-radius: var(--borde-redondeado);
-    border: none;
-    background-color: var(--gris-claro);
-    margin-right: 10px;
-}
-
-/* Botones de acción */
-.boton-buscador,
-#downloadPdf,
-#downloadWord,
-#downloadExcel,
-#insumo-more {
-    padding: 8px 15px;
-    border-radius: var(--borde-redondeado);
-    border: none;
-    margin: 0 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.boton-buscador {
-    background-color: transparent;
-    color: var(--rosa-oscuro);
-}
-
-#downloadPdf {
-    background-color: #ff4081;
-    color: white;
-}
-
-#downloadWord {
-    background-color: #4fc3f7;
-    color: white;
-}
-
-#downloadExcel {
-    background-color: #66bb6a;
-    color: white;
-}
-
-#insumo-more {
-    background-color: var(--rosa-principal);
-    color: white;
-}
-
-/* Hover effects */
-#downloadPdf:hover { background-color: #f50057; }
-#downloadWord:hover { background-color: #29b6f6; }
-#downloadExcel:hover { background-color: #4caf50; }
-#insumo-more:hover { background-color: var(--rosa-oscuro); }
-
-/* ============ ESTILOS DE TABLA ============ */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-th, td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid var(--gris-claro);
-}
-
-th {
-    background-color: var(--rosa-principal);
-    color: white;
-    font-weight: normal;
-}
-
-tr:hover {
-    background-color: rgba(252, 105, 152, 0.1);
-}
-
-/* ============ TARJETAS DE ESTADÍSTICAS ============ */
-.vent_semanal, .vent_mensual {
-    background-color: var(--texto-claro);
-    border-radius: var(--borde-redondeado);
-    padding: 20px;
-    margin: 20px auto;
-    width: 80%;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.vent_semanal {
-    border-top: 5px solid #e3f634;
-}
-
-.vent_mensual {
-    border-top: 5px solid var(--rosa-principal);
-}
-
-/* ============ BOTONES ROSA ============ */
-.btn-rosa {
-    background-color: var(--rosa-principal);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: var(--borde-redondeado);
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.btn-rosa:hover {
-    background-color: var(--rosa-oscuro);
-}
-
-.btn-pink-outline {
-    border: 1px solid var(--rosa-principal);
-    color: var(--rosa-principal);
-    background-color: transparent;
-    padding: 10px 20px;
-    border-radius: var(--borde-redondeado);
-    cursor: pointer;
+/* ======== Botones generales ======== */
+.btn {
+    border-radius: 30px;
+    font-weight: bold;
     transition: all 0.3s ease;
 }
 
-.btn-pink-outline:hover {
-    background-color: var(--rosa-claro);
-    color: var(--rosa-oscuro);
+.btn-outline-danger,
+.btn-outline-primary,
+.btn-outline-success,
+.btn-outline-warning {
+    border-width: 2px;
 }
 
-/* ============ RESPONSIVE DESIGN ============ */
+.btn-outline-danger:hover {
+    background-color: #ffccd5;
+    color: #a00032;
+}
+
+.btn-outline-primary:hover {
+    background-color: #e5d4ff;
+    color: #4b0082;
+}
+
+.btn-outline-success:hover {
+    background-color: #d1f7df;
+    color: #0b5e3c;
+}
+
+.btn-outline-warning:hover {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+/* ======== Botón rosa principal ======== */
+.btn-rosa,
+.btn-pink {
+    background-color: #ff69b4;
+    color: white;
+    border: none;
+}
+
+.btn-rosa:hover,
+.btn-pink:hover {
+    background-color: #ff1493;
+    color: white;
+}
+
+/* ======== Filtro de estado ======== */
+#filtroEstado {
+    border-radius: 30px;
+    font-style: italic;
+    background-color: #fff;
+    color: #ff69b4;
+}
+
+/* ======== Etiquetas de estado ======== */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-in-progress {
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+.status-completed {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-cancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* ======== Responsive ======== */
 @media (max-width: 768px) {
-    main {
-        flex-direction: column;
-        padding: 15px;
+    .table {
+        font-size: 0.9rem;
     }
 
-    main h4, main h5, .icons {
-        margin-left: 0;
-        text-align: center;
+    .btn {
+        font-size: 0.85rem;
+        padding: 8px 12px;
     }
 
-    .table, .vent_semanal, .vent_mensual {
-        width: 95%;
+    .ptable {
+        font-size: 1.2rem;
     }
 
-    .search-form {
-        width: 100%;
-        margin-bottom: 15px;
-    }
-
-    main input {
-        width: 100%;
+    #filtroEstado {
+        font-size: 0.9rem;
     }
 }
 
-/* ============ BOTÓN CERRAR SESIÓN ============ */
-.Cerrar {
-    background-color: transparent;
-    color: var(--rosa-oscuro);
-    border: 1px solid var(--rosa-oscuro);
-    padding: 8px 20px;
-    border-radius: var(--borde-redondeado);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 20px;
-}
-
-.Cerrar:hover {
-    background-color: var(--rosa-oscuro);
-    color: white;
-}
 /* Contenedor de la tabla */
 .table {
-    border: 3px solid #ffb6c1;
-    border-radius: 30px;
-    overflow: hidden;
-    border-collapse: separate;
-    border-spacing: 0;
-    margin-top: 20px;
+    background-color: #f3f0f0;
+    border-radius: 60px;
+    padding: 20px;
+    margin: 20px auto;
+    width: 70%;
+    background: linear-gradient(to bottom, #ffeef3, #FFF9F2);
+    box-shadow: 0 8px 20px rgba(255, 192, 203, 0.4);
+    font-family: 'Segoe UI', sans-serif;
+}
+#tablaProducciones {
+    width: 90%;
+    border: #004085 3px solid;
 }
 
 /* Título */
@@ -322,6 +159,7 @@ tr:hover {
     color: #ff80a4;
     text-align: center;
     margin-top: 10px;
+    font-family: "Dunkin";
 }
 
 /* Encabezados */
