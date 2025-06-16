@@ -43,7 +43,7 @@
 </head>
 
 <body>
-<body>
+
     {% include "includes/nav_admin.html" %}
 
 <!-- Gestión de Ventas -->
@@ -103,7 +103,6 @@
 
 {% load static %}
 
-        {% block content %}
         <div class="container mt-5">
             <h2 class="mb-4">Listado de Ventas</h2>
             
@@ -120,7 +119,6 @@
                             <th>Estado</th>
                             <th>Dirección Entrega</th>
                             <th>Observaciones</th>
-                            <th>Ver Detalles</th>
                             <th>Opciones</th>
                         </tr>
                     </thead>
@@ -128,7 +126,7 @@
                         {% for venta in ventas %}
                         <tr data-estado="{{ venta.estado }}">
                             <td>{{ venta.cod_venta }}</td>
-                            <td>{{ venta.nombre_cliente }}</td>
+                            <td>{{ venta.nom_usua }}</td>
                             <td>{{ venta.fecha_hora|date:"Y-m-d H:i" }}</td>
                             <td>${{ venta.subtotal }}</td>
                             <td>${{ venta.iva }}</td>
@@ -140,11 +138,19 @@
                                 <a href="{% url 'detalle_ventas' venta.cod_venta %}" class="btn btn-info btn-sm">
                                     Detalles
                                 </a>
-                            </td>
-                            <td class="text-center">
                                 <a href="{% url 'editar_estado_venta' venta.cod_venta %}" class="btn btn-warning btn-sm">
                                     Editar Estado
                                 </a>
+                            
+                                {% if venta.produccion_id %}
+                                    <span class="badge bg-secondary">Producción Generada</span>
+                                {% else %}
+                                    <a href="{% url 'confirmar_generacion_produccion' venta.cod_venta %}" class="btn btn-success btn-sm">
+                                        <i class="bi bi-gear-fill"></i> Generar Producción
+                                    </a>
+
+                                {% endif %}
+
                             </td>
                         </tr>
                         {% empty %}
@@ -162,7 +168,6 @@
                 </table>
             </div>
         </div>
-        {% endblock %}
     
             <!-- Paginación -->
             {% if total_paginas > 1 %}

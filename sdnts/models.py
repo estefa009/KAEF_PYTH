@@ -487,24 +487,19 @@ class Envio(models.Model):
         return f"Envío #{self.cod_envio} - {self.get_estado_display()}"
 
 class SaborMasa(models.Model):
-    """
-    Modelo para sabores de masa de donas
-    """
     cod_sabor_masa = models.AutoField(primary_key=True)
     nombre = models.CharField('nombre', max_length=30, unique=True)
     descripcion = models.CharField('descripción', max_length=100, blank=True, null=True)
-    
-    class Meta:
-        verbose_name = 'Sabor de Masa'
-        verbose_name_plural = 'Sabores de Masa'
-    
+    insumo = models.ForeignKey(
+        'Insumo',
+        on_delete=models.CASCADE,
+        related_name='sabores_masa',  # <- diferente
+        null=True, blank=True
+    )
     def __str__(self):
         return self.nombre
 
 class Glaseado(models.Model):
-    """
-    Modelo para tipos de glaseados de donas
-    """
     TIPOS = (
         ('Oscuro', 'Oscuro'),
         ('Blanco', 'Blanco'),
@@ -517,40 +512,32 @@ class Glaseado(models.Model):
         ('Azul', 'Azul'),
         ('Verde', 'Verde'),
     )
-    
     cod_glaseado = models.AutoField(primary_key=True)
     nombre = models.CharField('nombre', max_length=30)
     tipo = models.CharField('tipo', max_length=10, choices=TIPOS)
-    color = models.CharField(
-        'color',
-        max_length=10,
-        choices=COLORES,
-        blank=True,
-        null=True
-    )
+    color = models.CharField('color', max_length=10, choices=COLORES, blank=True, null=True)
     descripcion = models.CharField('descripción', max_length=100, blank=True, null=True)
-    
-    class Meta:
-        verbose_name = 'Glaseado'
-        verbose_name_plural = 'Glaseados'
-    
+    insumo = models.ForeignKey(
+        'Insumo',
+        on_delete=models.CASCADE,
+        related_name='glaseados',  # <- diferente
+        null=True, blank=True
+    )
     def __str__(self):
         if self.tipo == 'Colorido':
             return f"{self.nombre} ({self.color})"
         return self.nombre
 
 class Topping(models.Model):
-    """
-    Modelo para toppings/adornos de donas
-    """
     cod_topping = models.AutoField(primary_key=True)
     nombre = models.CharField('nombre', max_length=30, unique=True)
     descripcion = models.CharField('descripción', max_length=100, blank=True, null=True)
-    
-    class Meta:
-        verbose_name = 'Topping'
-        verbose_name_plural = 'Toppings'
-    
+    insumo = models.ForeignKey(
+        'Insumo',
+        on_delete=models.CASCADE,
+        related_name='toppings',  # <- diferente
+        null=True, blank=True
+    )
     def __str__(self):
         return self.nombre
 
@@ -570,7 +557,8 @@ class CombinacionProducto(models.Model):
         on_delete=models.CASCADE,
         related_name='combinaciones'
     )
-    
+    cod_detalle = models.ForeignKey(DetalleVenta, on_delete=models.CASCADE, related_name='combinaciones', null=True, blank=True)  # ← NUEVO
+
     # Primera combinación (obligatoria)
     cod_sabor_masa_1 = models.ForeignKey(
         SaborMasa,

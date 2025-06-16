@@ -347,12 +347,6 @@ class RecetaProductoForm(forms.ModelForm):
         model = RecetaProducto
         fields = ['cantidad', 'unidad_medida']
 
-RecetaProductoFormSet = modelformset_factory(
-    RecetaProducto,
-    form=RecetaProductoForm,
-    extra=0,
-    can_delete=False  # no se pueden borrar insumos
-)
 
 RecetaProductoFormSet = modelformset_factory(
     RecetaProducto,
