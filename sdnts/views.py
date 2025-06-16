@@ -1493,20 +1493,17 @@ def agregar_categoria(request):
 
         if CategoriaInsumo.objects.filter(nom_categoria__iexact=nom_categoria).exists():
             messages.warning(request, 'Ya existe una categoría con ese nombre.')
-        else:
-            CategoriaInsumo.objects.create(
-                nom_categoria=nom_categoria,
-                descripcion=descripcion if descripcion else None
-            )
-            messages.success(request, 'Categoría agregada exitosamente.')
+            return redirect('agregar_categoria')
         
-        return redirect('categorias_admin')  # Cambia por el nombre correcto de tu ruta
+        CategoriaInsumo.objects.create(
+            nom_categoria=nom_categoria,
+            descripcion=descripcion or None
+        )
+        messages.success(request, 'Categoría agregada exitosamente.')
+        return redirect('categorias_admin')
 
-    # Para métodos GET también puedes mostrar la tabla de categorías
-    categorias = CategoriaInsumo.objects.all()
-    return render(request, 'admin/categorias/categorias_admin.html', {
-        'categorias': categorias
-    })
+    return render(request, 'admin/categorias/agregar_categoria.html')
+
 
 def eliminar_categoria(request, cod_categoria):
     categoria = get_object_or_404(CategoriaInsumo, cod_categoria=cod_categoria)

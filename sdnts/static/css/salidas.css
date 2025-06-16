@@ -1,3 +1,47 @@
+/* Fondo general y fuente */
+body {
+    background: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #ff80a4;
+}
+
+/* Contenedor principal */
+.table_salida {
+    background-color: #f3f0f0;
+    border-radius: 60px;
+    padding: 20px;
+    margin: 20px auto;
+    width: 70%;
+    background: linear-gradient(to bottom, #ffeef3, #FFF9F2);
+    box-shadow: 0 8px 20px rgba(255, 192, 203, 0.4);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Título */
+.table_salida h5 {
+    font-family: "Dunkin", sans-serif;
+    font-weight: bold;
+    color: #ff80a4;
+    padding: 10px 30px;
+    border-radius: 40px;
+    display: inline-block;
+}
+
+/* Botón "Agregar Salida" */
+.btn-primary {
+    background-color: #ff85a2;
+    border: none;
+    border-radius: 30px;
+    padding: 8px 16px;
+    font-weight: bold;
+    font-family: inherit;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 6px rgba(255, 192, 203, 0.3);
+}
+
+.btn-primary:hover {
+    background-color: #ff5b8a;
+}
 /* Estilo general de la tabla */
 .table {
     border: 3px solid #ffb6c1;
