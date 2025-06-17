@@ -1085,11 +1085,31 @@ def agregar_venta_completa(request):
                     venta.total = total
                     venta.save()
 
-                    for form in combinacion_formset:
+                    # Asumimos que hay una combinación por cada unidad vendida (por cantidad)
+                    detalle_index = 0
+                    detalle_instances = []
+
+                    # Guardar detalles primero y acumularlos
+                    for form in detalle_formset:
+                        if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                            detalle = form.save(commit=False)
+                            detalle.cod_venta = venta
+                            detalle.save()
+                            detalle_instances.extend([detalle] * detalle.cantidad)  # Repetir según la cantidad
+
+                            subtotal += detalle.cantidad * detalle.precio_unitario
+
+                    # Asociar combinaciones con detalle correspondiente por índice
+                    for i, form in enumerate(combinacion_formset):
                         if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
                             combinacion = form.save(commit=False)
                             combinacion.cod_venta = venta
+
+                            if i < len(detalle_instances):
+                                combinacion.cod_detalle = detalle_instances[i]  # ← Enlazar con detalle correcto
+
                             combinacion.save()
+
 
                     pago = pago_form.save(commit=False)
                     pago.cod_venta = venta
@@ -1116,9 +1136,12 @@ def agregar_venta_completa(request):
         'productos': productos,
         'precios_productos': precios,
     })
+
 @login_required
 def detalle_ventas(request, venta_id):
     venta = get_object_or_404(Venta, pk=venta_id)
+
+    # Traer detalles con producto relacionado
     detalles = DetalleVenta.objects.filter(cod_venta=venta).select_related('cod_producto')
 
     total = sum(detalle.subtotal for detalle in detalles)
@@ -1283,7 +1306,6 @@ def generar_produccion_confirmada(request, cod_venta):
             messages.warning(request, "Ya se ha generado una producción para esta venta.")
             return redirect('ventas_admin')
 
-        # Crear producción
         produccion = Produccion.objects.create(
             cod_venta=venta,
             fecha_inicio=datetime.now()
@@ -1291,39 +1313,25 @@ def generar_produccion_confirmada(request, cod_venta):
 
         insumos_necesarios = {}
 
-        # Procesar combinaciones por cada detalle y unidad
         for detalle in DetalleVenta.objects.filter(cod_venta=venta):
-            # Insumos de receta base
+            # --- 1. Receta base ---
             receta = RecetaProducto.objects.filter(cod_producto=detalle.cod_producto)
             for item in receta:
                 total = item.cantidad * detalle.cantidad
                 insumos_necesarios[item.insumo_id] = insumos_necesarios.get(item.insumo_id, 0) + total
 
-            # Combos personalizados
-            for i in range(detalle.cantidad):
-                prefijo = f"combinaciones[{detalle.pk}][{i}]"
-                masa_id = request.POST.get(f"{prefijo}[masa]")
-                glaseado_id = request.POST.get(f"{prefijo}[glaseado]")
-                topping_id = request.POST.get(f"{prefijo}[topping]")
-
-                # Guardar combinación
-                combinacion = CombinacionProducto.objects.create(
-                    cod_detalle=detalle,
-                    cod_sabor_masa_1_id=masa_id,
-                    cod_glaseado_1_id=glaseado_id,
-                    cod_topping_1_id=topping_id
-                )
-
-                # Sumar insumos de componentes seleccionados
+            # --- 2. Personalización por combinación ---
+            combinaciones = CombinacionProducto.objects.filter(cod_detalle=detalle)
+            for combinacion in combinaciones:
                 for insumo_id in [
-                    SaborMasa.objects.get(pk=masa_id).insumo_id if masa_id else None,
-                    Glaseado.objects.get(pk=glaseado_id).insumo_id if glaseado_id else None,
-                    Topping.objects.get(pk=topping_id).insumo_id if topping_id else None
+                    combinacion.cod_sabor_masa_1.insumo_id if combinacion.cod_sabor_masa_1 else None,
+                    combinacion.cod_glaseado_1.insumo_id if combinacion.cod_glaseado_1 else None,
+                    combinacion.cod_topping_1.insumo_id if combinacion.cod_topping_1 else None
                 ]:
                     if insumo_id:
                         insumos_necesarios[insumo_id] = insumos_necesarios.get(insumo_id, 0) + 1
 
-        # Verificar stock
+        # Verificación de stock
         faltantes = []
         for insumo_id, requerido in insumos_necesarios.items():
             insumo = Insumo.objects.get(pk=insumo_id)
@@ -1332,9 +1340,9 @@ def generar_produccion_confirmada(request, cod_venta):
 
         if faltantes:
             messages.error(request, "No hay suficiente stock para:\n" + "\n".join(faltantes))
-            raise transaction.TransactionManagementError  # revierte la transacción
+            raise transaction.TransactionManagementError  # Se revierte la transacción
 
-        # Descontar stock y registrar salidas
+        # Registrar salidas y descontar stock
         for insumo_id, cantidad in insumos_necesarios.items():
             insumo = Insumo.objects.get(pk=insumo_id)
             Salida.objects.create(
@@ -1348,7 +1356,6 @@ def generar_produccion_confirmada(request, cod_venta):
         messages.success(request, "Producción generada exitosamente y stock actualizado.")
         return redirect('produccion_admin')
 
-    # Si accede por GET (error)
     messages.error(request, "Acceso inválido.")
     return redirect('ventas_admin')
 

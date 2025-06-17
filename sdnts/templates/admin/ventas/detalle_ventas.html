@@ -192,12 +192,27 @@
                 <tr>
                     <td>{{ detalle.cod_producto.nombre }}</td>
                     <td>
-                        {% if detalle.cod_producto.combinacion %}
-                            {{ detalle.cod_producto.combinacion }}
+                        {% if detalle.combinaciones.all %}
+                            <ul class="list-unstyled mb-0">
+                                {% for c in detalle.combinaciones.all %}
+                                    <li>
+                                        {{ c.cod_sabor_masa_1.nombre }} /
+                                        {{ c.cod_glaseado_1.nombre }} /
+                                        {% if c.cod_topping_1 %}
+                                            {{ c.cod_topping_1.nombre }}
+                                        {% else %}
+                                            Sin topping
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         {% else %}
-                            Sin combinación
+                            <em>Sin combinación</em>
                         {% endif %}
                     </td>
+
+
+
                     <td>{{ detalle.cantidad }}</td>
                     <td>${{ detalle.precio_unitario }}</td>
                     <td>{{ detalle.fecha_entrega }}</td>
