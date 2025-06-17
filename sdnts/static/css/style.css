@@ -393,5 +393,40 @@ a:hover {
     font-family: 'Dunkin';
     src: url('../font/Dunkin.otf') format('truetype');
 }
+.icon-trash {
+    font-size: 2.5rem !important; /* GRANDE y fijo */
+    color: #fc6998 !important;
+    cursor: pointer;
+    margin: 0 auto;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    transition: transform 0.18s, color 0.18s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    line-height: 1;
+    text-align: center;
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+    max-width: 2.5rem;
+    max-height: 2.5rem;
+}
+.icon-trash:hover {
+    color: #c82333 !important;
+    transform: scale(1.18) rotate(-10deg);
+}
 
-
+.detalles-producto-carrito {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    min-height: 80px;
+    max-width: 100px;
+    max-height: 100px;
+    padding: 0;
+    margin: 0;
+}

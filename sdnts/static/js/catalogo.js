@@ -35,7 +35,7 @@ const nombresParaMostrar = {
         'chocolate': 'Chocolate',
         'red-velvet': 'Red Velvet'
     },
-   cobertura: {
+    cobertura: {
         'choc-blanco': 'Chocolate Blanco',
         'choc-oscuro': 'Chocolate Oscuro',
         'arequipe': 'Arequipe'
@@ -269,14 +269,31 @@ function showHTML() {
                     <span class="precio-producto-carrito">$${(product.precio * product.quantity).toFixed(2)}</span>
                 </div>
                 <div class="detalles-producto-carrito">
-                    <p>${product.descripcion}</p>
+                    <i class="bi bi-trash-fill icon-trash" data-id="${product.id}" title="Eliminar"></i>
                 </div>
                 <div class="acciones-producto-carrito">
-        <span class="btn-decrementar icon-btn" data-id="${product.id}">-</span>
-        <span class="btn-incrementar icon-btn" data-id="${product.id}">+</span>
-    </div>`;
+                    <span class="btn-decrementar icon-btn" data-id="${product.id}">-</span>
+                    <span class="btn-incrementar icon-btn" data-id="${product.id}">+</span>
+                </div>`;
 
-                  rowProduct.append(containerProduct);
+            // Animación y eliminación del producto
+            const iconTrash = containerProduct.querySelector('.icon-trash');
+            iconTrash.addEventListener('click', function () {
+                containerProduct.style.height = containerProduct.offsetHeight + "px"; // Fija la altura antes de animar
+                // Forzar reflow para que el cambio de clase sea animado
+                void containerProduct.offsetWidth;
+                containerProduct.classList.add('eliminando');
+                setTimeout(() => {
+                    const index = allProducts.findIndex(p => p.id == product.id);
+                    if (index !== -1) {
+                        allProducts.splice(index, 1);
+                        localStorage.setItem('cart', JSON.stringify(allProducts));
+                        showHTML();
+                    }
+                }, 500);
+            });
+
+            rowProduct.append(containerProduct);
             total += product.quantity * product.precio;
             totalOfProducts += product.quantity;
         });
@@ -384,8 +401,8 @@ document.addEventListener('DOMContentLoaded', function () {
             masa: selecciones.masa,
             cobertura: selecciones.cobertura,
             topping: selecciones.topping,
-             precio: 8403.36,
-             precio: precio,
+            precio: 8403.36,
+            precio: precio,
 
             titulo: 'Donas Talla S',
             descripcion: `${selecciones.masa.nombre} | ${selecciones.cobertura.nombre} | ${selecciones.topping.nombre}`,
@@ -582,14 +599,14 @@ document.addEventListener('DOMContentLoaded', function () {
     if (radioDavi) radioDavi.addEventListener('change', toggleMetodoPago);
 
     // Manejo de modales específicos
-    window.openModal = function(modalId) {
+    window.openModal = function (modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.style.display = 'block';
         }
     }
 
-    window.closeModal = function(modalId) {
+    window.closeModal = function (modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.style.display = 'none';
@@ -597,7 +614,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Cerrar modales al hacer click fuera
-    window.onclick = function(event) {
+    window.onclick = function (event) {
         if (event.target.classList.contains('modal-nequi')) {
             event.target.style.display = 'none';
         }
@@ -605,40 +622,40 @@ document.addEventListener('DOMContentLoaded', function () {
             event.target.style.display = 'none';
         }
     }
-// Seleccionamos el modal directamente por ID
-// Seleccionamos el modal correcto
-const modalCompraExitosa = document.getElementById('modalCompraExitosa');
-const btnOK = modalCompraExitosa.querySelector('button');
-const btnClose = modalCompraExitosa.querySelector('.close');
+    // Seleccionamos el modal directamente por ID
+    // Seleccionamos el modal correcto
+    const modalCompraExitosa = document.getElementById('modalCompraExitosa');
+    const btnOK = modalCompraExitosa.querySelector('button');
+    const btnClose = modalCompraExitosa.querySelector('.close');
 
-function cerrarModalCompra() {
-    modalCompraExitosa.classList.add('hidden');
-    modalCompraExitosa.style.display = 'none';
-    modalCompraExitosa.style.opacity = '0';
-}
-
-// Asignamos los listeners
-btnOK?.addEventListener('click', cerrarModalCompra);
-btnClose?.addEventListener('click', cerrarModalCompra);
-
-// Cerrar al hacer clic fuera del modal
-window.addEventListener('click', function(event) {
-    if (event.target === modalCompraExitosa) {
-        cerrarModalCompra();
+    function cerrarModalCompra() {
+        modalCompraExitosa.classList.add('hidden');
+        modalCompraExitosa.style.display = 'none';
+        modalCompraExitosa.style.opacity = '0';
     }
-});
+
+    // Asignamos los listeners
+    btnOK?.addEventListener('click', cerrarModalCompra);
+    btnClose?.addEventListener('click', cerrarModalCompra);
+
+    // Cerrar al hacer clic fuera del modal
+    window.addEventListener('click', function (event) {
+        if (event.target === modalCompraExitosa) {
+            cerrarModalCompra();
+        }
+    });
     showHTML();
 
 
 
-// Esta función la llamas cada vez que quieras mostrar el resumen
-window.mostrarModalResumen = function(datos) {
-    const contenidoDetalles = modalResumen.querySelector('.resumen-detalles');
-    if (contenidoDetalles) {
-        contenidoDetalles.innerHTML = datos;
-    }
-    modalResumen.classList.remove('hidden');
-};
+    // Esta función la llamas cada vez que quieras mostrar el resumen
+    window.mostrarModalResumen = function (datos) {
+        const contenidoDetalles = modalResumen.querySelector('.resumen-detalles');
+        if (contenidoDetalles) {
+            contenidoDetalles.innerHTML = datos;
+        }
+        modalResumen.classList.remove('hidden');
+    };
 
 
 });
@@ -705,7 +722,7 @@ document.getElementById('btnPagar')?.addEventListener('click', function () {
     }
 
     // Asegúrate de que el contenedor existe antes de asignar el HTML
-const cajita = document.querySelector('#modalP .productosPagar .cajita');    if (cajita) {
+    const cajita = document.querySelector('#modalP .productosPagar .cajita'); if (cajita) {
         cajita.innerHTML = productosHTML;
     }
 
@@ -915,7 +932,7 @@ document.getElementById('btnAgregarProducto')?.addEventListener('click', async f
                 modal.style.opacity = '1';
                 modal.style.zIndex = '9999';
                 void modal.offsetWidth;
-                modal.scrollIntoView({behavior: 'smooth', block: 'center'});
+                modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 if (typeof showHTML === 'function') showHTML();
             } else {
                 alert('Error al procesar la compra: ' + (data.error || ''));
@@ -963,7 +980,7 @@ function cerrarModalCompraExitosa() {
 }
 
 // Asigna los listeners al botón OK y la X del modal de compra exitosa
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Solo asigna listeners, NO muestres el modal ni lo toques aquí
     const modalCompraExitosa = document.getElementById('modalCompraExitosa');
     if (modalCompraExitosa) {
