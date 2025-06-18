@@ -354,5 +354,24 @@ RecetaProductoFormSet = modelformset_factory(
     extra=1,
     can_delete=True
 )
+from django import forms
+from .models import RecetaPersonalizacion
+
+class RecetaPersonalizacionForm(forms.ModelForm):
+    class Meta:
+        model = RecetaPersonalizacion
+        fields = ['tipo', 'insumo', 'unidad_medida']
+        widgets = {
+            'tipo': forms.Select(attrs={'class': 'form-control'}),
+            'insumo': forms.Select(attrs={'class': 'form-control'}),
+            'unidad_medida': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+RecetaPersonalizacionFormSet = forms.modelformset_factory(
+    RecetaPersonalizacion,
+    form=RecetaPersonalizacionForm,
+    extra=3,  # Puedes aumentar esto si quieres más combinaciones
+    can_delete=True
+)
 
 

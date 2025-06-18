@@ -135,7 +135,9 @@
                     <th>Requerido</th>
                     <th>Stock Actual</th>
                     <th>Unidad</th>
+                    <th>Fuente</th>
                     <th>Disponibilidad</th>
+
                 </tr>
             </thead>
             <tbody>
@@ -146,9 +148,16 @@
                         <tr>
                     {% endif %}
                         <td>{{ nombre }}</td>
-                        <td>{{ data.cantidad }}</td>
-                        <td>{{ data.stock }}</td>
+                        <td>{{ data.cantidad|floatformat:2 }}</td>
+                        <td>{{ data.stock|floatformat:2 }}</td>
                         <td>{{ data.unidad }}</td>
+                        <td>
+                            {% if data.fuente %}
+                                {{ data.fuente|join:", " }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
                         <td>
                             {% if data.cantidad > data.stock %}
                                 <strong class="text-danger">Insuficiente</strong>
@@ -156,6 +165,8 @@
                                 <span class="text-success">Disponible</span>
                             {% endif %}
                         </td>
+
+
                     </tr>
                 {% endfor %}
             </tbody>
