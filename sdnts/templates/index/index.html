@@ -13,82 +13,747 @@
     <link rel="icon" href="{% static 'icon/2.ico' %}" sizes="128x128" type="image/x-icon">
 
     <style>
-        .combos { cursor: pointer; }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fc6998;
+        }
+
+        .logo {
+            font-weight: bold;
+            padding-left: 50px;
+        }
+
+        .DNUT {
+            font-size: 400px;
+        }
+
+        h1 {
+            font-weight: bold;
+        }
+        .btn1 {
+            font-size: large;
+            border-radius: 50px;
+            background-color: #4e4032;
+            color: #ffc0cb;
+            border: 2px solid#695450;
+            font-family: "Dunkin";
+            padding: 10px 40px;
+        }
+        .btn2 {
+            border-radius: 50px;
+            background-color: #4e4032;
+            color: #ffc0cb;
+            border: 2px solid #4e4032;
+            font-family: "Dunkin";
+        }
+        .btn:hover {
+            background-color: #ffc0cb;
+            border: 2px solid #ffc0cb;
+            color: #695450;
+            transform: scale(1.05);
+            font-family: "Dunkin";
+        }
+        .botones {
+            margin-left: 100px;
+            width: 50%;
+        }
+        .container img {
+            max-width: 200px;
+            height: auto;
+        }
+        .contenedor1 {
+            background-color: white;
+            margin: auto;
+            margin-top: 30px;
+            padding-top: 50px;
+            width: 80%;
+            height: 550px;
+            border-radius: 100px;
+            font-family: "Dunkin";
+            color: #4e4032;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .textoPrincipal {
+            width: 60%;
+            padding-left: 120px;
+            float: left;
+        }
+
+        .textoPrincipal h1 {
+            font-size: 70px;
+        }
+        .celular {
+            float: right;
+            width: 40%;
+            height: 100%;
+            position: relative;
+        }
+        .celular img {
+            width: 80%;
+            height: auto;
+            padding-bottom: 25px;
+            margin-left: 50px;
+            position: absolute;
+            bottom: 0;
+        }
+        .contenedor2 {
+            width: 100%;
+            height: 600px;
+            background-color: #ffe5f0;
+            margin-top: 40px;
+        }
+        .DNUT {
+            font-size: 95px;
+        }
+        .mt-3 {
+            color: #88584e;
+            font-size: 20px;
+        }
+
+        .textoCapa2 {
+            font-family: "Dunkin";
+            color: #4e4032;
+            text-align: center;
+        }
+        .textoCapa2 h1 {
+            font-size: 55px;
+            padding-top: 30px;
+        }
+        .palabra {
+            font-size: 75px;
+        }
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 100px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 350px;
+            width: 350px;
+            background-color: #ecd6c0;
+            padding: 50px;
+            margin: 10px;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .titulo {
+            text-align: center;
+            font-family: "Dunkin";
+            color: #695450;
+            font-size: 20px;
+
+        }
+        .contenedor3 {
+            background-color: #fc6998;
+            width: 100%;
+            height: 600px;
+            position: relative;
+        }
+        .combos {
+            width: 85%;
+            height: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .cuadro {
+            width: 95%;
+            margin: auto;
+            height: 500px;
+            background-color: white;
+            margin-top: 50px;
+            border-radius: 100px;
+            border: 30px solid #fff9c7;
+        }
+        .letras {
+            width: 55%;
+            height: 450px;
+            float: left;
+        }
+        .letras h1 {
+            font-family: "Dunkin";
+            color: #4e4032;
+            font-size: 60px;
+            margin-top: 50px;
+            padding-left: 130px;
+        }
+        .letras p {
+            color: #88584e;
+        }
+        .descripcion {
+            font-family: "Dunkin";
+            color: #695450;
+            font-size: 20px;
+            padding-left: 130px;
+        }
+        .ANTOJO {
+            font-size: 85px;
+        }
+        .cantidad img {
+            width: 95%;
+            height: auto;
+            margin-left: 10%;
+            margin-right: 10%;
+        }
+        .cantidad {
+            width: 45%;
+            height: 450px;
+            float: right;
+            padding-left: 20px;
+            padding-top: 21px;
+            margin-right: 5%;
+            margin-top: -2%;
+        }
+        .flecha {
+            width: 15%;
+            height: 500px;
+            float: right;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .flecha img {
+            width: 60px;
+            height: 60px;
+            margin-top: 200px;
+        }
+        .flecha:hover {
+            transform: translateY(-50%) scale(1.05);
+        }
+        .cuadro:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+        .InicioSesion {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+       
+    .InicioSesion::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('{% static "Image/fondo.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        opacity: 0.5;
+        z-index: -1;
+    }
+
+
+        .InicioSesion h1 {
+            font-family: "Dunkin";
+            color: #4e4032;
+            font-size: 60px;
+            text-align: center;
+            padding-top: 100px;
+            z-index: 1;
+        }
+        .cuenta {
+            font-size: 80px;
+        }
+        .InicioSesion h2 {
+            font-family: "Dunkin";
+            color: #695450;
+            font-size: 20px;
+            text-align: center;
+        }
+        input.form-control {
+            border-radius: 100px;
+            background-color: white;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            border: 5px solid #695450;
+        }
+        input.form-control:hover {
+            background-color: white;
+            border-color: #695450;
+        }
+        .row {
+            margin: auto;
+            width: 70%;
+            height: 200px;
+        }
+        .btn-link {
+            width: 300px;
+            height: 50px;
+            background-color: transparent;
+            border: none;
+            font-family: "Dunkin";
+            color: #695450;
+            font-size: 13px;
+        }
+        .btn-link:hover {
+            color: #93877e;
+            transform: scale(1.05);
+        }
+        .forgot {
+            padding-bottom: 200px;
+            padding-right: 50px;
+            text-align: center;
+        }
+        .RedesSociales {
+            width: 100%;
+            height: 485px;
+            background-color: #ecd6c0;
+            margin-top: 50px;
+        }
+        .RedesSociales h1 {
+            font-family: "Dunkin";
+            color: #4e4032;
+            text-align: center;
+            padding-top: 50px;
+        }
+        .RedesSociales h2 {
+            font-family: "Dunkin";
+            color: #695450;
+            text-align: center;
+
+        }
+        .redes img {
+            width: 200px;
+            height: 200px;
+            margin: 10px;
+        }
+        .redes1:hover {
+            transform: scale(1.05);
+        }
+        .redes2:hover {
+            transform: scale(1.05);
+        }
+        .redes3:hover {
+            transform: scale(1.05);
+        }
+        .social {
+            width: 45%;
+            height: 300px;
+            margin: auto;
+        }
+        .redes {
+            display: flex;
+            justify-content: center;
+        }
+        .redes h1 {
+            font-size: 18px;
+            text-align: center;
+        }
+        .InformacionFinal {
+            width: 100%;
+            height: 300px;
+            background-color: #695450;
+
+        }
+        .navbarFinal {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Dunkin";
+            padding-top: 50px;
+        }
+
+        .navbarFinal li {
+            margin: 0 30px;
+            position: relative;
+        }
+
+        .navbarFinal li::after {
+            content: '|';
+            margin-left: 30px;
+            color: #93877e;
+        }
+
+        .navbarFinal li:last-child::after {
+            content: '';
+        }
+
+        .navbarFinal a {
+            text-decoration: none;
+            color: #93877e;
+            transition: transform 0.3s;
+            display: inline-block;
+        }
+        .navbarFinal a:hover {
+            transform: scale(1.05);
+            color: #ecd6c0;
+        }
+        .Direccion {
+            text-align: center;
+            color: #93877e;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            margin-top: 30px;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        a:hover {
+            text-decoration: none;
+        }
+        @font-face {
+            font-family: 'Dunkin';
+            src: url('../font/Dunkin.otf') format('truetype');
+        }
+        .icon-trash {
+            font-size: 2.5rem !important;
+            color: #fc6998 !important;
+            cursor: pointer;
+            margin: 0 auto;
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            transition: transform 0.18s, color 0.18s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+            line-height: 1;
+            text-align: center;
+            min-width: 1.5rem;
+            min-height: 1.5rem;
+            max-width: 2.5rem;
+            max-height: 2.5rem;
+        }
+        .icon-trash:hover {
+            color: #c82333 !important;
+            transform: scale(1.18) rotate(-10deg);
+        }
+
+        .detalles-producto-carrito {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 80px;
+            min-height: 80px;
+            max-width: 100px;
+            max-height: 100px;
+            padding: 0;
+            margin: 0;
+        }
+
+        .combos { 
+            cursor: pointer; 
+        }
+
+        /* Media Queries para responsividad */
+        @media (max-width: 1200px) {
+            .contenedor1 {
+                width: 90%;
+                height: auto;
+                padding-bottom: 50px;
+            }
+            .textoPrincipal h1 {
+                font-size: 50px;
+            }
+            .DNUT {
+                font-size: 50px;
+            }
+            .celular img {
+                width: 70%;
+            }
+            .letras h1 {
+                font-size: 50px;
+                padding-left: 80px;
+            }
+            .ANTOJO {
+                font-size: 70px;
+            }
+            .descripcion {
+                padding-left: 80px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .contenedor1 {
+                height: auto;
+                padding-bottom: 400px;
+                position: relative;
+            }
+            .textoPrincipal {
+                width: 100%;
+                padding-left: 50px;
+                padding-right: 50px;
+                float: none;
+            }
+            .celular {
+                width: 100%;
+                float: none;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                text-align: center;
+            }
+            .celular img {
+                position: relative;
+                margin: 0 auto;
+                left: auto;
+                right: auto;
+            }
+            .botones {
+                margin-left: 50px;
+                margin-bottom: 30px;
+            }
+            .gallery-item {
+                width: 300px;
+                height: 300px;
+                padding: 30px;
+            }
+            .letras h1 {
+                font-size: 40px;
+                padding-left: 50px;
+            }
+            .ANTOJO {
+                font-size: 60px;
+            }
+            .descripcion {
+                padding-left: 50px;
+            }
+            .InicioSesion h1 {
+                font-size: 50px;
+            }
+            .cuenta {
+                font-size: 60px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .contenedor1 {
+                padding-bottom: 350px;
+            }
+            .textoPrincipal h1 {
+                font-size: 40px;
+            }
+            .DNUT {
+                font-size: 40px;
+            }
+            .textoCapa2 h1 {
+                font-size: 40px;
+            }
+            .palabra {
+                font-size: 50px;
+            }
+            .gallery-item {
+                width: 250px;
+                height: 250px;
+                padding: 20px;
+            }
+            .letras {
+                width: 100%;
+                float: none;
+                text-align: center;
+            }
+            .letras h1 {
+                padding-left: 0;
+                font-size: 35px;
+                margin-top: 30px;
+            }
+            .ANTOJO {
+                font-size: 50px;
+            }
+            .descripcion {
+                padding-left: 0;
+                text-align: center;
+            }
+            .cantidad {
+                width: 100%;
+                float: none;
+                text-align: center;
+            }
+            .cantidad img {
+                margin-left: 20px;
+            }
+            .flecha {
+                display: none;
+            }
+            .InicioSesion h1 {
+                font-size: 40px;
+            }
+            .cuenta {
+                font-size: 50px;
+            }
+            .row {
+                flex-direction: column;
+                height: auto;
+                width: 90%;
+            }
+            .row .col {
+                margin-bottom: 15px;
+                width: 100%;
+            }
+            .forgot {
+                padding-bottom: 50px;
+                padding-right: 0;
+            }
+            .social {
+                width: 90%;
+            }
+            .redes {
+                flex-wrap: wrap;
+            }
+            .redes img {
+                width: 150px;
+                height: 150px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .contenedor1 {
+                padding-bottom: 300px;
+            }
+            .textoPrincipal h1 {
+                font-size: 30px;
+            }
+            .DNUT {
+                font-size: 30px;
+            }
+            .textoPrincipal {
+                padding-left: 30px;
+                padding-right: 30px;
+            }
+            .botones {
+                margin-left: 30px;
+            }
+            .textoCapa2 h1 {
+                font-size: 30px;
+            }
+            .palabra {
+                font-size: 40px;
+            }
+            .gallery-item {
+                width: 220px;
+                height: 220px;
+                margin: 5px;
+            }
+            .letras h1 {
+                font-size: 30px;
+            }
+            .ANTOJO {
+                font-size: 40px;
+            }
+            .InicioSesion h1 {
+                font-size: 30px;
+                padding-top: 70px;
+            }
+            .cuenta {
+                font-size: 40px;
+            }
+            .navbarFinal {
+                flex-direction: column;
+                padding-top: 30px;
+            }
+            .navbarFinal li {
+                margin: 10px 0;
+            }
+            .navbarFinal li::after {
+                content: '';
+            }
+        }
     </style>
 </head>
 
 <body>
   {% include 'includes/nav_index.html' %}
 
-<!-- Sección principal -->
-<div class="contenedor1 shadow">
-    <div class="celular">
-        <img src="{% static 'Image/donlog.png' %}" alt="Donut imagen" class="img-fluid">
-    </div>
-    <div class="textoPrincipal">
-        <h1>¡La vida sabe mejor con una <span class="DNUT">DNUT!</span></h1>
-        <p class="mt-3">Haz parte de esta experiencia, ¡Regístrate y<br> ordena AHORA!</p>
-    </div>
-    <div class="botones">
-        <a href="{% url 'registro' %}" class="btn1 btn mx-2 shadow">REGISTRARME</a>
-    </div>
-</div>
+  <!-- Sección principal -->
+  <div class="contenedor1 shadow">
+      <div class="textoPrincipal">
+          <h1>¡La vida sabe mejor con una <span class="DNUT">DNUT!</span></h1>
+          <p class="mt-3">Haz parte de esta experiencia, ¡Regístrate y<br> ordena AHORA!</p>
+      </div>
+      <div class="celular">
+          <img src="{% static 'Image/donlog.png' %}" alt="Donut imagen" class="img-fluid">
+      </div>
+      <div class="botones">
+          <a href="{% url 'registro' %}" class="btn1 btn mx-2 shadow">REGISTRARME</a>
+      </div>
+  </div>
 
-<!-- Galería de productos -->
-<div class="contenedor2 shadow">
-    <div class="textoCapa2">
-        <h1>¡Arma y construye tu <span class="palabra">DNUT</span> a tu gusto!</h1>
-    </div>
-    <div class="gallery">
-        <div class="gallery-item shadow">
-            <a href="{% url 'catalogo' %}#ProductMasas">
-                <img src="{% static 'Image/masa.png' %}" alt="masa">
-                <p class="titulo">Masa</p>
-            </a>
-        </div>
-        <div class="gallery-item shadow">
-            <a href="{% url 'catalogo' %}#ProductCobertura">
-                <img src="{% static 'Image/cobertura.png' %}" alt="cobertura">
-                <p class="titulo">Cobertura</p>
-            </a>
-        </div>
-        <div class="gallery-item shadow">
-            <a href="{% url 'catalogo' %}#ProductToppings">
-                <img src="{% static 'Image/toppings.png' %}" alt="topping">
-                <p class="titulo">Toppings</p>
-            </a>
-        </div>
-    </div>
-</div>
+  <!-- Galería de productos -->
+  <div class="contenedor2 shadow">
+      <div class="textoCapa2">
+          <h1>¡Arma y construye tu <span class="palabra">DNUT</span> a tu gusto!</h1>
+      </div>
+      <div class="gallery">
+          <div class="gallery-item shadow">
+              <a href="{% url 'catalogo' %}#ProductMasas">
+                  <img src="{% static 'Image/masa.png' %}" alt="masa">
+                  <p class="titulo">Masa</p>
+              </a>
+          </div>
+          <div class="gallery-item shadow">
+              <a href="{% url 'catalogo' %}#ProductCobertura">
+                  <img src="{% static 'Image/cobertura.png' %}" alt="cobertura">
+                  <p class="titulo">Cobertura</p>
+              </a>
+          </div>
+          <div class="gallery-item shadow">
+              <a href="{% url 'catalogo' %}#ProductToppings">
+                  <img src="{% static 'Image/toppings.png' %}" alt="topping">
+                  <p class="titulo">Toppings</p>
+              </a>
+          </div>
+      </div>
+  </div>
 
-<!-- Sección de combos -->
-<div class="contenedor3 shadow">
-    <div class="flecha">
-        <a class="flechita" href="{% url 'catalogo' %}">
-            <img src="{% static 'Image/flecha.png' %}" alt="flecha">
-        </a>
-    </div>
-    <div class="combos" id="combos">
-        <div class="cuadro shadow">
-            <div class="cantidad">
-                <img src="{% static 'Image/yea.png' %}" alt="cantidadDonas">
-            </div>
-            <div class="letras">
-                <h1>!Elige el <br>combo a tu <span class="ANTOJO">ANTOJO!</span></h1>
-                <p class="descripcion">Elige la cantidad de DNTS que <br>quieras llevar</p>
-            </div>
-        </div>
-    </div>
-</div>
+  <!-- Sección de combos -->
+  <div class="contenedor3 shadow">
+      <div class="flecha">
+          <a class="flechita" href="{% url 'catalogo' %}">
+              <img src="{% static 'Image/flecha.png' %}" alt="flecha">
+          </a>
+      </div>
+      <div class="combos" id="combos">
+          <div class="cuadro shadow">
+              <div class="letras">
+                  <h1>!Elige el <br>combo a tu <span class="ANTOJO">ANTOJO!</span></h1>
+                  <p class="descripcion">Elige la cantidad de DNTS que <br>quieras llevar</p>
+              </div>
+              <div class="cantidad">
+                  <img src="{% static 'Image/yea.png' %}" alt="cantidadDonas">
+              </div>
+          </div>
+      </div>
+  </div>
 
-<!-- Script de redirección -->
-<script>
-    document.getElementById("combos").onclick = function () {
-        window.location.href = "{% url 'catalogo' %}";
-    };
-</script>
+  <!-- Script de redirección -->
+  <script>
+      document.getElementById("combos").onclick = function () {
+          window.location.href = "{% url 'catalogo' %}";
+      };
+  </script>
 
-<!-- Login -->
+  <!-- Login -->
 <div class="InicioSesion shadow">
     <h1>¿Ya tienes <span class="cuenta">CUENTA?</span></h1>
     <h2>Inicia Sesión</h2>
@@ -117,46 +782,50 @@
     </form>
 </div>
 
-<!-- Redes sociales -->
-<div class="RedesSociales">
-    <h1>Síguenos en nuestras redes sociales</h1>
-    <h2>¡CONÓCENOS!</h2>
-    <div class="social">
-        <div class="redes">
-            <div class="redes1 shadow">
-                <a href="https://x.com/?lang=es" target="_blank">
-                    <img src="{% static 'Image/twitter.png' %}" alt="Twitter">
-                </a>
-            </div>
-            <div class="redes2 shadow">
-                <a href="https://www.facebook.com/" target="_blank">
-                    <img src="{% static 'Image/facebook.png' %}" alt="Facebook">
-                </a>
-            </div>
-            <div class="redes3 shadow">
-                <a href="https://www.instagram.com/09_tefy_09/" target="_blank">
-                    <img src="{% static 'Image/instagram.png' %}" alt="Instagram">
-                </a>
-            </div>
-            <h1>@Stefa'sdonuts</h1>
-        </div>
-    </div>
-</div>
+  <!-- Redes sociales -->
+  <div class="RedesSociales">
+      <h1>Síguenos en nuestras redes sociales</h1>
+      <h2>¡CONÓCENOS!</h2>
+      <div class="social">
+          <div class="redes">
+              <div class="redes1">
+                  <a href="https://x.com/?lang=es" target="_blank">
+                      <img src="{% static 'Image/twitter.png' %}" alt="Twitter">
+                  </a>
+              </div>
+              <div class="redes2">
+                  <a href="https://www.facebook.com/" target="_blank">
+                      <img src="{% static 'Image/facebook.png' %}" alt="Facebook">
+                  </a>
+              </div>
+              <div class="redes3">
+                  <a href="https://www.instagram.com/09_tefy_09/" target="_blank">
+                      <img src="{% static 'Image/instagram.png' %}" alt="Instagram">
+                  </a>
+              </div>
+              <h1>@Stefa'sdonuts</h1>
+          </div>
+      </div>
+  </div>
 
-<!-- Footer -->
-<div class="InformacionFinal">
-    <ul class="navbarFinal">
-        <li><a href="{% url 'index' %}">Inicio</a></li>
-        <li><a href="{% url 'catalogo' %}">Catálogo</a></li>
-        <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
-        <li><a href="{% url 'contactanos' %}">Contáctanos</a></li>
-    </ul>
-    <div class="Direccion">
-        <br><hr><br>
-        <p>Cra 13 # 6510, Bogotá, Colombia <br>
-            © {% now "Y" %} Stefa´s Donuts.</p>
-    </div>
-</div>
+  <!-- Footer -->
+  <div class="InformacionFinal">
+      <ul class="navbarFinal">
+          <li><a href="{% url 'index' %}">Inicio</a></li>
+          <li><a href="{% url 'catalogo' %}">Catálogo</a></li>
+          <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
+          <li><a href="{% url 'contactanos' %}">Contáctanos</a></li>
+      </ul>
+      <div class="Direccion">
+          <br><hr><br>
+          <p>Cra 13 # 6510, Bogotá, Colombia <br>
+              © {% now "Y" %} Stefa´s Donuts.</p>
+      </div>
+  </div>
 
+  <!-- Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

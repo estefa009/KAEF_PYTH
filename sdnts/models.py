@@ -216,10 +216,10 @@ class Producto(models.Model):
     Modelo para productos (donas) que se venden
     """
     TAMANOS = (
-        ('XS', 'Extra Pequeño'),
-        ('S', 'Pequeño'),
-        ('M', 'Mediano'),
-        ('L', 'Grande'),
+        ('S', 'Extra Pequeño'),
+        ('M', 'Pequeño'),
+        ('L', 'Mediano'),
+        ('XL', 'Grande'),
     )
     
     cod_producto = models.AutoField(primary_key=True)
