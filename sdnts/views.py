@@ -1949,7 +1949,7 @@ def generar_receta_base(request, cod_producto):
     # Elimina receta anterior si existe
     RecetaProducto.objects.filter(cod_producto=producto).delete()
 
-    # Ingredientes base para XS
+    # Ingredientes base para S
     ingredientes_base = [
         ('Azucar', 50, 'Gramos'),
         ('Sal', 1, 'Gramos'),
@@ -1961,7 +1961,7 @@ def generar_receta_base(request, cod_producto):
     ]
 
     tamano = producto.tamano.upper()
-    multiplicador = {'XS': 1, 'S': 2, 'M': 3, 'L': 4}.get(tamano, 1)
+    multiplicador = {'S': 1, 'M': 2, 'L': 3, 'XL': 4}.get(tamano, 1)
 
     for nombre_insumo, cantidad_base, unidad in ingredientes_base:
         try:
