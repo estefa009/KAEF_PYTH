@@ -138,6 +138,37 @@
             font-style: italic;
         }
 
+        /* Scroll bonito para la tabla de ventas */
+        .tabla-scroll-ventas {
+            max-height: 480px;
+            overflow-y: auto;
+            border-radius: 24px;
+            box-shadow: 0 2px 8px rgba(252,105,152,0.08);
+        }
+        .tabla-scroll-ventas::-webkit-scrollbar {
+            width: 10px;
+            background: #ffeef3;
+            border-radius: 8px;
+        }
+        .tabla-scroll-ventas::-webkit-scrollbar-thumb {
+            background: #fc6998;
+            border-radius: 8px;
+            border: 2px solid #ffeef3;
+        }
+        .tabla-scroll-ventas::-webkit-scrollbar-thumb:hover {
+            background: #e75480;
+        }
+        .tabla-scroll-ventas {
+            scrollbar-color: #fc6998 #ffeef3;
+            scrollbar-width: thin;
+        }
+        .tabla-scroll-ventas thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #ff80a4;
+        }
+
         @media (max-width: 768px) {
             .table thead th,
             .table tbody td {
@@ -205,7 +236,8 @@
             </div>
         </div>
 
-        <div class="table-responsive">
+        <!-- Tabla de ventas con scroll -->
+        <div class="table-responsive tabla-scroll-ventas">
             <table class="table">
                 <thead>
                     <tr>
@@ -271,30 +303,6 @@
                 </tfoot>
             </table>
         </div>
-
-        {% if total_paginas > 1 %}
-        <nav>
-            <ul class="pagination justify-content-center mt-4">
-                <li class="page-item {% if pagina_actual == 1 %}disabled{% endif %}">
-                    <a class="page-link" href="?page=1">Primera</a>
-                </li>
-                <li class="page-item {% if pagina_actual == 1 %}disabled{% endif %}">
-                    <a class="page-link" href="?page={{ pagina_actual|add:'-1' }}">Anterior</a>
-                </li>
-                {% for i in range_paginas %}
-                <li class="page-item {% if i == pagina_actual %}active{% endif %}">
-                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-                </li>
-                {% endfor %}
-                <li class="page-item {% if pagina_actual == total_paginas %}disabled{% endif %}">
-                    <a class="page-link" href="?page={{ pagina_actual|add:'1' }}">Siguiente</a>
-                </li>
-                <li class="page-item {% if pagina_actual == total_paginas %}disabled{% endif %}">
-                    <a class="page-link" href="?page={{ total_paginas }}">Última</a>
-                </li>
-            </ul>
-        </nav>
-        {% endif %}
     </div>
 
     <script>

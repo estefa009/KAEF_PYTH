@@ -14,7 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import path
+from django.urls import path, include
 from django.http import HttpResponse
 from . import views
 from .views import (
@@ -58,8 +58,6 @@ urlpatterns = [
      #Domiciliario
     path('mis_domicilios/', views.mis_domicilios, name='mis_domicilios'),
     path('historial_envios/', views.historial_envios, name='historial_envios'),
-    path('exportar-pdf/', views.exportar_pdf, name='exportar_pdf'),
-    path('exportar-excel/', views.exportar_excel, name='exportar_excel'),
     path('perfildomi/', views.perfildomi, name='perfildomi'),
     path('editar_perfildomi/', views.editar_perfildomi, name='editar_perfildomi'),
 
@@ -127,7 +125,7 @@ urlpatterns = [
     path('salidas/agregar/', views.agregar_salida, name='agregar_salida'),
 
     #correo
-    path('correos_admin/', views.correos_admin, name='correos_admin'),
+    path('correos_admin/', views.enviar_correos_masivos, name='correos_admin'),
     path('correo/<int:cod_correo>/', views.ver_correo, name='ver_correo'),
     path('correos/enviar_correos_masivos/', views.enviar_correos_masivos, name='enviar_correos_masivos'),
     #productos
@@ -161,6 +159,8 @@ urlpatterns = [
     path('notificaciones/', views.notificaciones_admin, name='notificaciones_admin'),
 
     path('procesar_compra/', views.procesar_compra, name='procesar_compra'),
+
+    path('cargar_insumos/', views.cargar_insumos, name='cargar_insumos'),
 
     
     # ...

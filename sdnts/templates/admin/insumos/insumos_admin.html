@@ -137,6 +137,40 @@
             margin-bottom: 30px;
         }
 
+        /* Scroll bonito para la tabla de insumos */
+        .tabla-scroll {
+            max-height: 480px;
+            overflow-y: auto;
+            border-radius: 24px;
+            box-shadow: 0 2px 8px rgba(252,105,152,0.08);
+        }
+        /* Scrollbar personalizado */
+        .tabla-scroll::-webkit-scrollbar {
+            width: 10px;
+            background: #ffeef3;
+            border-radius: 8px;
+        }
+        .tabla-scroll::-webkit-scrollbar-thumb {
+            background: #fc6998;
+            border-radius: 8px;
+            border: 2px solid #ffeef3;
+        }
+        .tabla-scroll::-webkit-scrollbar-thumb:hover {
+            background: #e75480;
+        }
+        /* Firefox */
+        .tabla-scroll {
+            scrollbar-color: #fc6998 #ffeef3;
+            scrollbar-width: thin;
+        }
+        /* Opcional: tabla sticky header */
+        .tabla-scroll thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #ff80a4;
+        }
+
         @media (max-width: 768px) {
             .contenedor {
                 padding: 20px;
@@ -179,8 +213,8 @@
         </a>
     </div>
 
-    <!-- Tabla de insumos -->
-    <div class="table-responsive">
+    <!-- Tabla de insumos con scroll -->
+    <div class="table-responsive tabla-scroll">
         <table class="table">
             <thead>
                 <tr>
@@ -193,6 +227,7 @@
                 </tr>
             </thead>
             <tbody>
+                {% csrf_token %}
                 {% if insumos %}
                     {% for insumo in insumos %}
                     <tr>
@@ -205,12 +240,12 @@
                             <a href="{% url 'editar_insumo' insumo.cod_insumo %}" class="btn btn-primary" title="Editar">
                                 <i class="bi bi-pencil-fill"></i> Editar
                             </a>
-                            <a href="{% url 'eliminar_insumo' insumo.cod_insumo %}" 
-                               class="btn btn-danger" 
-                               title="Eliminar"
-                               onclick="return confirm('¿Estás seguro de que deseas eliminar este insumo?')">
+                            <button type="button"
+                                class="btn btn-danger btn-eliminar-insumo"
+                                data-insumo-id="{{ insumo.cod_insumo }}"
+                                data-insumo-nombre="{{ insumo.nomb_insumo }}">
                                 <i class="bi bi-trash-fill"></i> Eliminar
-                            </a>
+                            </button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -223,6 +258,142 @@
         </table>
     </div>
 </div>
+
+<!-- Modal personalizado para confirmación de eliminación -->
+<div id="modalConfirmarEliminar" class="modal fade" tabindex="-1" style="display:none; background:rgba(0,0,0,0.45);">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 32px; border: 4px solid #fc6998;">
+            <div class="modal-header" style="background: #fc6998; color: #fff; border-radius: 28px 28px 0 0;">
+                <h5 class="modal-title" style="font-family:'Dunkin',Arial,sans-serif;">
+                    <i class="bi bi-exclamation-triangle-fill" style="color:#fff; margin-right:8px;"></i>
+                    Confirmar eliminación
+                </h5>
+                <button type="button" class="btn-close" id="closeModalEliminar" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" style="text-align:center; font-size:1.1em; color:#4e4032;">
+                <p id="textoModalEliminar"></p>
+            </div>
+            <div class="modal-footer" style="justify-content:center; gap:18px;">
+                <button type="button" class="btn" id="btnConfirmarEliminar" style="background:#fc6998; color:#fff; border-radius:50px; padding:10px 32px; font-family:'Dunkin',Arial,sans-serif;">Sí, eliminar</button>
+                <button type="button" class="btn" id="btnCancelarEliminar" style="background:#fff; color:#fc6998; border:2px solid #fc6998; border-radius:50px; padding:10px 32px; font-family:'Dunkin',Arial,sans-serif;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de éxito al eliminar insumo -->
+<div id="modalEliminadoExito" class="modal fade" tabindex="-1" style="display:none; background:rgba(0,0,0,0.45);">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 32px; border: 4px solid #fc6998; background: linear-gradient(135deg, #fff9f2 60%, #ffeef3 100%);">
+            <div class="modal-header" style="background: #fc6998; color: #fff; border-radius: 28px 28px 0 0; border-bottom: 2px solid #e75480;">
+                <h5 class="modal-title" style="font-family:'Dunkin',Arial,sans-serif; color: #fff;">
+                    <i class="bi bi-check-circle-fill" style="color:#fff; margin-right:8px;"></i>
+                    Insumo eliminado exitosamente
+                </h5>
+                <button type="button" class="btn-close" id="closeModalEliminadoExito" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" style="text-align:center; color:#4e4032; font-family:'Dunkin',Arial,sans-serif; font-size:1.2em; background: #fff;">
+                <div style="margin: 10px 0 0 0;">
+                    <span style="font-size:2.5em; color:#e75480;">
+                        <i class="bi bi-emoji-heart-eyes-fill"></i>
+                    </span>
+                    <div style="margin-top:10px; color:#4e4032;">
+                        ¡El insumo fue eliminado correctamente!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+document.addEventListener('DOMContentLoaded', function() {
+    let insumoIdAEliminar = null;
+    let filaAEliminar = null;
+
+    document.querySelectorAll('.btn-eliminar-insumo').forEach(btn => {
+        btn.addEventListener('click', function() {
+            insumoIdAEliminar = this.dataset.insumoId;
+            filaAEliminar = this.closest('tr');
+            const nombre = this.dataset.insumoNombre;
+            document.getElementById('textoModalEliminar').innerHTML = `
+                ¿Estás seguro de que deseas eliminar el insumo<br>
+                <b style="color:#fc6998;">${nombre}</b>?
+            `;
+            const modal = document.getElementById('modalConfirmarEliminar');
+            modal.style.display = 'block';
+            modal.classList.add('show');
+        });
+    });
+
+    function cerrarModalEliminar() {
+        const modal = document.getElementById('modalConfirmarEliminar');
+        modal.classList.remove('show');
+        setTimeout(() => { modal.style.display = 'none'; }, 200);
+    }
+    document.getElementById('closeModalEliminar').onclick = cerrarModalEliminar;
+    document.getElementById('btnCancelarEliminar').onclick = cerrarModalEliminar;
+
+    document.getElementById('btnConfirmarEliminar').onclick = function() {
+        if (!insumoIdAEliminar) return;
+        fetch(`/insumos/eliminar/${insumoIdAEliminar}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Accept': 'application/json'
+            }
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            if (data.success) {
+                if (filaAEliminar) filaAEliminar.remove();
+                cerrarModalEliminar();
+                // Mostrar modal de éxito
+                mostrarModalEliminadoExito();
+            } else {
+                alert('No se pudo eliminar el insumo: ' + (data.error || ''));
+                cerrarModalEliminar();
+            }
+        })
+        .catch(() => {
+            alert('Error de red al eliminar.');
+            cerrarModalEliminar();
+        });
+    };
+
+    // Modal de éxito al eliminar insumo
+    function mostrarModalEliminadoExito() {
+        const modal = document.getElementById('modalEliminadoExito');
+        if (!modal) return;
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        // Cerrar automáticamente después de 1.5 segundos
+        setTimeout(() => {
+            modal.classList.remove('show');
+            modal.style.display = 'none';
+        }, 1500);
+    }
+    document.getElementById('closeModalEliminadoExito').onclick = function() {
+        const modal = document.getElementById('modalEliminadoExito');
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+    };
+});
+</script>
 
 </body>
 </html>

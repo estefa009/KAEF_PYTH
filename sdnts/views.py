@@ -512,20 +512,18 @@ def procesar_compra(request):
                 normalizar("Choc Blanco"): "Choc. Blanco",
                 normalizar("Choc. Blanco"): "Choc. Blanco",
                 normalizar("choc-blanco"): "Choc. Blanco",
-                normalizar("Chocolate Blanco"): "Choc. Blanco",  # <-- Agregado
-                normalizar("chocolate blanco"): "Choc. Blanco",  # <-- Agregado
+                normalizar("Chocolate Blanco"): "Choc. Blanco",
+                normalizar("chocolate blanco"): "Choc. Blanco",
                 normalizar("Chocolate Oscuro"): "Choc. Oscuro",
                 normalizar("Choc Oscuro"): "Choc. Oscuro",
                 normalizar("Choc. Oscuro"): "Choc. Oscuro",
                 normalizar("choc-oscuro"): "Choc. Oscuro",
                 normalizar("Arequipe"): "Arequipe",
-                # Agrega aquí todos los nombres posibles y sus variantes normalizadas
             }
             MASA_MAP = {
                 normalizar("Vainilla"): "Vainilla",
                 normalizar("Chocolate"): "Chocolate",
                 normalizar("Red Velvet"): "Red Velvet",
-                # Agrega aquí todos los nombres posibles y sus variantes normalizadas
             }
             TOPPING_MAP = {
                 normalizar("Chispas"): "Chispas",
@@ -534,24 +532,24 @@ def procesar_compra(request):
                 normalizar("mm"): "M&M",
                 normalizar("Chips"): "Chips",
                 normalizar("Ninguno"): None,
-                # Agrega aquí todos los nombres posibles y sus variantes normalizadas
             }
             for item in carrito:
                 producto = Producto.objects.filter(cod_producto=item['cod_producto']).first()
                 if not producto:
                     print('Producto no encontrado para cod_producto:', item['cod_producto'])
                     continue
-                DetalleVenta.objects.create(
-                    cod_venta=venta,
-                    cod_producto=producto,
-                    cantidad=item['quantity'],
-                    precio_unitario=item['precio'],
-                    fecha_entrega=fecha_entrega
-                )
-                print('DetalleVenta creado para producto:', producto)
-                # Guardar la combinación personalizada
-                masa_nombre = cobertura_nombre = topping_nombre = None
-                try:
+            detalle = DetalleVenta.objects.create(
+                cod_venta=venta,
+                cod_producto=producto,
+                cantidad=item['quantity'],
+                precio_unitario=item['precio'],
+                fecha_entrega=fecha_entrega
+            )
+            print('DetalleVenta creado para producto:', producto)
+                
+            masa_nombre = cobertura_nombre = topping_nombre = None
+
+            try:
                     # --- MASA ---
                     masa_nombre = item['masa']['nombre']
                     masa_nombre_norm = normalizar(masa_nombre)
@@ -592,11 +590,12 @@ def procesar_compra(request):
                         cod_venta=venta,
                         cod_producto=producto,
                         cod_sabor_masa_1=masa,
+                        cod_detalle=detalle,  # 👈 Esto es lo que estaba faltando
                         cod_glaseado_1=cobertura,
                         cod_topping_1=topping
                     )
                     print('CombinacionProducto creada')
-                except Exception as e:
+            except Exception as e:
                     print(f'Error creando CombinacionProducto para producto {producto} (masa: {masa_nombre}, cobertura: {cobertura_nombre}, topping: {topping_nombre}):', e)
 
             # 3. Crear el pago
@@ -642,86 +641,8 @@ def procesar_compra(request):
         except Exception as e:
             print('Error en procesar_compra:', e)
             traceback.print_exc()
-            return JsonResponse({'success': False, 'error': str(e)})       
-            return JsonResponse({'success': False, 'error': 'Método no permitido'})
-            carrito = data.get('carrito', [])
-            direccion = data.get('direccion', '')  # Puedes pedirla en el modal
-            observaciones = data.get('observaciones', '')
-        except Exception:
-            return JsonResponse({'success': False, 'error': 'Datos inválidos'}, status=400)
-
-        if not carrito:
-            return JsonResponse({'success': False, 'error': 'Carrito vacío'}, status=400)
-
-        try:
-            cliente = request.user.cliente
-        except Exception:
-            return JsonResponse({'success': False, 'error': 'No es cliente'}, status=400)
-
-        subtotal = Decimal('0.00')
-        detalles = []
-
-        for item in carrito:
-            # Busca el producto por nombre y tamaño
-            talla = item.get('talla')
-            nombre = item.get('titulo')
-            cantidad = int(item.get('quantity', 1))
-            precio_unitario = Decimal(str(item.get('precio', 0)))
-            try:
-                producto = Producto.objects.get(nomb_pro=nombre, tamano=talla)
-            except Producto.DoesNotExist:
-                continue
-
-            detalles.append({
-                'producto': producto,
-                'cantidad': cantidad,
-                'precio_unitario': precio_unitario,
-            })
-            subtotal += precio_unitario * cantidad
-
-        iva = subtotal * Decimal('0.19')
-        total = subtotal + iva
-
-        venta = Venta.objects.create(
-            cod_cliente=cliente,
-            subtotal=subtotal,
-            iva=iva,
-            total=total,
-            direccion_entrega=direccion,
-            observaciones=observaciones
-        )
-
-        for det in detalles:
-            DetalleVenta.objects.create(
-                cod_venta=venta,
-                cod_producto=det['producto'],
-                cantidad=det['cantidad'],
-                precio_unitario=det['precio_unitario']
-            )
-
-        return JsonResponse({
-            'success': True,
-            'venta': {
-                'id': venta.cod_venta,
-                'fecha': venta.fecha_hora.strftime('%Y-%m-%d %H:%M'),
-                'subtotal': str(subtotal),
-                'iva': str(iva),
-                'total': str(total),
-                'direccion': venta.direccion_entrega,
-                'detalles': [
-                    {
-                        'producto': str(det['producto']),
-                        'cantidad': det['cantidad'],
-                        'precio_unitario': str(det['precio_unitario']),
-                        'subtotal': str(det['precio_unitario'] * det['cantidad'])
-                    }
-                    for det in detalles
-                ]
-            }
-        })
-
+            return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
-
 @login_required
 def mis_domicilios(request):
     try:
@@ -1684,23 +1605,9 @@ def eliminar_categoria(request, cod_categoria):
 # Vista de Correos - COMENTADA porque no tienes este modelo
 # Si necesitas esta funcionalidad, debes crear el modelo Correo
 
-from .models import Correo
+from .models import Correo, Cliente, Administrador, Domiciliario, Usuario
 
 @login_required
-def correos_admin(request):
-    historial_correos = Correo.objects.all().order_by('-fecha_envio')
-    return render(request, 'admin/correos/correos_admin.html', {
-        'historial_correos': historial_correos
-    })
-    
-def ver_correo(request, cod_correo):
-    correo = get_object_or_404(Correo, cod_correo=cod_correo)
-    return render(request, 'admin/correos/ver_correo.html', {'correo': correo})
-  
-from django.core.mail import EmailMessage
-from .models import Correo
-from .models import Cliente, Administrador, Domiciliario  # Ajusta si usas otros nombres
-
 def enviar_correos_masivos(request):
     if request.method == 'POST':
         destinatarios_tipo = request.POST.getlist('destinatarios')
@@ -1708,39 +1615,39 @@ def enviar_correos_masivos(request):
         mensaje = request.POST.get('mensaje')
         archivos = request.FILES.getlist('adjuntos')
 
-        # Obtener correos reales de los destinatarios seleccionados
         correos_a_enviar = []
 
         if 'CLIENTE' in destinatarios_tipo:
-            correos_a_enviar += list(Cliente.objects.select_related('cod_usua').values_list('cod_usua__email', flat=True))
+            correos_a_enviar += list(
+                Cliente.objects.select_related('cod_usua').values_list('cod_usua__email', flat=True)
+            )
 
         if 'ADMIN' in destinatarios_tipo:
-            correos_a_enviar += list(Administrador.objects.select_related('cod_usua').values_list('cod_usua__email', flat=True))
+            admin_ids = Administrador.objects.values_list('cod_usua_id', flat=True)
+            admin_emails = Usuario.objects.filter(pk__in=admin_ids).values_list('email', flat=True)
+            correos_a_enviar += list(admin_emails)
 
         if 'DOMI' in destinatarios_tipo:
-            correos_a_enviar += list(Domiciliario.objects.select_related('cod_usua').values_list('cod_usua__email', flat=True))
+            correos_a_enviar += list(
+                Domiciliario.objects.select_related('cod_usua').values_list('cod_usua__email', flat=True)
+            )
 
-        # Enviar correos y registrar en BD
         enviados = 0
-        for correo_dest in set(correos_a_enviar):  # Evitar duplicados
+        for correo_dest in set(correos_a_enviar):
             try:
                 email = EmailMessage(
                     asunto,
                     mensaje,
                     to=[correo_dest]
                 )
-
-                # Adjuntar archivos
                 for adj in archivos:
                     email.attach(adj.name, adj.read(), adj.content_type)
-
-                email.send()
+                email.send(fail_silently=False)
                 enviado = True
                 enviados += 1
             except Exception as e:
-                enviado = False  # puedes registrar el error si lo deseas
+                enviado = False
 
-            # Guardar registro en BD
             Correo.objects.create(
                 destinatario=correo_dest,
                 asunto=asunto,
@@ -1751,8 +1658,8 @@ def enviar_correos_masivos(request):
         messages.success(request, f'Se enviaron {enviados} correos.')
         return redirect('correos_admin')
 
-    return redirect('admin/correos/correos_admin')
-
+    # Para GET, renderiza el template de correos
+    return render(request, 'admin/correos/correos_admin.html')
 
 # Vista para Cargar Datos
 @login_required
@@ -1805,14 +1712,18 @@ def editar_insumo(request, cod_insumo):
     return render(request, 'admin/insumos/editar_insumo.html', {'form': form})
 
 # Eliminar insumo
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+
+@require_POST
+@login_required
 def eliminar_insumo(request, cod_insumo):
     insumo = get_object_or_404(Insumo, cod_insumo=cod_insumo)
-    if request.method == 'POST':
+    try:
         insumo.delete()
-        return redirect('insumos_admin')
-    return render(request, 'admin/insumos/eliminar_insumo.html', {'insumo': insumo})
-
-
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 @login_required
 def clientes_admin(request):
@@ -1832,6 +1743,7 @@ def domiciliarios_admin(request):
 def actualizar_usuario(request):
     if request.method == 'POST':
         cod_usuario = request.POST.get('codUsuario')
+        nombre = request.POST.get('nomUsua')
         nombre = request.POST.get('nomUsua')
         apellido = request.POST.get('apellUsua')
         email = request.POST.get('emailUsua')
@@ -2039,10 +1951,27 @@ def reporte_usuarios_pdf(request):
     # Estadísticas: contar cuántos usuarios hay por rol
    
     roles = ['ADMIN', 'CLIENTE', 'DOMI']
+
     conteo_roles = [Usuario.objects.filter(rol=rol).count() for rol in roles]
 
     # Generar el gráfico
     plt.figure(figsize=(6, 4))  # tamaño opcional
+    plt.bar(roles, conteo_roles, color='skyblue')
+    plt.title('Usuarios por Rol')
+    plt.xlabel('Rol')
+    plt.ylabel('Cantidad')
+    plt.tight_layout()
+
+    # Guardar gráfico en memoria
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    grafico_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    buf.close()
+
+   
+
+    # Cerrar el plot (importantísimo para evitar sobrecarga)
     plt.bar(roles, conteo_roles, color='skyblue')
     plt.title('Usuarios por Rol')
     plt.xlabel('Rol')
@@ -2298,7 +2227,6 @@ def reporte_ventas(request):
     response['Content-Disposition'] = 'attachment; filename="reporte_ventas.pdf"'
     return response
 
-from.models import Produccion
 @login_required
 def reporte_produccion(request):
     producciones = Produccion.objects.all()
@@ -2317,7 +2245,7 @@ def reporte_produccion(request):
     grafico_base64 = base64.b64encode(buf.read()).decode('utf-8')
     buf.close()
     plt.close()
-    context = {'producciones': producciones, 'grafico_base64': grafico_base64}
+    context = {'producciones': produccion, 'grafico_base64': grafico_base64}
     html_string = render_to_string('reportes/reporte_produccion.html', context)
     pdf_file = HTML(string=html_string).write_pdf()
     response = HttpResponse(pdf_file, content_type='application/pdf')
@@ -2403,3 +2331,57 @@ def reporte_categorias(request):
 def notificaciones_admin(request):
     notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha')
     return render(request, 'admin/notificaciones.html', {'notificaciones': notificaciones})
+
+import csv
+from .models import Insumo, CategoriaInsumo
+from django.views.decorators.csrf import csrf_exempt
+
+@login_required
+@csrf_exempt
+def cargar_insumos(request):
+    if request.method == 'POST':
+        archivo = request.FILES.get('archivo_insumos')
+        if not archivo or not archivo.name.endswith('.csv'):
+            messages.error(request, 'El archivo debe ser un CSV.')
+            return redirect('cargarDatos')
+        try:
+            decoded_file = archivo.read().decode('utf-8').splitlines()
+            reader = csv.DictReader(decoded_file)
+            insumos_cargados = 0
+            insumos_fallidos = []
+            for fila in reader:
+                categoria = None
+                cod_categoria = fila.get('cod_categoria')
+                if cod_categoria:
+                    try:
+                        categoria = CategoriaInsumo.objects.get(pk=cod_categoria)
+                    except CategoriaInsumo.DoesNotExist:
+                        categoria = None
+                if categoria:
+                    Insumo.objects.create(
+                        nomb_insumo=fila.get('nomb_insumo', ''),
+                        cnt_insumo=fila.get('cnt_insumo', 0),
+                        unidad_medida=fila.get('unidad_medida', ''),
+                        cod_categoria=categoria
+                    )
+                    insumos_cargados += 1
+                else:
+                    insumos_fallidos.append(fila.get('nomb_insumo', ''))
+            msg = f'Insumos cargados exitosamente: {insumos_cargados}.'
+            if insumos_fallidos:
+                msg += f' No se cargaron estos insumos por categoría inexistente: {", ".join(insumos_fallidos)}.'
+                messages.warning(request, msg)
+            else:
+                messages.success(request, msg)
+        except Exception as e:
+            messages.error(request, f'Error al cargar insumos: {e}')
+        return redirect('cargarDatos')
+    return redirect('cargarDatos')
+
+from django.shortcuts import render, get_object_or_404
+from .models import Correo
+
+@login_required
+def ver_correo(request, cod_correo):
+    correo = get_object_or_404(Correo, pk=cod_correo)
+    return render(request, 'admin/correos/ver_correo.html', {'correo': correo})

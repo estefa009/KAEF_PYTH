@@ -149,6 +149,37 @@
             gap: 10px;
         }
 
+        /* Scroll bonito para la tabla de envíos */
+        .tabla-scroll-envios {
+            max-height: 480px;
+            overflow-y: auto;
+            border-radius: 24px;
+            box-shadow: 0 2px 8px rgba(252,105,152,0.08);
+        }
+        .tabla-scroll-envios::-webkit-scrollbar {
+            width: 10px;
+            background: #ffeef3;
+            border-radius: 8px;
+        }
+        .tabla-scroll-envios::-webkit-scrollbar-thumb {
+            background: #fc6998;
+            border-radius: 8px;
+            border: 2px solid #ffeef3;
+        }
+        .tabla-scroll-envios::-webkit-scrollbar-thumb:hover {
+            background: #e75480;
+        }
+        .tabla-scroll-envios {
+            scrollbar-color: #fc6998 #ffeef3;
+            scrollbar-width: thin;
+        }
+        .tabla-scroll-envios thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #ff80a4;
+        }
+
         @media (max-width: 768px) {
             .contenedor {
                 padding: 20px;
@@ -181,21 +212,10 @@
 <div class="contenedor">
     <h2><i class="bi bi-truck"></i> GESTIÓN DE DOMICILIOS</h2>
 
-    <!-- Botones de exportación -->
-    <div class="export-buttons">
-        <button id="downloadPdf" class="btn btn-outline-danger">
-            <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
-        </button>
-        <button id="downloadWord" class="btn btn-outline-primary">
-            <i class="bi bi-file-earmark-word"></i> Exportar Word
-        </button>
-        <button id="downloadExcel" class="btn btn-outline-success">
-            <i class="bi bi-file-earmark-excel"></i> Exportar Excel
-        </button>
-    </div>
+   
 
-    <!-- Tabla de envíos -->
-    <div class="table-responsive">
+    <!-- Tabla de envíos con scroll -->
+    <div class="table-responsive tabla-scroll-envios">
         <table class="table">
             <thead>
                 <tr>

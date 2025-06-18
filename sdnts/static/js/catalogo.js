@@ -1032,70 +1032,87 @@ function mostrarModalAgregadoCarrito(producto) {
     document.addEventListener('keydown', cerrarEscape);
 }
 
-// 1. Asegúrate de que el input de fecha tenga el atributo "min" correctamente
-//    y que el modal de fecha esté en el HTML con el id correcto ("modalFecha" y "inputFecha").
+// Reemplaza confirm() por un modal personalizado para eliminar insumos
+function mostrarConfirmacionEliminarInsumo(callback) {
+    // Si ya existe el modal, elimínalo primero
+    let modal = document.getElementById('modalConfirmarEliminar');
+    if (modal) modal.remove();
 
-// 2. Cuando abras el modal de fecha, asegúrate de establecer el valor mínimo:
-function getFechaFromModal(minDateStr) {
-    return new Promise((resolve, reject) => {
-        const modal = document.getElementById('modalFecha');
-        const input = document.getElementById('inputFecha');
-        const confirm = document.getElementById('confirmFecha');
-        const cancel = document.getElementById('cancelFecha');
-        const close = document.getElementById('closeFecha');
+    // Crea el modal con estilos personalizados
+    modal = document.createElement('div');
+    modal.id = 'modalConfirmarEliminar';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100vw';
+    modal.style.height = '100vh';
+    modal.style.background = 'rgba(0,0,0,0.5)';
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.zIndex = '9999';
 
-        function cleanup() {
-            confirm.removeEventListener('click', onConfirm);
-            cancel.removeEventListener('click', onCancel);
-            close.removeEventListener('click', onCancel);
-            modal.classList.add('hidden');
-        }
-        function onConfirm(e) {
-            e.preventDefault();
-            if (input.value && input.value >= minDateStr) {
-                cleanup();
-                resolve(input.value);
-            } else {
-                input.focus();
-                input.classList.add('input-error');
-            }
-        }
-        function onCancel(e) {
-            e.preventDefault();
-            cleanup();
-            resolve(null);
-        }
-        input.classList.remove('input-error');
-        input.value = '';
-        input.setAttribute('min', minDateStr); // Esto es correcto
-        modal.classList.remove('hidden');
-        input.focus();
-        confirm.addEventListener('click', onConfirm);
-        cancel.addEventListener('click', onCancel);
-        close.addEventListener('click', onCancel);
-    });
+    modal.innerHTML = `
+        <div style="
+            background: #fff;
+            border-radius: 24px;
+            padding: 32px 32px 24px 32px;
+            box-shadow: 0 8px 32px rgba(252,105,152,0.18);
+            min-width: 340px;
+            max-width: 90vw;
+            text-align: center;
+            font-family: 'Dunkin', Arial, sans-serif;
+            color: #4e4032;
+            border: 4px solid #fc6998;
+        ">
+            <div style="font-size: 2.2em; margin-bottom: 10px;">
+                <i class="bi bi-exclamation-triangle-fill" style="color:#fc6998;"></i>
+            </div>
+            <div style="font-size: 1.2em; margin-bottom: 18px;">
+                ¿Estás seguro de que deseas eliminar este insumo?
+            </div>
+            <div style="display: flex; justify-content: center; gap: 18px;">
+                <button id="btnConfirmarEliminar" style="
+                    background: #fc6998;
+                    color: #fff;
+                    border: none;
+                    border-radius: 50px;
+                    padding: 10px 32px;
+                    font-size: 1em;
+                    font-family: 'Dunkin', Arial, sans-serif;
+                    cursor: pointer;
+                    transition: background 0.2s;
+                ">Sí, eliminar</button>
+                <button id="btnCancelarEliminar" style="
+                    background: #fff;
+                    color: #fc6998;
+                    border: 2px solid #fc6998;
+                    border-radius: 50px;
+                    padding: 10px 32px;
+                    font-size: 1em;
+                    font-family: 'Dunkin', Arial, sans-serif;
+                    cursor: pointer;
+                    transition: background 0.2s, color 0.2s;
+                ">Cancelar</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document.getElementById('btnConfirmarEliminar').onclick = function() {
+        modal.remove();
+        if (typeof callback === 'function') callback(true);
+    };
+    document.getElementById('btnCancelarEliminar').onclick = function() {
+        modal.remove();
+        if (typeof callback === 'function') callback(false);
+    };
 }
 
-// 3. Cuando abras el modal de dirección, asegúrate de que el input tenga el id correcto ("inputDireccion").
-
-// 4. El flujo correcto para la compra es:
-//    - El usuario da click en "Comprar" (btnAgregarProducto)
-//    - Se abre el modal de dirección y luego el de fecha
-//    - Se valida el método de pago y la referencia
-//    - Se envía el fetch al backend
-//    - Si todo sale bien, se muestra el modal de compra exitosa
-
-// 5. Si el modal de compra exitosa aparece vacío o no se recarga bien:
-//    - Asegúrate de que el backend responde con los datos de la venta (data.venta)
-//    - Asegúrate de que el código que llena el resumen (info.innerHTML = productosHTML) se ejecuta
-//    - Si el modal sigue visible tras recargar, revisa que el HTML no tenga la clase "show" ni "display:flex" tras el reload
-
-// 6. Si el input de fecha aparece vacío o no deja seleccionar fechas, revisa en el HTML que el input tenga el atributo "min" y que el valor sea una fecha válida (YYYY-MM-DD).
-
-// 7. Si el modal de dirección o fecha no aparece, revisa que los IDs en el HTML coincidan con los usados en JS.
-
-// 8. Si el fetch no envía los datos, revisa en la consola del navegador si hay errores de JavaScript.
-
-// 9. Si el resumen de compra aparece vacío, revisa en la consola del navegador el valor de "data" después del fetch.
-
-// 10. Si nada de esto funciona, abre la consola del navegador (F12) y revisa los errores de JavaScript y la respuesta del backend.
+// Ejemplo de uso en tu código (reemplaza confirm(...) por esto):
+// mostrarConfirmacionEliminarInsumo(function(confirmado) {
+//     if (confirmado) {
+//         // Eliminar insumo
+//     }
+// });

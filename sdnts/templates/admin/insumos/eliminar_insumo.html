@@ -11,11 +11,11 @@
 {% include "includes/nav_admin.html" %}
 
 <div class="container mt-5">
-  <div class="alert alert-warning text-center">
-    <h4>¿Estás seguro de que deseas eliminar el insumo <strong>{{ insumo.nomb_insumo }}</strong>?</h4>
-    <form method="post" class="mt-4">
-      {% csrf_token %}
-      <a href="{% url 'insumos_admin' %}" class="btn btn-secondary">Cancelar</a>
+  {# Elimina este archivo, ya no se necesita una página de confirmación. 
+  La confirmación y eliminación se hará solo con el modal JS y recarga de la vista de insumos. #}
+</div>
+</body>
+</html>
       <button type="submit" class="btn btn-danger">Eliminar</button>
     </form>
   </div>

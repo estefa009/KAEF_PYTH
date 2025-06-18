@@ -97,8 +97,8 @@
                                                             <td>{{ combinacion.cod_sabor_masa_1.nombre }}</td>
                                                             <td>{{ combinacion.cod_glaseado_1.nombre }}</td>
                                                             <td>{{ combinacion.cod_topping_1.nombre }}</td>
-                                                            {% for detalles in venta.detalles.all %}
-                                                                <td>{{ detalles.cantidad }}</td>
+                                                            {% for detalle in venta.detalles.all %}
+                                                                <td>{{ detalle.cantidad }}</td>
                                                             {% endfor %}
                                                         </tr>
                                                         {% endfor %}
