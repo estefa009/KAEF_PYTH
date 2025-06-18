@@ -58,6 +58,10 @@ h1 {
     font-family: "Dunkin";
     color: #4e4032;
 }
+.contenedor1 p, .letras p {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: bold;
+}
 
 .textoPrincipal {
     width: 60%;
@@ -307,6 +311,10 @@ input.form-control:hover {
     text-align: center;
 
 }
+.redes h1{
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: bolder;
+}
 .redes img {
     width: 200px;
     height: 200px;
@@ -387,4 +395,64 @@ a:hover {
 }
 .ordena{
     font-size: 30px;
+}
+
+.seccion-cuenta {
+    background: linear-gradient(to bottom, #ffeef3, #ffe4ec);
+    border-radius: 60px;
+    padding: 40px;
+    margin: 30px auto;
+    max-width: 800px;
+    box-shadow: 0 8px 20px rgba(255, 192, 203, 0.3);
+}
+
+.contenido-cuenta {
+    font-family: 'Dunkin', cursive;
+    color: #4e4032;
+}
+
+.icono {
+    max-width: 120px;
+    animation: rebote 1.5s infinite;
+}
+
+.titulo-cuenta {
+    font-size: 30px;
+    color: #e75480;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.descripcion-cuenta {
+    font-size: 16px;
+    padding: 0 20px;
+    margin-bottom: 20px;
+}
+
+.btn-cuenta {
+    background-color: #fc6998;
+    color: white;
+    border-radius: 100px;
+    padding: 10px 25px;
+    font-size: 16px;
+    border: none;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-cuenta:hover {
+    background-color: #e75480;
+}
+
+@keyframes rebote {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+.seccion-cuenta p{
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
