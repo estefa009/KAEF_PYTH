@@ -265,16 +265,20 @@ function showHTML() {
             containerProduct.innerHTML = `
                 <div class="info-cart-product">
                     <span class="cantidad-producto-carrito">${product.quantity}</span>
-                    <p class="titulo-producto-carrito">${product.titulo}</p>
-                    <span class="precio-producto-carrito">$${(product.precio * product.quantity).toFixed(2)}</span>
-                </div>
-                <div class="detalles-producto-carrito">
+                    <div class="info-cart-productx2">
+                        <p class="titulo-producto-carrito">${product.titulo}</p>
+                       <span class="precio-producto-carrito">$${(product.precio * product.quantity).toFixed(2)}</span>
+                   </div>
+                </div><div class="bottonesx2">
+                  <div class="detalles-producto-carrito">
                     <i class="bi bi-trash-fill icon-trash" data-id="${product.id}" title="Eliminar"></i>
                 </div>
                 <div class="acciones-producto-carrito">
                     <span class="btn-decrementar icon-btn" data-id="${product.id}">-</span>
                     <span class="btn-incrementar icon-btn" data-id="${product.id}">+</span>
-                </div>`;
+                </div>
+                </div>
+                `;
 
             // Animación y eliminación del producto
             const iconTrash = containerProduct.querySelector('.icon-trash');

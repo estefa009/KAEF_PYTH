@@ -198,6 +198,8 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin-top: 20px;
     font-size: 19px;
+    font-weight: bold;
+    margin-bottom: 2px; /* reduce el espacio debajo del título */
 }
 
 .total-pagar {
@@ -215,9 +217,16 @@
 
 .info-cart-product {
     display: flex;
-    justify-content: space-between;
-    flex: 1;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 18px;
+}
+
+.info-cart-productx2 {
+    margin-top: -20%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .cart-total {
@@ -242,7 +251,8 @@
 
 .precio-producto-carrito {
     font-size: 22px;
-    margin-top: 10px;
+    margin-top: 0px; /* antes 10px, ahora pegado al título */
+    line-height: 1.1;
 }
 
 
@@ -416,9 +426,6 @@
     padding: 0 !important;
 }
 
-
-
-
 /*________________________INDEX________________________*/
 .Profile {
     width: auto;
@@ -467,4 +474,29 @@
 .navbar-brand img {
     height: 100%;
     width: 100%;
+}
+
+/* Alinea los botones de eliminar y +/- a la derecha y en fila */
+.bottonesx2 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 18px;
+    min-width: 120px;
+    margin-left: auto;
+    /* Empuja los botones a la derecha */
+}
+
+/* Opcional: ajusta el padding para separar más de la info del producto */
+.detalles-producto-carrito,
+.acciones-producto-carrito {
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+}
+
+/* Opcional: separa más los botones +/- */
+.acciones-producto-carrito .icon-btn {
+    margin: 0 2px;
 }
