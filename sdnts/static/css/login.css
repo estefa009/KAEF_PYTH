@@ -100,3 +100,22 @@ input.form-control:hover {
     height: 100px;
     padding-top: 30px;
 }
+.recupera img {
+    width: 50%;
+    height: auto;
+    margin: 15px;
+}
+.contenedorPrincipalrec{
+    width: 70%;
+    height: 950%;
+    background-color: #ffe5f0;
+    border-radius: 100px;
+    margin-left: 100px;
+    padding-top: 50px;
+}
+#recoveryForm {
+    border-radius: 20px;
+    padding: 30px;
+
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
