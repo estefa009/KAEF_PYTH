@@ -2385,3 +2385,22 @@ from .models import Correo
 def ver_correo(request, cod_correo):
     correo = get_object_or_404(Correo, pk=cod_correo)
     return render(request, 'admin/correos/ver_correo.html', {'correo': correo})
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+
+@login_required
+@csrf_exempt
+def actualizar_estado_envio(request, envio_id):
+    if request.method == 'POST':
+        import json
+        try:
+            data = json.loads(request.body)
+            nuevo_estado = data.get('nuevo_estado')
+            envio = get_object_or_404(Envio, pk=envio_id)
+            envio.estado = nuevo_estado
+            envio.save()
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
