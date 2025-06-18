@@ -1,0 +1,32 @@
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Editar Recetas Personalizadas de {{ producto.nomb_pro }}</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Insumo</th>
+                    <th>Unidad de Medida</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in formset %}
+                <tr>
+                    <td>{{ form.tipo }}</td>
+                    <td>{{ form.insumo }}</td>
+                    <td>{{ form.unidad_medida }}</td>
+                    <td>{{ form.DELETE }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-success">Guardar Recetas</button>
+    </form>
+</div>
+{% endblock %}

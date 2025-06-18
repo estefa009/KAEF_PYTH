@@ -84,6 +84,7 @@ urlpatterns = [
     path('ventas/<int:cod_venta>/confirmar-produccion/', views.confirmar_generacion_produccion, name='confirmar_generacion_produccion'),
     path('ventas/<int:cod_venta>/generar-produccion/', views.generar_produccion_confirmada, name='generar_produccion_confirmada'),
     path('ventas/<int:cod_venta>/seleccionar-combinaciones/', views.seleccionar_combinaciones_admin, name='seleccionar_combinaciones_admin'),
+    path('productos_admin/<int:cod_producto>/editar_receta_personalizada/', views.editar_receta_personalizada, name='editar_receta_personalizada'),
 
     
     #Ventas

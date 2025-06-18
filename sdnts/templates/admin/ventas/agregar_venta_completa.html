@@ -16,36 +16,63 @@
 
 <div class="container mt-5">
     <h2>Agregar Venta Completa</h2>
+
+    <!-- Mostrar mensajes de Django -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
     <form method="post">
         {% csrf_token %}
 
         <h4>Datos de la Venta</h4>
-        {{ venta_form.as_p }}
+        {{ venta_form.non_field_errors }}
+        {% for field in venta_form %}
+            <div class="mb-2">
+                {{ field.label_tag }} {{ field }}
+                {% if field.errors %}
+                    <div class="text-danger">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
 
         <h4>Productos en la Venta</h4>
+        {{ detalle_formset.management_form }}
         <div id="detalle-form-container">
-            {{ detalle_formset.management_form }}
             {% for form in detalle_formset %}
                 <div class="border rounded p-3 mb-3 bg-light detalle-form position-relative">
-                {{ form.as_p }}
-                <button type="button" class="btn btn-sm btn-danger eliminar-detalle position-absolute top-0 end-0 m-2">Eliminar</button>
-            </div>
-
+                    {{ form.non_field_errors }}
+                    {% for field in form %}
+                        <div class="mb-1">
+                            {{ field.label_tag }} {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button type="button" class="btn btn-sm btn-danger eliminar-detalle position-absolute top-0 end-0 m-2">Eliminar</button>
+                </div>
             {% endfor %}
         </div>
         <button type="button" class="btn btn-outline-primary mb-3" id="agregar-detalle">Agregar otro producto</button>
 
         <h4>Combinaciones Personalizadas</h4>
         <p><strong>Nota:</strong> Debes agregar una combinación por cada dona (según la cantidad de productos).</p>
-
+        {{ combinacion_formset.management_form }}
         <div id="combinacion-form-container">
-            {{ combinacion_formset.management_form }}
             {% for form in combinacion_formset %}
                 <div class="border rounded p-3 mb-3 bg-light combinacion-form">
-                    {{ form.cod_producto.label_tag }} {{ form.cod_producto }}
-                    {{ form.cod_sabor_masa_1.label_tag }} {{ form.cod_sabor_masa_1 }}
-                    {{ form.cod_glaseado_1.label_tag }} {{ form.cod_glaseado_1 }}
-                    {{ form.cod_topping_1.label_tag }} {{ form.cod_topping_1 }}
+                    {{ form.non_field_errors }}
+                    {% for field in form %}
+                        <div class="mb-1">
+                            {{ field.label_tag }} {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
                 </div>
             {% endfor %}
         </div>
@@ -56,7 +83,15 @@
         <p>Total: $<span id="total">0.00</span></p>
 
         <h4>Pago</h4>
-        {{ pago_form.as_p }}
+        {{ pago_form.non_field_errors }}
+        {% for field in pago_form %}
+            <div class="mb-2">
+                {{ field.label_tag }} {{ field }}
+                {% if field.errors %}
+                    <div class="text-danger">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
 
         <button type="submit" class="btn btn-success">Guardar Venta</button>
         <a href="{% url 'ventas_admin' %}" class="btn btn-secondary">Cancelar</a>
@@ -165,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('iva').textContent = iva.toFixed(2);
         document.getElementById('total').textContent = total.toFixed(2);
 
-        const montoTotalInput = document.querySelector('input[name$="monto_total"]');
+        const montoTotalInput = document.querySelector('input[name$="total"]');
         if (montoTotalInput) {
             montoTotalInput.value = total.toFixed(2);
         }

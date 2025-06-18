@@ -54,6 +54,8 @@
                     {% else %}
                         <a href="{% url 'editar_receta_producto' producto.cod_producto %}" class="btn btn-success btn-sm">Crear Receta</a>
                     {% endif %}
+                    <a href="{% url 'editar_receta_personalizada' producto.cod_producto %}" class="btn btn-warning btn-sm">Editar Receta Personalizadas</a>
+
                 </td>
             </tr>
             {% endfor %}

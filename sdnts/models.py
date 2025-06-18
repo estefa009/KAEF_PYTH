@@ -221,7 +221,13 @@ class Producto(models.Model):
         ('L', 'Mediano'),
         ('XL', 'Grande'),
     )
-    
+    MULTIPLICADORES_TAMANO = {
+        'S': 1,
+        'M': 2,
+        'L': 3,
+        'XL': 4,
+    }
+
     cod_producto = models.AutoField(primary_key=True)
     nomb_pro = models.CharField('nombre', max_length=50, unique=True)
     tamano = models.CharField('tamaño', max_length=2, choices=TAMANOS)
@@ -233,6 +239,9 @@ class Producto(models.Model):
         verbose_name = 'Producto'
         verbose_name_plural = 'Productos'
     
+    def get_multiplicador(self):
+        return self.MULTIPLICADORES_TAMANO.get(self.tamano, 1)
+
     def __str__(self):
         return f"{self.nomb_pro} ({self.get_tamano_display()})"
 
@@ -643,6 +652,37 @@ class RecetaProducto(models.Model):
         return f"{self.cod_producto} - {self.insumo} ({self.cantidad} {self.unidad_medida})"
     def __str__(self):
         return f"{self.cod_producto} - {self.insumo} ({self.cantidad} {self.unidad_medida})"
+
+class RecetaPersonalizacion(models.Model):
+    TIPO_CHOICES = [
+        ('MASA', 'Masa'),
+        ('GLASEADO', 'Glaseado'),
+        ('TOPPING', 'Topping'),
+    ]
+
+    cod_producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='recetas_personalizadas')
+    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
+    insumo = models.ForeignKey(Insumo, on_delete=models.CASCADE)
+    unidad_medida = models.CharField(max_length=10, default='g')  # o 'cucharada' si es masa
+
+    class Meta:
+        unique_together = ('cod_producto', 'tipo', 'insumo')
+
+    def cantidad_base(self):
+        if self.tipo == 'MASA':
+            return 15  # cucharada
+        elif self.tipo == 'GLASEADO':
+            return 200  # gramos
+        elif self.tipo == 'TOPPING':
+            return 100  # gramos
+        return 0
+
+    def cantidad_total(self):
+        multiplicador = self.cod_producto.get_multiplicador()
+        return self.cantidad_base() * multiplicador
+
+    def __str__(self):
+        return f"{self.cod_producto} - {self.tipo} - {self.insumo} ({self.cantidad_base()}{self.unidad_medida})"
 
 class Notificacion(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='notificaciones')

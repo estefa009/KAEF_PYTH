@@ -1047,13 +1047,11 @@ def agregar_venta_completa(request):
         pago_form = PagoForm(request.POST)
 
         if venta_form.is_valid() and detalle_formset.is_valid() and combinacion_formset.is_valid() and pago_form.is_valid():
-            # Calcular la cantidad total de donas vendidas
             cantidad_total = sum(
                 form.cleaned_data.get('cantidad', 0)
                 for form in detalle_formset
                 if form.cleaned_data and not form.cleaned_data.get('DELETE', False)
             )
-
             cantidad_combinaciones = sum(
                 1 for form in combinacion_formset
                 if form.cleaned_data and not form.cleaned_data.get('DELETE', False)
@@ -1065,58 +1063,50 @@ def agregar_venta_completa(request):
                     f"Debes agregar exactamente {cantidad_total} combinaciones. Has agregado {cantidad_combinaciones}."
                 )
             else:
-                with transaction.atomic():
-                    venta = venta_form.save(commit=False)
-                    venta.save()
+                try:
+                    with transaction.atomic():
+                        venta = venta_form.save(commit=False)
 
-                    subtotal = Decimal('0.00')
-                    for form in detalle_formset:
-                        if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
-                            detalle = form.save(commit=False)
-                            detalle.cod_venta = venta
-                            detalle.save()
-                            subtotal += detalle.cantidad * detalle.precio_unitario
+                        subtotal = Decimal('0.00')
+                        detalle_instances = []
 
-                    iva = subtotal * Decimal('0.19')
-                    total = subtotal + iva
+                        for form in detalle_formset:
+                            if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                                detalle = form.save(commit=False)
+                                detalle.cod_venta = venta
+                                detalle_instances.extend([detalle] * detalle.cantidad)
+                                subtotal += detalle.cantidad * detalle.precio_unitario
 
-                    venta.subtotal = subtotal
-                    venta.iva = iva
-                    venta.total = total
-                    venta.save()
+                        iva = subtotal * Decimal('0.19')
+                        total = subtotal + iva
 
-                    # Asumimos que hay una combinación por cada unidad vendida (por cantidad)
-                    detalle_index = 0
-                    detalle_instances = []
+                        venta.subtotal = subtotal
+                        venta.iva = iva
+                        venta.total = total
+                        venta.save()
 
-                    # Guardar detalles primero y acumularlos
-                    for form in detalle_formset:
-                        if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
-                            detalle = form.save(commit=False)
-                            detalle.cod_venta = venta
-                            detalle.save()
-                            detalle_instances.extend([detalle] * detalle.cantidad)  # Repetir según la cantidad
+                        for form in detalle_formset:
+                            if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                                detalle = form.save(commit=False)
+                                detalle.cod_venta = venta
+                                detalle.save()
 
-                            subtotal += detalle.cantidad * detalle.precio_unitario
+                        for i, form in enumerate(combinacion_formset):
+                            if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                                combinacion = form.save(commit=False)
+                                combinacion.cod_venta = venta
+                                if i < len(detalle_instances):
+                                    combinacion.cod_detalle = detalle_instances[i]
+                                combinacion.save()
 
-                    # Asociar combinaciones con detalle correspondiente por índice
-                    for i, form in enumerate(combinacion_formset):
-                        if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
-                            combinacion = form.save(commit=False)
-                            combinacion.cod_venta = venta
+                        pago = pago_form.save(commit=False)
+                        pago.cod_venta = venta
+                        pago.save()
 
-                            if i < len(detalle_instances):
-                                combinacion.cod_detalle = detalle_instances[i]  # ← Enlazar con detalle correcto
-
-                            combinacion.save()
-
-
-                    pago = pago_form.save(commit=False)
-                    pago.cod_venta = venta
-                    pago.save()
-
-                    messages.success(request, "Venta creada correctamente.")
-                    return redirect('ventas_admin')
+                        messages.success(request, "Venta creada correctamente.")
+                        return redirect('ventas_admin')
+                except Exception as e:
+                    messages.error(request, f"Ocurrió un error al guardar la venta: {e}")
         else:
             messages.error(request, "Revisa todos los campos. Hay errores en el formulario.")
     else:
@@ -1136,6 +1126,7 @@ def agregar_venta_completa(request):
         'productos': productos,
         'precios_productos': precios,
     })
+
 
 @login_required
 def detalle_ventas(request, venta_id):
@@ -1200,8 +1191,9 @@ def confirmar_generacion_produccion(request, cod_venta):
     for detalle in detalles:
         producto = detalle.cod_producto
         cantidad = detalle.cantidad
+        multiplicador = producto.get_multiplicador()
 
-        # Insumos de receta base
+        # 1. Insumos de receta base
         receta = RecetaProducto.objects.filter(cod_producto=producto)
         for r in receta:
             insumo = r.insumo
@@ -1209,27 +1201,33 @@ def confirmar_generacion_produccion(request, cod_venta):
             insumos_requeridos.setdefault(key, {
                 "cantidad": 0,
                 "stock": insumo.cnt_insumo,
-                "unidad": insumo.unidad_medida
+                "unidad": insumo.unidad_medida,
+                "fuente": set()
             })
             insumos_requeridos[key]["cantidad"] += r.cantidad * cantidad
+            insumos_requeridos[key]["fuente"].add("Receta base")
 
-        # Insumos por personalización
-            combinaciones = CombinacionProducto.objects.filter(cod_detalle=detalle)
-            for c in combinaciones:
-                for componente in [c.cod_sabor_masa_1, c.cod_glaseado_1, c.cod_topping_1]:
-                    if componente and componente.insumo:
-                        insumo = componente.insumo
-                        key = insumo.nomb_insumo
-                        insumos_requeridos.setdefault(key, {
-                            "cantidad": 0,
-                            "stock": insumo.cnt_insumo,
-                            "unidad": insumo.unidad_medida,
-                            "fuente": set()
-                        })
-                        insumos_requeridos[key]["cantidad"] += cantidad  # 1 por cada unidad vendida
-                        insumos_requeridos[key]["fuente"].add("Personalización")
-
-
+        # 2. Insumos por personalización
+        combinaciones = CombinacionProducto.objects.filter(cod_detalle=detalle)
+        for c in combinaciones:
+            combinaciones_insumos = [
+                (c.cod_sabor_masa_1, 15),     # 15 ml de masa base
+                (c.cod_glaseado_1, 200),      # 200 g de glaseado
+                (c.cod_topping_1, 100),       # 100 g de topping
+            ]
+            for componente, cantidad_base in combinaciones_insumos:
+                if componente and componente.insumo:
+                    insumo = componente.insumo
+                    key = insumo.nomb_insumo
+                    insumos_requeridos.setdefault(key, {
+                        "cantidad": 0,
+                        "stock": insumo.cnt_insumo,
+                        "unidad": insumo.unidad_medida,
+                        "fuente": set()
+                    })
+                    total_personalizado = cantidad * multiplicador * cantidad_base
+                    insumos_requeridos[key]["cantidad"] += total_personalizado
+                    insumos_requeridos[key]["fuente"].add("Personalización")
 
     # Verificar si hay stock suficiente
     hay_stock_suficiente = all(data["cantidad"] <= data["stock"] for data in insumos_requeridos.values())
@@ -1297,6 +1295,12 @@ def seleccionar_combinaciones_admin(request, cod_venta):
     return render(request, 'admin/ventas/seleccionar_combinaciones.html', context)
 
 
+CANTIDAD_BASE = {
+    'masa': 15,
+    'glaseado': 200,
+    'topping': 100,
+}
+
 @transaction.atomic
 def generar_produccion_confirmada(request, cod_venta):
     venta = get_object_or_404(Venta, cod_venta=cod_venta)
@@ -1314,8 +1318,11 @@ def generar_produccion_confirmada(request, cod_venta):
         insumos_necesarios = {}
 
         for detalle in DetalleVenta.objects.filter(cod_venta=venta):
+            producto = detalle.cod_producto
+            multiplicador = producto.get_multiplicador()
+
             # --- 1. Receta base ---
-            receta = RecetaProducto.objects.filter(cod_producto=detalle.cod_producto)
+            receta = RecetaProducto.objects.filter(cod_producto=producto)
             for item in receta:
                 total = item.cantidad * detalle.cantidad
                 insumos_necesarios[item.insumo_id] = insumos_necesarios.get(item.insumo_id, 0) + total
@@ -1323,13 +1330,23 @@ def generar_produccion_confirmada(request, cod_venta):
             # --- 2. Personalización por combinación ---
             combinaciones = CombinacionProducto.objects.filter(cod_detalle=detalle)
             for combinacion in combinaciones:
-                for insumo_id in [
-                    combinacion.cod_sabor_masa_1.insumo_id if combinacion.cod_sabor_masa_1 else None,
-                    combinacion.cod_glaseado_1.insumo_id if combinacion.cod_glaseado_1 else None,
-                    combinacion.cod_topping_1.insumo_id if combinacion.cod_topping_1 else None
-                ]:
-                    if insumo_id:
-                        insumos_necesarios[insumo_id] = insumos_necesarios.get(insumo_id, 0) + 1
+                # Masa
+                if combinacion.cod_sabor_masa_1:
+                    id_insumo = combinacion.cod_sabor_masa_1.insumo_id
+                    cantidad = CANTIDAD_BASE['masa'] * multiplicador
+                    insumos_necesarios[id_insumo] = insumos_necesarios.get(id_insumo, 0) + cantidad
+
+                # Glaseado
+                if combinacion.cod_glaseado_1:
+                    id_insumo = combinacion.cod_glaseado_1.insumo_id
+                    cantidad = CANTIDAD_BASE['glaseado'] * multiplicador
+                    insumos_necesarios[id_insumo] = insumos_necesarios.get(id_insumo, 0) + cantidad
+
+                # Topping
+                if combinacion.cod_topping_1:
+                    id_insumo = combinacion.cod_topping_1.insumo_id
+                    cantidad = CANTIDAD_BASE['topping'] * multiplicador
+                    insumos_necesarios[id_insumo] = insumos_necesarios.get(id_insumo, 0) + cantidad
 
         # Verificación de stock
         faltantes = []
@@ -1340,7 +1357,7 @@ def generar_produccion_confirmada(request, cod_venta):
 
         if faltantes:
             messages.error(request, "No hay suficiente stock para:\n" + "\n".join(faltantes))
-            raise transaction.TransactionManagementError  # Se revierte la transacción
+            raise transaction.TransactionManagementError  # Revierte todo si hay faltantes
 
         # Registrar salidas y descontar stock
         for insumo_id, cantidad in insumos_necesarios.items():
@@ -1941,6 +1958,41 @@ def editar_receta_producto(request, cod_producto):
         'formset': formset
     })
 
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Producto, RecetaPersonalizacion
+from .forms import RecetaPersonalizacionFormSet
+from django.contrib import messages
+
+def editar_receta_personalizada(request, cod_producto):
+    producto = get_object_or_404(Producto, cod_producto=cod_producto)
+    queryset = RecetaPersonalizacion.objects.filter(cod_producto=producto)
+
+    if request.method == 'POST':
+        formset = RecetaPersonalizacionFormSet(request.POST, queryset=queryset)
+        if formset.is_valid():
+            recetas = formset.save(commit=False)
+            # Eliminar los que el usuario marcó para borrar
+            for obj in formset.deleted_objects:
+                obj.delete()
+            for receta in recetas:
+                receta.cod_producto = producto
+                # Asignar cantidad base automáticamente según tipo
+                if receta.tipo == 'MASA':
+                    receta.cantidad_base = 15  # gramos (1 cucharada)
+                elif receta.tipo == 'GLASEADO':
+                    receta.cantidad_base = 200
+                elif receta.tipo == 'TOPPING':
+                    receta.cantidad_base = 100
+                receta.save()
+            messages.success(request, "Recetas personalizadas guardadas correctamente.")
+            return redirect('editar_receta_personalizada', cod_producto=producto.cod_producto)
+    else:
+        formset = RecetaPersonalizacionFormSet(queryset=queryset)
+
+    return render(request, 'admin/productos/editar_receta_personalizada.html', {
+        'formset': formset,
+        'producto': producto,
+    })
 
 
 def generar_receta_base(request, cod_producto):
