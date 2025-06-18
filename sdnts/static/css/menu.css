@@ -382,6 +382,43 @@
     background-color: #e7697e;
 }
 
+
+
+
+
+
+
+.icon-trash {
+    color: #fc6998;
+    font-size: 2.2em;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+    vertical-align: middle;
+}
+.icon-trash:hover {
+    color: #b3003c;
+    transform: scale(1.2) rotate(-10deg) translateY(-4px);
+}
+/* Nuevo efecto al hacer click */
+.icon-trash:active {
+    transform: scale(1.1) rotate(-10deg) translateY(3px);
+    filter: brightness(0.85);
+}
+
+/* Animación al eliminar producto del carrito */
+.cart-product.eliminando {
+    opacity: 0;
+    transform: translateX(60px) scale(0.95);
+    transition: opacity 0.5s, transform 0.5s;
+    pointer-events: none;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+
+
+
 /*________________________INDEX________________________*/
 .Profile {
     width: auto;
