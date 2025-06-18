@@ -1,329 +1,571 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin</title>
+    <title>Panel de Administración</title>
     <link rel="icon" type="image/ico" href="{% static 'icon/2.ico' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
     <link rel="stylesheet" href="{% static 'css/menu.css' %}">
-  
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Century Gothic', sans-serif;
+            background-color: #fff0f5;
+           
+        }
+
+        .contenedor {
+            max-width: 1400px;
+            margin: 30px auto;
+            border-radius: 60px;
+            padding: 40px;
+            background: linear-gradient(to bottom, #ffeef3, #fff9f2);
+            box-shadow: 0 10px 20px rgba(255, 182, 193, 0.3);
+        }
+
+        h2 {
+            font-family: "Dunkin", sans-serif;
+            color: #ff80a4;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: bold;
+            font-size: 25px;
+        }
+
+        .btn-rosa {
+            background-color: #ff80a4 !important;
+            color: white;
+            border-radius: 30px;
+            padding: 10px 20px;
+            font-weight: bold;
+            border: none;
+            transition: all 0.3s ease;
+            height: 50px;
+            margin-top: 20px;
+            margin-left: 300px;
+        }
+
+        .btn-rosa:hover {
+            background-color: #ff4a94 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
+        }
+
+        .card.bg-light-pink {
+            background-color: white !important;
+            border-radius: 30px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(255, 182, 193, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .card.bg-light-pink:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 182, 193, 0.4);
+        }
+
+        /* Estilo para la tabla */
+        .table {
+            border: 3px solid #ffb6c1;
+            border-radius: 30px;
+            overflow: hidden;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+        }
+
+        .table thead th {
+            background-color: #ff80a4;
+            color: white;
+            text-align: center;
+            border: 2px solid #ffb6c1;
+            padding: 12px;
+            font-weight: bold;
+        }
+
+        .table tbody td {
+            background-color: #f5f7f8;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 10px;
+            border: 1px solid #eee;
+        }
+
+        .table .btn {
+            font-size: 0.8rem;
+            padding: 5px 8px;
+            border-radius: 10px;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .status-in-progress {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .status-completed {
+            background-color: #198754;
+            color: white;
+        }
+
+        .status-pending {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #a64b6b;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        select.form-select {
+            border-radius: 20px;
+            border: 2px solid #ffb6c1;
+            font-style: italic;
+            color: #666;
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background-color: white;
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(255, 182, 193, 0.2);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 182, 193, 0.4);
+        }
+
+        .card-title {
+            font-size: 16px;
+            color: #ff80a4;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff5b8a;
+            margin: 10px 0;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: #a64b6b;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .contenedor {
+                padding: 20px;
+                border-radius: 40px;
+            }
+            
+            .dashboard-cards {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .table thead th,
+            .table tbody td {
+                font-size: 0.8rem;
+                padding: 8px;
+            }
+        }
+    </style>
 </head>
 <body>
-    {% include "includes/nav_admin.html" %} <br><br>
 
-   <div class="container-fluid">
+{% include "includes/nav_admin.html" %}
+
+<div class="contenedor">
+    <!-- Mensajes de alerta -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Tarjetas de resumen -->
     <div class="dashboard-cards">
-        <!-- Tarjeta Usuarios -->
         <div class="dashboard-card">
-            <div class="card-title">Usuarios registrados</div>
+            <div class="card-title"><i class="bi bi-people-fill"></i> Usuarios registrados</div>
             <div class="card-value">{{ total_usuarios }}</div>
-            <div class="card-desc">Total de usuarios en la plataforma</div>
+            <div class="card-desc">Total en la plataforma</div>
         </div>
         
-        <!-- Tarjeta Clientes -->
         <div class="dashboard-card">
-            <div class="card-title">Clientes</div>
+            <div class="card-title"><i class="bi bi-person-heart"></i> Clientes</div>
             <div class="card-value">{{ total_clientes }}</div>
             <div class="card-desc">Usuarios con rol Cliente</div>
         </div>
         
-        <!-- Tarjeta Domiciliarios -->
         <div class="dashboard-card">
-            <div class="card-title">Domiciliarios</div>
+            <div class="card-title"><i class="bi bi-bicycle"></i> Domiciliarios</div>
             <div class="card-value">{{ total_domis }}</div>
             <div class="card-desc">Usuarios con rol Domiciliario</div>
         </div>
         
-        <!-- Tarjeta Ventas -->
         <div class="dashboard-card">
-            <div class="card-title">Ventas totales</div>
+            <div class="card-title"><i class="bi bi-cart-check-fill"></i> Ventas totales</div>
             <div class="card-value">{{ total_ventas }}</div>
-            <div class="card-desc">Cantidad total de ventas</div>
+            <div class="card-desc">Cantidad de ventas</div>
         </div>
         
-        <!-- Tarjeta Monto Ventas -->
         <div class="dashboard-card">
-            <div class="card-title">Monto total</div>
+            <div class="card-title"><i class="bi bi-cash-stack"></i> Monto total</div>
             <div class="card-value">${{ total_ventas_monto|floatformat:2 }}</div>
             <div class="card-desc">Valor total de ventas</div>
         </div>
     </div>
 
-</div>
-
-        <!-- NUEVA SECCIÓN DE REPORTES -->
-        <div class="dashboard-reports-section">
-            <h2>Reportes y Exportaciones</h2>
-            <div class="dashboard-reports-grid">
-                <div class="dashboard-report-card">
-                    <div class="card-title">Insumos</div>
-                    <a href="{% url 'reporte_insumo' %}" class="btn btn-danger btn-sm mb-1">PDF</a>
-                </div>
-                <div class="dashboard-report-card">
-                    <div class="card-title">Producción</div>
-                    <a href="{% url 'reporte_produccion' %}" class="btn btn-danger btn-sm mb-1">PDF</a>
-                </div>
-                <div class="dashboard-report-card">
-                    <div class="card-title">Ventas</div>
-                    <a href="{% url 'reporte_ventas' %}" class="btn btn-danger btn-sm mb-1">PDF</a>
-                </div>
-                <div class="dashboard-report-card">
-                    <div class="card-title">Entradas</div>
-                    <a href="{% url 'reporte_entradas' %}" class="btn btn-danger btn-sm mb-1">PDF</a>
-                </div>
-                <div class="dashboard-report-card">
-                    <div class="card-title">Salidas</div>
-                    <a href="{% url 'reporte_salidas' %}" class="btn btn-danger btn-sm mb-1">PDF</a>
-                </div>
-                <div class="dashboard-report-card">
-                    <div class="card-title">Proveedores</div>
-                    <a href="{% url 'reporte_proveedores' %}" class="btn btn-danger btn-sm mb-1">PDF</a>
-                </div>
-                <div class="dashboard-report-card">
-                    <div class="card-title">Categorías</div>
-                    <a href="{% url 'reporte_categorias' %}" class="btn btn-danger btn-sm mb-1">PDF</a>
-                </div>
-                <div class="dashboard-report-card">
-                    <div class="card-title">Envíos</div>
-                    <a href="{% url 'reporte_envios' %}" class="btn btn-danger btn-sm mb-1">PDF</a>
-                </div>
-                <div class="dashboard-report-card">
-                    <div class="card-title">Usuarios</div>
-                    <a href="{% url 'usuarios_pdf' %}" class="btn btn-danger btn-sm mb-1">PDF</a>
-                </div>
+    <!-- Sección de reportes -->
+    <h2><i class="bi bi-file-earmark-pdf-fill"></i> REPORTES Y EXPORTACIONES</h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card bg-light-pink p-3 text-center">
+                <h5><i class="bi bi-box-seam"></i> Insumos</h5>
+                <a href="{% url 'reporte_insumo' %}" class="btn btn-rosa mt-2">PDF</a>
             </div>
         </div>
-
-        <!-- NUEVA SECCIÓN DE GRÁFICAS -->
-        <div class="dashboard-charts-section">
-            <h2>Gráficas de Ventas</h2>
-            <div class="dashboard-charts-grid" style="display: flex; gap: 30px; flex-wrap: wrap;">
-                <div class="dashboard-chart-card" style="flex: 2 1 480px; min-width: 350px; max-width: 700px;">
-                    <canvas id="ventasMensualesChart" style="width:100%; height:340px; min-height:320px; max-height:370px;"></canvas>
-                </div>
-                <div class="dashboard-chart-card" style="flex: 1 1 320px; min-width: 260px; max-width: 420px;">
-                    <canvas id="ventasPorProductoChart" style="width:100%; height:320px; min-height:260px; max-height:340px;"></canvas>
-                </div>
-                <div class="dashboard-chart-card" style="flex: 1 1 320px; min-width: 260px; max-width: 420px;">
-                    <canvas id="clientesTopChart" style="width:100%; height:320px; min-height:260px; max-height:340px;"></canvas>
-                </div>
+        <div class="col-md-4 mb-3">
+            <div class="card bg-light-pink p-3 text-center">
+                <h5><i class="bi bi-gear"></i> Producción</h5>
+                <a href="{% url 'reporte_produccion' %}" class="btn btn-rosa mt-2">PDF</a>
             </div>
         </div>
-
-        <div class="dashboard-table-card">
-            <h2>Gestión de Usuarios</h2>
-            <div class="d-flex justify-content-between mb-3">
-                <div>
-                    <a href="{% url 'agregar_usuario' %}" class="btn btn-rosa me-2 mb-2">
-                        <i class="bi bi-person-plus"></i> Agregar Usuario
-                    </a>
-                </div>
-               
+        <div class="col-md-4 mb-3">
+            <div class="card bg-light-pink p-3 text-center">
+                <h5><i class="bi bi-cart"></i> Ventas</h5>
+                <a href="{% url 'reporte_ventas' %}" class="btn btn-rosa mt-2">PDF</a>
             </div>
-            <form method="GET" class="mb-3 d-flex align-items-center">
-                <label for="rol" class="me-2">Filtrar por rol:</label>
-                <select name="rol" id="rol" class="form-select me-2" style="width: auto;">
-                    <option value="">Todos</option>
-                    <option value="ADMIN" {% if rol_actual == "ADMIN" %}selected{% endif %}>Administrador</option>
-                    <option value="CLIENTE" {% if rol_actual == "CLIENTE" %}selected{% endif %}>Cliente</option>
-                    <option value="DOMI" {% if rol_actual == "DOMI" %}selected{% endif %}>Domiciliario</option>
-                </select>
-                <button type="submit" class="btn btn-primary">Aplicar</button>
-            </form>
-            <div class="table-responsive">
-                <table class="table tabla-usuarios">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Apellido</th>
-                            <th>Email</th>
-                            <th>Rol</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if usuarios %}
-                            {% for usuario in usuarios %}
-                                <tr>
-                                    <td>{{ usuario.cod_usuario }}</td>
-                                    <td>{{ usuario.nom_usua }}</td>
-                                    <td>{{ usuario.apell_usua }}</td>
-                                    <td>{{ usuario.email }}</td>
-                                    <td>
-                                        <span class="status-badge 
-                                            {% if usuario.rol == 'ADMIN' %}status-in-progress
-                                            {% elif usuario.rol == 'CLIENTE' %}status-completed
-                                            {% elif usuario.rol == 'DOMI' %}status-pending
-                                            {% endif %}">
-                                            {{ usuario.get_rol_display }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'editar_usuario' cod_usuario=usuario.cod_usuario %}" class="btn btn-rosa me-2">
-                                            <i class="bi bi-pencil"></i> Editar
-                                        </a>
-                                        <a href="{% url 'eliminar_usuario' cod_usuario=usuario.cod_usuario %}"
-                                           onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?');"
-                                           class="btn btn-danger">
-                                            Eliminar
-                                        </a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="6" class="no-data py-3">No hay usuarios disponibles.</td>
-                            </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card bg-light-pink p-3 text-center">
+                <h5><i class="bi bi-box-arrow-in-down"></i> Entradas</h5>
+                <a href="{% url 'reporte_entradas' %}" class="btn btn-rosa mt-2">PDF</a>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card bg-light-pink p-3 text-center">
+                <h5><i class="bi bi-box-arrow-up"></i> Salidas</h5>
+                <a href="{% url 'reporte_salidas' %}" class="btn btn-rosa mt-2">PDF</a>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card bg-light-pink p-3 text-center">
+                <h5><i class="bi bi-truck"></i> Proveedores</h5>
+                <a href="{% url 'reporte_proveedores' %}" class="btn btn-rosa mt-2">PDF</a>
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Gráfica de ventas mensuales
-        const ventasMensualesData = {{ ventas_mensuales|safe }};
-        const ventasMensualesLabels = ventasMensualesData.labels || [];
-        const ventasMensualesValores = ventasMensualesData.data || [];
-        const ctx1 = document.getElementById('ventasMensualesChart');
-        if (ctx1) {
-            new Chart(ctx1.getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: ventasMensualesLabels,
-                    datasets: [{
-                        label: 'Monto de ventas ($)',
-                        data: ventasMensualesValores,
-                        backgroundColor: '#f357a8',
-                        borderRadius: 8,
-                        borderWidth: 2,
-                        borderColor: '#7b2ff2'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        title: { display: true, text: 'Ventas por Mes', color: '#7b2ff2', font: { size: 18 } },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return '$' + context.parsed.y.toLocaleString();
-                                }
+
+    <!-- Sección de gráficas -->
+    <h2><i class="bi bi-bar-chart-line-fill"></i> GRÁFICAS DE VENTAS</h2>
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-4">
+            <div class="card bg-light-pink p-3">
+                <canvas id="ventasMensualesChart" height="300"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card bg-light-pink p-3">
+                <canvas id="ventasPorProductoChart" height="300"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card bg-light-pink p-3">
+                <canvas id="clientesTopChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gestión de usuarios -->
+    <h2><i class="bi bi-people-fill"></i> GESTIÓN DE USUARIOS</h2>
+    <div class="d-flex justify-content-between mb-4 flex-wrap gap-3">
+        <a href="{% url 'agregar_usuario' %}" class="btn btn-rosa">
+            <i class="bi bi-person-plus"></i> Agregar Usuario
+        </a>
+       
+        <form method="GET" class="d-flex align-items-center flex-wrap gap-2">
+            <label for="rol" class="me-2 mb-0">Filtrar por rol:</label>
+            <select name="rol" id="rol" class="form-select me-2">
+                <option value="">Todos</option>
+                <option value="ADMIN" {% if rol_actual == "ADMIN" %}selected{% endif %}>Administrador</option>
+                <option value="CLIENTE" {% if rol_actual == "CLIENTE" %}selected{% endif %}>Cliente</option>
+                <option value="DOMI" {% if rol_actual == "DOMI" %}selected{% endif %}>Domiciliario</option>
+            </select>
+            <button type="submit" class="btn btn-rosa">Aplicar</button>
+        </form>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if usuarios %}
+                    {% for usuario in usuarios %}
+                        <tr>
+                            <td>{{ usuario.cod_usuario }}</td>
+                            <td>{{ usuario.nom_usua }}</td>
+                            <td>{{ usuario.apell_usua }}</td>
+                            <td>{{ usuario.email }}</td>
+                            <td>
+                                <span class="status-badge 
+                                    {% if usuario.rol == 'ADMIN' %}status-in-progress
+                                    {% elif usuario.rol == 'CLIENTE' %}status-completed
+                                    {% elif usuario.rol == 'DOMI' %}status-pending
+                                    {% endif %}">
+                                    {{ usuario.get_rol_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <a href="{% url 'editar_usuario' cod_usuario=usuario.cod_usuario %}" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'eliminar_usuario' cod_usuario=usuario.cod_usuario %}"
+                                       onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?');"
+                                       class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="no-data">No hay usuarios disponibles.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gráfica de ventas mensuales
+    const ventasMensualesData = {{ ventas_mensuales|safe }};
+    const ventasMensualesLabels = ventasMensualesData.labels || [];
+    const ventasMensualesValores = ventasMensualesData.data || [];
+    const ctx1 = document.getElementById('ventasMensualesChart');
+    if (ctx1) {
+        new Chart(ctx1.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ventasMensualesLabels,
+                datasets: [{
+                    label: 'Monto de ventas ($)',
+                    data: ventasMensualesValores,
+                    backgroundColor: '#ff69b4',
+                    borderRadius: 8,
+                    borderWidth: 2,
+                    borderColor: '#ff4a94'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { 
+                        display: true, 
+                        text: 'Ventas por Mes', 
+                        color: '#ff80a4', 
+                        font: { size: 16 } 
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return '$' + context.parsed.y.toLocaleString();
                             }
+                        }
+                    }
+                },
+                scales: {
+                    x: { 
+                        title: { 
+                            display: true, 
+                            text: 'Mes', 
+                            color: '#ff80a4',
+                            font: { weight: 'bold' }
+                        },
+                        ticks: { color: '#ff80a4' }
+                    },
+                    y: { 
+                        beginAtZero: true, 
+                        title: { 
+                            display: true, 
+                            text: 'Monto ($)', 
+                            color: '#ff80a4',
+                            font: { weight: 'bold' }
+                        },
+                        ticks: { 
+                            color: '#ff80a4', 
+                            callback: value => '$' + value 
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Gráfica de ventas por producto
+    const ventasPorProductoData = {{ ventas_por_producto|safe }};
+    const ventasPorProductoLabels = ventasPorProductoData.labels || [];
+    const ventasPorProductoValores = ventasPorProductoData.data || [];
+    const ctx2 = document.getElementById('ventasPorProductoChart');
+    if (ctx2) {
+        new Chart(ctx2.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ventasPorProductoLabels,
+                datasets: [{
+                    label: 'Cantidad vendida',
+                    data: ventasPorProductoValores,
+                    backgroundColor: [
+                        '#ff69b4', '#ff80a4', '#ffb6c1', '#ffc0cb', '#ffd1dc',
+                        '#ff9eb5', '#ff6b8b', '#ff85a2', '#ff4a94'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { 
+                        position: 'bottom', 
+                        labels: { 
+                            color: '#ff80a4', 
+                            font: { size: 12 } 
+                        } 
+                    },
+                    title: { 
+                        display: true, 
+                        text: 'Ventas por Producto', 
+                        color: '#ff80a4', 
+                        font: { size: 16 } 
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed + ' unidades';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Gráfica de clientes con más compras
+    const clientesTopData = {{ clientes_top|safe }};
+    const clientesTopLabels = clientesTopData.labels || [];
+    const clientesTopValores = clientesTopData.data || [];
+    const ctx3 = document.getElementById('clientesTopChart');
+    if (ctx3) {
+        new Chart(ctx3.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: clientesTopLabels,
+                datasets: [{
+                    label: 'Compras realizadas',
+                    data: clientesTopValores,
+                    backgroundColor: '#ffb6c1',
+                    borderRadius: 8,
+                    borderWidth: 2,
+                    borderColor: '#ff69b4'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { 
+                        display: true, 
+                        text: 'Clientes con más compras', 
+                        color: '#ff80a4', 
+                        font: { size: 16 } 
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + ' compras';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { 
+                        title: { 
+                            display: true, 
+                            text: 'Cliente', 
+                            color: '#ff80a4',
+                            font: { weight: 'bold' }
+                        },
+                        ticks: { 
+                            color: '#ff80a4', 
+                            font: { size: 12 }, 
+                            autoSkip: false, 
+                            maxRotation: 45, 
+                            minRotation: 0 
                         }
                     },
-                    scales: {
-                        x: { 
-                            title: { display: true, text: 'Mes', color: '#7b2ff2' },
-                            ticks: { color: '#7b2ff2' }
+                    y: { 
+                        beginAtZero: true, 
+                        title: { 
+                            display: true, 
+                            text: 'Compras', 
+                            color: '#ff80a4',
+                            font: { weight: 'bold' }
                         },
-                        y: { 
-                            beginAtZero: true, 
-                            title: { display: true, text: 'Monto ($)', color: '#7b2ff2' },
-                            ticks: { color: '#7b2ff2', callback: value => '$' + value }
-                        }
+                        ticks: { color: '#ff80a4' }
                     }
                 }
-            });
-        }
-
-        // Gráfica de ventas por producto
-        const ventasPorProductoData = {{ ventas_por_producto|safe }};
-        const ventasPorProductoLabels = ventasPorProductoData.labels || [];
-        const ventasPorProductoValores = ventasPorProductoData.data || [];
-        const ctx2 = document.getElementById('ventasPorProductoChart');
-        if (ctx2) {
-            new Chart(ctx2.getContext('2d'), {
-                type: 'doughnut',
-                data: {
-                    labels: ventasPorProductoLabels,
-                    datasets: [{
-                        label: 'Cantidad vendida',
-                        data: ventasPorProductoValores,
-                        backgroundColor: [
-                            '#7b2ff2', '#f357a8', '#ffb347', '#4e4032', '#fc6998', '#ffc0cb', '#a3e635', '#fbbf24', '#f87171'
-                        ],
-                        borderWidth: 2,
-                        borderColor: '#fff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: '#7b2ff2', font: { size: 14 } } },
-                        title: { display: true, text: 'Ventas por Producto', color: '#7b2ff2', font: { size: 18 } },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': ' + context.parsed + ' unidades';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Gráfica de clientes con más compras
-        const clientesTopData = {{ clientes_top|safe }};
-        const clientesTopLabels = clientesTopData.labels || [];
-        const clientesTopValores = clientesTopData.data || [];
-        const ctx3 = document.getElementById('clientesTopChart');
-        if (ctx3) {
-            new Chart(ctx3.getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: clientesTopLabels,
-                    datasets: [{
-                        label: 'Compras realizadas',
-                        data: clientesTopValores,
-                        backgroundColor: '#a3e635',
-                        borderRadius: 8,
-                        borderWidth: 2,
-                        borderColor: '#7b2ff2'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        title: { display: true, text: 'Clientes con más compras', color: '#7b2ff2', font: { size: 18 } },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.parsed.y + ' compras';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: { 
-                            title: { display: true, text: 'Cliente', color: '#7b2ff2' },
-                            ticks: { color: '#7b2ff2', font: { size: 12 }, autoSkip: false, maxRotation: 45, minRotation: 0 }
-                        },
-                        y: { 
-                            beginAtZero: true, 
-                            title: { display: true, text: 'Compras', color: '#7b2ff2' },
-                            ticks: { color: '#7b2ff2' }
-                        }
-                    }
-                }
-            });
-        }
-    });
-    </script>
+            }
+        });
+    }
+});
+</script>
 </body>
 </html>

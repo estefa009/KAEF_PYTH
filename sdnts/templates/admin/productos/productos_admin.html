@@ -4,63 +4,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proveedores</title>
+    <title>Gestión de Productos</title>
     <link rel="icon" type="image/ico" href="{% static 'icon/2.ico' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="{% static 'css/proveedores.css' %}">
     <link rel="stylesheet" href="{% static 'css/menu.css' %}">
-</head>
 
+    <style>
+        body {
+            font-family: 'Century Gothic', sans-serif;
+            background-color: #fff0f5;
+            color: #e75480;
+        }
+
+        .contenedor {
+            max-width: 1200px;
+            margin: 30px auto;
+            border-radius: 60px;
+            padding: 40px;
+            background: linear-gradient(to bottom, #ffeef3, #fff9f2);
+            box-shadow: 0 10px 20px rgba(255, 182, 193, 0.3);
+        }
+
+        h2 {
+            font-family: "Dunkin", sans-serif;
+            color: #ff80a4;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        .btn-rosa {
+            background-color: #ff69b4;
+            color: white;
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-weight: bold;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-rosa:hover {
+            background-color: #ff4a94;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
+        }
+
+        .btn-info {
+            background-color: #ffc0cb;
+            border: none;
+            color: white;
+            border-radius: 30px;
+        }
+
+        .btn-info:hover {
+            background-color: #f8a5b5;
+        }
+
+        .btn-warning {
+            background-color: #ffcccb;
+            border: none;
+            color: #8b0000;
+            border-radius: 30px;
+        }
+
+        .btn-warning:hover {
+            background-color: #f8a5b5;
+        }
+
+        .btn-success {
+            background-color: #b5ead7;
+            border: none;
+            color: #2e8b57;
+            border-radius: 30px;
+        }
+
+        .btn-success:hover {
+            background-color: #9dd8c2;
+        }
+
+        /* Estilo para la tabla */
+        .table {
+            border: 3px solid #ffb6c1;
+            border-radius: 30px;
+            overflow: hidden;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+        }
+
+        .table thead th {
+            background-color: #ff80a4;
+            color: white;
+            text-align: center;
+            border: 2px solid #ffb6c1;
+            padding: 12px;
+            font-weight: bold;
+        }
+
+        .table tbody td {
+            background-color: #f5f7f8;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 12px;
+            border: 1px solid #eee;
+        }
+
+        .table .btn {
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            margin: 2px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .table .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .badge.bg-success {
+            background-color: #198754 !important;
+        }
+
+        .badge.bg-danger {
+            background-color: #dc3545 !important;
+        }
+
+        @media (max-width: 768px) {
+            .contenedor {
+                padding: 20px;
+                border-radius: 40px;
+            }
+            
+            .table thead th,
+            .table tbody td {
+                font-size: 0.8rem;
+                padding: 8px;
+            }
+            
+            .table .btn {
+                font-size: 0.7rem;
+                padding: 4px 8px;
+                margin: 1px;
+            }
+        }
+    </style>
+</head>
 <body>
+
 {% include "includes/nav_admin.html" %}
 
+<div class="contenedor">
+    <h2><i class="bi bi-box-seam"></i> Gestión de Productos</h2>
 
-{% block content %}
-<h2 class="mb-4">Gestión de Productos</h2>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Tamaño</th>
+                    <th>Capacidad</th>
+                    <th>Precio</th>
+                    <th>Activo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.nomb_pro }}</td>
+                    <td>{{ producto.get_tamano_display }}</td>
+                    <td>{{ producto.capacidad }} donas</td>
+                    <td>${{ producto.prec_pro }}</td>
+                    <td>
+                        {% if producto.activo %}
+                            <span class="badge bg-success">Sí</span>
+                        {% else %}
+                            <span class="badge bg-danger">No</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            <a href="{% url 'cambiar_estado_producto' producto.cod_producto %}" 
+                               class="btn btn-warning btn-sm">
+                               <i class="bi bi-power"></i> Activar/Desactivar
+                            </a>
+                            
+                            {% if producto.recetas.exists %}
+                                <a href="{% url 'ver_receta_producto' producto.cod_producto %}" 
+                                   class="btn btn-info btn-sm">
+                                   <i class="bi bi-eye"></i> Ver Receta
+                                </a>
+                                <a href="{% url 'editar_receta_producto' producto.cod_producto %}" 
+                                   class="btn btn-warning btn-sm">
+                                   <i class="bi bi-pencil"></i> Editar Receta
+                                </a>
+                            {% else %}
+                                <a href="{% url 'editar_receta_producto' producto.cod_producto %}" 
+                                   class="btn btn-success btn-sm">
+                                   <i class="bi bi-plus-circle"></i> Crear Receta
+                                </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-<div class="table_productos">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Tamaño</th>
-                <th>Capacidad</th>
-                <th>Precio</th>
-                <th>Activo</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for producto in productos %}
-            <tr>
-                <td>{{ producto.nomb_pro }}</td>
-                <td>{{ producto.get_tamano_display }}</td>
-                <td>{{ producto.capacidad }} donas</td>
-                <td>${{ producto.prec_pro }}</td>
-                <td>
-                    {% if producto.activo %}
-                        <span class="badge bg-success">Sí</span>
-                    {% else %}
-                        <span class="badge bg-danger">No</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'cambiar_estado_producto' producto.cod_producto %}" class="btn btn-sm btn-warning">Activar/Desactivar</a>
-                    {% if producto.recetas.exists %}
-                    <a href="{% url 'ver_receta_producto' producto.cod_producto %}" class="btn btn-info btn-sm">Ver Receta</a>
-                    <a href="{% url 'editar_receta_producto' producto.cod_producto %}" class="btn btn-warning btn-sm">Editar Receta</a>
-                    {% else %}
-                        <a href="{% url 'editar_receta_producto' producto.cod_producto %}" class="btn btn-success btn-sm">Crear Receta</a>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% endblock %}
-
-</div>    
 </body>
 </html>
