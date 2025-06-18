@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/menu.css' %}">
     <link rel="icon" href="{% static 'icon/2.ico' %}" sizes="128x128" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .combos {
             cursor: pointer; 
@@ -61,7 +62,7 @@
                 </div>
                 <div class="letras">
                     <h1>!Elige el <br>combo a tu <span class="ANTOJO">ANTOJO!</span></h1>
-                    <p class="descripcion">Elige la cantidad de DNTS que <br>quieras llevar</p>
+                    <p class="descripcion">Elige la cantidad de DNTS que <br>quieras llevar...</p>
                 </div>
             </div>
         </div>
@@ -73,32 +74,42 @@
     </script>
     <!-- Login -->
 <div class="InicioSesion shadow">
-    <h1>¿Ya tienes <span class="cuenta">CUENTA?</span></h1>
-    <h2>Inicia Sesión</h2>
-    <br>
-    <form action="{% url 'login' %}" method="post" id="loginForm">
-        {% csrf_token %}
-        {% if error %}
-        <div class="alert alert-danger">
-            <p>{{ error }}</p>
-        </div>
-        {% endif %}
-        <div class="row">
-            <div class="col-5">
-                <input type="text" name="email" class="form-control shadow" placeholder="Correo" required maxlength="50">
-            </div>
-            <div class="col-5">
-                <input type="password" name="password" class="form-control shadow" placeholder="Contraseña" required maxlength="50">
-            </div>
-            <div>
-                <button type="submit" class="btn2 btn form mx-2 shadow">INICIAR SESIÓN</button>
-            </div>
-            <div class="forgot">
-<a href="{% url 'password_reset' %}" class=" btn-link ">¿Olvidaste tu contraseña?</a>
-            </div>
-        </div>
-    </form>
+    <div class="seccion-cuenta shadow">
+    <div class="contenido-cuenta text-center">
+        <i class="icono fas fa-user-edit fa-4x mb-4" style="color: #e75480;"></i>
+        <h2 class="titulo-cuenta">¡Mantén tu cuenta al día!</h2>
+        <p class="descripcion-cuenta">
+            Puedes <strong>actualizar tu información personal</strong> en cualquier momento: cambia tu nombre, correo o contraseña para mantener tu perfil siempre actualizado y seguro 💖🔐
+        </p>
+        <a href="{% url 'editar_perfil' %}" class="btn btn-cuenta mt-3">Editar mi información</a>
+    </div>
 </div>
+</div>
+<style>
+    .InicioSesion {
+        position: relative;  /* Necesario para el posicionamiento absoluto del fondo */
+        min-height: 60vh;  /* Ocupa toda la altura de la pantalla (ajusta según necesidad) */
+        padding: 2rem;  /* Espaciado interno */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .InicioSesion::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('{% static "Image/fondo.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        opacity: 0.5;  /* Opacidad del fondo */
+        z-index: -1;  /* Lo envía al fondo */
+    }
+</style>
+
 
     <div class="RedesSociales">
         <h1>Síguenos en nuestras redes sociales</h1>
