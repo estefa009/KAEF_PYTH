@@ -117,6 +117,10 @@
             background-color: #F8D7DA; 
             color: #721C24; 
         }
+        .status-assigned {
+            background-color: #fff3cd; /* amarillo pastel */
+            color: #856404;            /* texto marrón oscuro */
+        }
 
         .export-buttons {
             display: flex;
@@ -238,6 +242,8 @@
                             <td>
                                 <span class="status-badge 
                                     {% if envio.estado == 'PENDIENTE' %}status-pending
+                                    {% elif envio.estado == 'ASIGNADO' %}status-assigned
+
                                     {% elif envio.estado == 'EN_PROCESO' %}status-in-progress
                                     {% elif envio.estado == 'COMPLETADO' %}status-completed
                                     {% elif envio.estado == 'CANCELADO' %}status-cancelled
