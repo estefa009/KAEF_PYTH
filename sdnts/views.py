@@ -2443,3 +2443,76 @@ def reporte_categorias(request):
 def notificaciones_admin(request):
     notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha')
     return render(request, 'admin/notificaciones.html', {'notificaciones': notificaciones})
+
+import csv
+from .models import Insumo, CategoriaInsumo
+from django.views.decorators.csrf import csrf_exempt
+
+@login_required
+@csrf_exempt
+def cargar_insumos(request):
+    if request.method == 'POST':
+        archivo = request.FILES.get('archivo_insumos')
+        if not archivo or not archivo.name.endswith('.csv'):
+            messages.error(request, 'El archivo debe ser un CSV.')
+            return redirect('cargarDatos')
+        try:
+            decoded_file = archivo.read().decode('utf-8').splitlines()
+            reader = csv.DictReader(decoded_file)
+            insumos_cargados = 0
+            insumos_fallidos = []
+            for fila in reader:
+                categoria = None
+                cod_categoria = fila.get('cod_categoria')
+                if cod_categoria:
+                    try:
+                        categoria = CategoriaInsumo.objects.get(pk=cod_categoria)
+                    except CategoriaInsumo.DoesNotExist:
+                        categoria = None
+                if categoria:
+                    Insumo.objects.create(
+                        nomb_insumo=fila.get('nomb_insumo', ''),
+                        cnt_insumo=fila.get('cnt_insumo', 0),
+                        unidad_medida=fila.get('unidad_medida', ''),
+                        cod_categoria=categoria
+                    )
+                    insumos_cargados += 1
+                else:
+                    insumos_fallidos.append(fila.get('nomb_insumo', ''))
+            msg = f'Insumos cargados exitosamente: {insumos_cargados}.'
+            if insumos_fallidos:
+                msg += f' No se cargaron estos insumos por categoría inexistente: {", ".join(insumos_fallidos)}.'
+                messages.warning(request, msg)
+            else:
+                messages.success(request, msg)
+        except Exception as e:
+            messages.error(request, f'Error al cargar insumos: {e}')
+        return redirect('cargarDatos')
+    return redirect('cargarDatos')
+
+from django.shortcuts import render, get_object_or_404
+from .models import Correo
+
+@login_required
+def ver_correo(request, cod_correo):
+    correo = get_object_or_404(Correo, pk=cod_correo)
+    return render(request, 'admin/correos/ver_correo.html', {'correo': correo})
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+
+@login_required
+@csrf_exempt
+def actualizar_estado_envio(request, envio_id):
+    if request.method == 'POST':
+        import json
+        try:
+            data = json.loads(request.body)
+            nuevo_estado = data.get('nuevo_estado')
+            envio = get_object_or_404(Envio, pk=envio_id)
+            envio.estado = nuevo_estado
+            envio.save()
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
