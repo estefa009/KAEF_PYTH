@@ -923,12 +923,16 @@ from django.db.models import Sum
 
 @login_required
 def ventas_admin(request):
-    ventas_list = Venta.objects.select_related('produccion').all().order_by('-fecha_hora')  # <-- se añade select_related
+    # Mostrar todos los registros de ventas ordenados por cod_venta ascendente
+    ventas_list = Venta.objects.select_related('produccion').all().order_by('cod_venta')
 
-    # Paginación
-    paginator = Paginator(ventas_list, 10)  # 10 ventas por página
-    page_number = request.GET.get('page', 1)
-    ventas = paginator.get_page(page_number)
+    # Si tienes más de 10 registros y solo ves 10, es por la paginación:
+    # paginator = Paginator(ventas_list, 10)  # 10 ventas por página
+    # page_number = request.GET.get('page', 1)
+    # ventas = paginator.get_page(page_number)
+
+    # Para mostrar TODOS los registros en una sola página, elimina la paginación:
+    ventas = ventas_list  # Sin paginación
 
     # Estadísticas
     ventas_pendientes = Venta.objects.filter(estado='PENDIENTE').count()
@@ -943,9 +947,7 @@ def ventas_admin(request):
         'ventasPendientes': ventas_pendientes,
         'ventasEnCamino': ventas_en_camino,
         'ventasEntregadas': ventas_entregadas,
-        'pagina_actual': ventas.number,
-        'total_paginas': paginator.num_pages,
-        'range_paginas': range(1, paginator.num_pages + 1),
+        # Elimina las variables de paginación del context si no usas paginación
     }
 
     return render(request, 'admin/ventas/ventas_admin.html', context)
