@@ -162,6 +162,11 @@ urlpatterns = [
 
     path('cargar_insumos/', views.cargar_insumos, name='cargar_insumos'),
 
+    path('exportar_pdf/', views.exportar_pdf, name='exportar_pdf'),
+    path('exportar_excel/', views.exportar_excel, name='exportar_excel'),
+
+    path('actualizar_estado_envio/<int:envio_id>/', views.actualizar_estado_envio, name='actualizar_estado_envio'),
+
     
     # ...
 ]
