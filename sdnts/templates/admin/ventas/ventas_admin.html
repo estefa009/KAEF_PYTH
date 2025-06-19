@@ -282,9 +282,13 @@
                             <a href="{% url 'editar_estado_venta' venta.cod_venta %}" class="btn btn-warning btn-sm mt-3">
                                 Editar Estado
                             </a>
+                            {% if not venta.produccion %}
                             <a href="{% url 'confirmar_generacion_produccion' venta.cod_venta %}" class="btn btn-warning btn-sm mt-3">
                                 Confirmar Produccion
                             </a>
+                            {% else %}
+                                <button class="btn btn-sm btn-secondary" disabled>Producción generada</button>
+                            {% endif %}
                         </td>
                     </tr>
                     {% empty %}
