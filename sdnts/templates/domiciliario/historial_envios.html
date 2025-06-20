@@ -266,22 +266,23 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('formEditarEstado').onsubmit = function(e) {
         e.preventDefault();
         const envioId = document.getElementById('modalEnvioId').value;
-        const form = document.getElementById('formEditarEstado');
-        const formData = new FormData(form);
+        const nuevoEstado = document.getElementById('nuevoEstado').value;
+        const csrfToken = document.querySelector('#formEditarEstado [name=csrfmiddlewaretoken]').value;
 
         fetch(`/actualizar_estado_envio/${envioId}/`, {
             method: 'POST',
             headers: {
-                // No pongas 'Content-Type' aquí, el navegador lo gestiona
-                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
             },
-            body: formData
+            body: JSON.stringify({ nuevo_estado: nuevoEstado })
         })
         .then(resp => resp.json())
         .then(data => {
             if (data.success) {
+                // Actualizar el estado en la tabla
                 const fila = document.querySelector(`tr[data-envio-id="${envioId}"] .estado-envio`);
-                if (fila) fila.textContent = formData.get('nuevo_estado');
+                if (fila) fila.textContent = nuevoEstado;
                 document.getElementById('estadoMsg').innerHTML = '<span style="color:green;">Estado actualizado correctamente.</span>';
                 setTimeout(() => {
                     document.getElementById('modalEditarEstado').classList.remove('show');
