@@ -771,31 +771,51 @@ def historial_envios(request):
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
 from sdnts.forms import EnvioDomiciliarioForm
+
 @login_required
 def editar_envio_domiciliario(request, cod_envio):
     envio = get_object_or_404(Envio, cod_envio=cod_envio)
 
-    # Validación para que solo el domiciliario asignado pueda editar
     if request.user != envio.cod_domi.cod_usua:
         messages.error(request, "No tienes permiso para editar este envío.")
         return redirect('mis_domicilios')
 
+    estado_anterior = envio.estado  # Capturar el estado antes de guardar
+
     if request.method == 'POST':
         form = EnvioDomiciliarioForm(request.POST, instance=envio)
         if form.is_valid():
-            envio = form.save()
+            envio = form.save(commit=False)  # Guardamos pero aún no en DB
 
-            # Si cambia a ENTREGADO o CANCELADO, también actualizamos la venta
-            if envio.estado in ['ENTREGADO', 'CANCELADO']:
-                envio.cod_venta.estado = envio.estado
+            # Verificamos el estado antes de guardar
+            if envio.estado == "ENTREGADO":
+                envio.cod_venta.estado = "ENTREGADO"
                 envio.cod_venta.save()
+                envio.save()
+                messages.success(request, "El envío fue entregado y archivado.")
+                return redirect('historial_envios')
 
-            messages.success(request, "Envío actualizado correctamente.")
+            elif envio.estado == "CANCELADO":
+                envio.cod_venta.estado = "CANCELADO"
+                envio.cod_venta.save()
+                envio.save()
+                messages.success(request, "El envío fue cancelado.")
+                return redirect('mis_domicilios')
+
+            # Si es otro estado, solo guarda normalmente
+            envio.save()
+            messages.success(request, "Información del envío actualizada.")
             return redirect('mis_domicilios')
+
+
+
     else:
         form = EnvioDomiciliarioForm(instance=envio)
 
-    return render(request, 'domiciliario/editar_envio_domiciliario.html', {'form': form, 'envio': envio})
+    return render(request, 'domiciliario/editar_envio_domiciliario.html', {
+        'form': form,
+        'envio': envio,
+    })
 
 @login_required
 def detalle_venta_domiciliario(request, cod_venta):

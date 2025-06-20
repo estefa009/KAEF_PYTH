@@ -227,6 +227,8 @@
                     <th scope="col">Cod Venta</th>
                     <th scope="col">Cod Domiciliario</th>
                     <th scope="col">Fecha de Asignación</th>
+                    <th scope="col">Fecha de Entrega</th>
+                    <th scope="col">Observaciones</th>
                     <th scope="col">Estado</th>
                     <th scope="col">Acciones</th>
                 </tr>
@@ -239,6 +241,10 @@
                             <td>{{ envio.cod_venta }}</td>
                             <td>{{ envio.cod_domi }}</td>
                             <td>{{ envio.fecha_asignacion|date:"d/m/Y H:i" }}</td>
+                            <td><input type="datetime-local" class="form-control" name="fecha_hora_entrega_{{ envio.cod_envio}}" value="{{ envio.fecha_entrega|date:'Y-m-d\\TH:i' }}" disabled></td>
+                            <td>
+                                <textarea name="observaciones_{{ envio.cod_envio }}" class="form-control" rows="2" disabled>{{ envio.observaciones }}</textarea>
+                            </td>
                             <td>
                                 <span class="status-badge 
                                     {% if envio.estado == 'PENDIENTE' %}status-pending
@@ -252,10 +258,10 @@
                                 </span>
                             </td>
                             <td class="actions-cell">
-                                <a href="{% url 'editar_envio' envio.cod_envio %}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                <a href="{% url 'editar_envio' envio.cod_envio %}" class="btn btn-sm btn-outline-primary mt-5" title="Editar">
                                     <i class="bi bi-pencil"></i> Editar
                                 </a>
-                                <a href="{% url 'eliminar_envio' envio.cod_envio %}" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                <a href="{% url 'eliminar_envio' envio.cod_envio %}" class="btn btn-sm btn-outline-danger mt-5" title="Eliminar">
                                     <i class="bi bi-trash"></i> Eliminar
                                 </a>
                             </td>

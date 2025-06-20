@@ -116,9 +116,9 @@
                   <td>{{ envio.cod_envio }}</td>
                   <td>{{ envio.cod_venta.cod_venta }}</td>
                   <td>{{ envio.fecha_asignacion|date:"d/m/Y H:i" }}</td>
-                  <td><input type="datetime-local" class="form-control" name="fecha_hora_entrega_{{ envio.id }}" value="{{ envio.fecha_hora_entrega|date:'Y-m-d\\TH:i' }}" disabled></td>
-                  <td><input type="text" class="form-control" name="tarifa_{{ envio.id }}" value="{{ envio.tarifa_envio }}" disabled></td>
-                  <td><input type="datetime-local" class="form-control" name="segunda_fecha_{{ envio.id }}" value="{{ envio.segunda_fecha_entrega|date:'Y-m-d\\TH:i' }}" disabled></td>
+                  <td><input type="datetime-local" class="form-control" name="fecha_hora_entrega_{{ envio.cod_envio}}" value="{{ envio.fecha_entrega|date:'Y-m-d\\TH:i' }}" disabled></td>
+                  <td><input type="text" class="form-control" name="tarifa_{{ envio.cod_envio }}" value="{{ envio.tarifa_envio }}" disabled></td>
+                  <td><input type="datetime-local" class="form-control" name="segunda_fecha_{{ envio.cod_envio }}" value="{{ envio.segunda_fecha|date:'Y-m-d\\TH:i' }}" disabled></td>
                   <td>
                     <textarea name="observaciones_{{ envio.cod_envio }}" class="form-control" rows="2" disabled>{{ envio.observaciones }}</textarea>
                   </td>
@@ -139,7 +139,7 @@
                 </tr>
               {% endfor %}
             {% else %}
-              <tr><td colspan="7" class="text-center">No hay envíos disponibles.</td></tr>
+              <tr><td colspan="9" class="text-center">No hay envíos disponibles.</td></tr>
             {% endif %}
           </tbody>
         </table>
