@@ -485,6 +485,7 @@ class Envio(models.Model):
         decimal_places=2,
         default=0
     )
+    segunda_fecha = models.DateTimeField('segunda fecha tentativa', blank=True, null=True)
     observaciones = models.CharField(max_length=200, blank=True, null=True)
     firma_recepcion = models.CharField('firma de recepción', max_length=100, blank=True, null=True)
     

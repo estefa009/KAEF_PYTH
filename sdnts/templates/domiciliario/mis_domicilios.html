@@ -99,10 +99,12 @@
           <thead>
             <tr>
               <th>Cod. Asignación</th>
+              <th>Cod. Venta</th>
               <th>Fecha/Hora Asignada</th>
               <th>Fecha/Hora Entrega</th>
               <th>Tarifa</th>
               <th>Segunda Fecha</th>
+              <th>Observaciones</th>
               <th>Estado</th>
               <th>Acciones</th>
             </tr>
@@ -111,15 +113,28 @@
             {% if envios %}
               {% for envio in envios %}
                 <tr>
-                  <td>{{ envio.cod_asignacion }}</td>
-                  <td>{{ envio.fecha_hora_asignada }}</td>
+                  <td>{{ envio.cod_envio }}</td>
+                  <td>{{ envio.cod_venta.cod_venta }}</td>
+                  <td>{{ envio.fecha_asignacion|date:"d/m/Y H:i" }}</td>
                   <td><input type="datetime-local" class="form-control" name="fecha_hora_entrega_{{ envio.id }}" value="{{ envio.fecha_hora_entrega|date:'Y-m-d\\TH:i' }}" disabled></td>
                   <td><input type="text" class="form-control" name="tarifa_{{ envio.id }}" value="{{ envio.tarifa_envio }}" disabled></td>
                   <td><input type="datetime-local" class="form-control" name="segunda_fecha_{{ envio.id }}" value="{{ envio.segunda_fecha_entrega|date:'Y-m-d\\TH:i' }}" disabled></td>
-                  <td><input type="text" class="form-control" name="estado_{{ envio.id }}" value="{{ envio.estado_envio }}" disabled></td>
                   <td>
-                    <button class="btn btn-primary" onclick="enableEdit({{ envio.id }})">Editar</button>
-                    <button class="btn btn-warning" onclick="sendToHistorial({{ envio.id }})">Archivar</button>
+                    <textarea name="observaciones_{{ envio.cod_envio }}" class="form-control" rows="2" disabled>{{ envio.observaciones }}</textarea>
+                  </td>
+                  
+                  <td>
+                    <select name="estado_{{ envio.cod_envio }}" class="form-select" disabled>
+                      {% for value, label in envio.ESTADOS %}
+                        <option value="{{ value }}" {% if envio.estado == value %}selected{% endif %}>{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                  </td>
+                  <td>
+                    <a href="{% url 'editar_envio_domiciliario' envio.cod_envio %}" class="btn btn-primary">Editar</a>
+                    <a href="{% url 'detalle_venta_domiciliario' envio.cod_venta.cod_venta %}" class="btn btn-info">Ver Detalles</a>
+
+                    </a>
                   </td>
                 </tr>
               {% endfor %}
@@ -145,8 +160,8 @@
             <ul class="list-group">
               {% for envio in nuevos_envios %}
                 <li class="list-group-item">
-                  <strong>Código:</strong> {{ envio.cod_asignacion }}<br>
-                  <strong>Asignado:</strong> {{ envio.fecha_hora_asignada|date:"d/m/Y H:i" }}
+                  <strong>Código:</strong> {{ envio.cod_venta.cod_venta }}<br>
+                  <strong>Asignado:</strong> {{ envio.fecha_asignacion|date:"d/m/Y H:i" }}
                 </li>
               {% endfor %}
             </ul>

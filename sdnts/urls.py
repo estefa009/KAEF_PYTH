@@ -60,6 +60,8 @@ urlpatterns = [
     path('historial_envios/', views.historial_envios, name='historial_envios'),
     path('perfildomi/', views.perfildomi, name='perfildomi'),
     path('editar_perfildomi/', views.editar_perfildomi, name='editar_perfildomi'),
+    path('editar-envio/<int:cod_envio>/', views.editar_envio_domiciliario, name='editar_envio_domiciliario'),
+    path('detalle-venta-domiciliario/<int:cod_venta>/', views.detalle_venta_domiciliario, name='detalle_venta_domiciliario'),
 
     #administrador
     path('cargar-datos/', views.cargar_datos_view, name='cargarDatos'),

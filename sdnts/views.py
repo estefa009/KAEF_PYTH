@@ -730,12 +730,14 @@ def mis_domicilios(request):
         messages.error(request, "No tienes un perfil de domiciliario asignado.")
         return render(request, 'domiciliario/mis_domicilios.html', {'envios': [], 'nuevos_envios': []})
 
-    envios = Envio.objects.filter(cod_domi=domiciliario, estado='PENDIENTE')
+    envios = Envio.objects.filter(cod_domi=domiciliario, estado__in=['PENDIENTE','ASIGNADO'])
 
     recientes = now() - timedelta(days=1)
     nuevos_envios = Envio.objects.filter(
         cod_domi=domiciliario,
-        fecha_asignacion__gte=recientes
+        fecha_asignacion__gte=recientes,
+        estado__in=['PENDIENTE', 'ASIGNADO']
+
     )
 
     context = {
@@ -765,7 +767,40 @@ def historial_envios(request):
         'fecha_hasta': fecha_hasta,
         'nuevos_envios': nuevos_envios,  # ✅ se pasa al template
     })
-    
+  
+from django.shortcuts import get_object_or_404
+from django.contrib import messages
+from sdnts.forms import EnvioDomiciliarioForm
+@login_required
+def editar_envio_domiciliario(request, cod_envio):
+    envio = get_object_or_404(Envio, cod_envio=cod_envio)
+
+    if request.user != envio.cod_domi.cod_usua:
+        messages.error(request, "No tienes permiso para editar este envío.")
+        return redirect('mis_domicilios')
+
+    if request.method == 'POST':
+        form = EnvioDomiciliarioForm(request.POST, instance=envio)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Estado del envío actualizado.")
+            return redirect('mis_domicilios')
+    else:
+        form = EnvioDomiciliarioForm(instance=envio)
+
+    return render(request, 'domiciliario/editar_envio_domiciliario.html', {'form': form, 'envio': envio})
+  
+@login_required
+def detalle_venta_domiciliario(request, cod_venta):
+    venta = get_object_or_404(Venta, cod_venta=cod_venta)
+    detalles = DetalleVenta.objects.filter(cod_venta=venta)
+
+    return render(request, 'admin/ventas/detalle_ventas.html', {
+        'venta': venta,
+        'detalles': detalles,
+        'origen': 'mis_domicilios'  # Este es el nombre de la URL de retorno
+    })
+
 @login_required
 def perfildomi(request):
     user = request.user
@@ -1428,15 +1463,19 @@ def asignar_envio_produccion(request, cod_produccion):
         if form.is_valid():
             envio = form.save(commit=False)
             envio.cod_venta = venta
-            envio.fecha_asignacion = timezone.now()
-            envio.estado = 'ASIGNADO'
+            if not envio.estado or envio.estado == 'PENDIENTE':
+                envio.estado = 'ASIGNADO'
             envio.save()
 
             # Cambiar el estado de la venta a EN_CAMINO
             venta.estado = 'EN_CAMINO'
             venta.save()
+            
+            messages.success(request, "¡Envío asignado correctamente!")
 
             return redirect('produccion_admin')
+        else:
+            messages.error(request, "Hay errores en el formulario. Revisa los campos.")
     else:
         form = EnvioForm()
 

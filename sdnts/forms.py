@@ -275,6 +275,30 @@ class EnvioForm(forms.ModelForm):
             'tarifa_envio': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
         }
 
+from django import forms
+from .models import Envio
+
+class EnvioDomiciliarioForm(forms.ModelForm):
+    class Meta:
+        model = Envio
+        fields = ['fecha_entrega', 'segunda_fecha', 'estado', 'observaciones']
+        widgets = {
+            'fecha_entrega': forms.DateTimeInput(attrs={
+                'type': 'datetime-local',
+                'class': 'form-control'
+            }),
+            'segunda_fecha': forms.DateTimeInput(attrs={
+                'type': 'datetime-local',
+                'class': 'form-control'
+            }),
+            'estado': forms.Select(attrs={'class': 'form-select'}),
+            'observaciones': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Escribe observaciones aquí...'
+            }),
+        }
+
 #proveedores
 from .models import Proveedor
 

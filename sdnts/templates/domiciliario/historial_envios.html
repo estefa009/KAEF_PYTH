@@ -138,7 +138,6 @@
                     <th>Fecha Entrega</th>
                     <th>Tarifa</th>
                     <th>Estado</th>
-                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -156,14 +155,7 @@
                         </td>
                         <td>${{ envio.tarifa_envio|floatformat:2 }}</td>
                         <td class="estado-envio">{{ envio.estado }}</td>
-                        <td class="actions-cell">
-                            <button type="button"
-                                class="btn btn-editar-estado btn-abrir-modal-estado"
-                                data-envio-id="{{ envio.cod_envio }}"
-                                data-estado-actual="{{ envio.estado }}">
-                                <i class="bi bi-pencil-square"></i> Editar Estado
-                            </button>
-                        </td>
+                        
                     </tr>
                     {% endfor %}
                 {% else %}
@@ -176,32 +168,9 @@
     </div>
 </div>
 
-<!-- Modal para editar estado de envío -->
-<div id="modalEditarEstado" class="modal-custom">
-    <div class="modal-content-custom">
-        <button type="button" id="cerrarModalEstado" class="btn-close" style="float:right; background:none; border:none; font-size:1.5em;">&times;</button>
-        <h5>Editar Estado del Envío</h5>
-        <form id="formEditarEstado" method="post" autocomplete="off">
-            {% csrf_token %}
-            <input type="hidden" id="modalEnvioId" name="envio_id" value="">
-            <div class="mb-3">
-                <label for="nuevoEstado" class="form-label">Nuevo Estado:</label>
-                <select id="nuevoEstado" name="nuevo_estado" class="form-select">
-                    <option value="PENDIENTE">Pendiente</option>
-                    <option value="EN_PROCESO">En proceso</option>
-                    <option value="COMPLETADO">Completado</option>
-                    <option value="CANCELADO">Cancelado</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-            <button type="button" class="btn btn-danger" id="cancelarModalEstado">Cancelar</button>
-        </form>
-        <div id="estadoMsg" style="margin-top:10px;"></div>
-    </div>
-</div>
 
 
-  <!-- Modal de notificaciones -->
+   <!-- Modal de notificaciones -->
   <div class="modal fade" id="modalNotificaciones" tabindex="-1" aria-labelledby="notificacionesLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-sm">
       <div class="modal-content">
@@ -214,8 +183,8 @@
             <ul class="list-group">
               {% for envio in nuevos_envios %}
                 <li class="list-group-item">
-                  <strong>Código:</strong> {{ envio.cod_asignacion }}<br>
-                  <strong>Asignado:</strong> {{ envio.fecha_hora_asignada|date:"d/m/Y H:i" }}
+                  <strong>Código:</strong> {{ envio.cod_venta.cod_venta }}<br>
+                  <strong>Asignado:</strong> {{ envio.fecha_asignacion|date:"d/m/Y H:i" }}
                 </li>
               {% endfor %}
             </ul>

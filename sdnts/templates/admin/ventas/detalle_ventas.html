@@ -239,7 +239,9 @@
             <p><em>No se ha registrado un pago para esta venta.</em></p>
         {% endif %}
 
-        <a href="{% url 'ventas_admin' %}" class="btn-rosa mt-4">Volver</a>
+        <a href="{% url origen|default:'ventas_admin' %}" class="btn btn-secondary">Volver</a>
+
+
     </div>
 </body>
 </html>
