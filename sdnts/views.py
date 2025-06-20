@@ -775,6 +775,7 @@ from sdnts.forms import EnvioDomiciliarioForm
 def editar_envio_domiciliario(request, cod_envio):
     envio = get_object_or_404(Envio, cod_envio=cod_envio)
 
+    # Validación para que solo el domiciliario asignado pueda editar
     if request.user != envio.cod_domi.cod_usua:
         messages.error(request, "No tienes permiso para editar este envío.")
         return redirect('mis_domicilios')
@@ -782,14 +783,20 @@ def editar_envio_domiciliario(request, cod_envio):
     if request.method == 'POST':
         form = EnvioDomiciliarioForm(request.POST, instance=envio)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Estado del envío actualizado.")
+            envio = form.save()
+
+            # Si cambia a ENTREGADO o CANCELADO, también actualizamos la venta
+            if envio.estado in ['ENTREGADO', 'CANCELADO']:
+                envio.cod_venta.estado = envio.estado
+                envio.cod_venta.save()
+
+            messages.success(request, "Envío actualizado correctamente.")
             return redirect('mis_domicilios')
     else:
         form = EnvioDomiciliarioForm(instance=envio)
 
     return render(request, 'domiciliario/editar_envio_domiciliario.html', {'form': form, 'envio': envio})
-  
+
 @login_required
 def detalle_venta_domiciliario(request, cod_venta):
     venta = get_object_or_404(Venta, cod_venta=cod_venta)
