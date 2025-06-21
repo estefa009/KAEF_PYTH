@@ -188,6 +188,14 @@
 
     <div class="contenedor">
         <h2><i class="bi bi-shop"></i> ADMINISTRACIÓN DE VENTAS</h2>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} mt-2">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
 
         <div class="text-center mb-4">
             <a href="{% url 'agregar_venta_completa' %}" class="btn btn-rosa">
@@ -256,7 +264,7 @@
                     {% for venta in ventas %}
                     <tr data-estado="{{ venta.estado }}">
                         <td>{{ venta.cod_venta }}</td>
-                        <td>{{ venta.nombre_cliente }}</td>
+                        <td>{{ venta.cod_cliente.cod_usua.nom_usua }} {{ venta.cod_cliente.cod_usua.apell_usua }}</td>
                         <td>{{ venta.fecha_hora|date:"Y-m-d H:i" }}</td>
                         <td>${{ venta.subtotal }}</td>
                         <td>${{ venta.iva }}</td>

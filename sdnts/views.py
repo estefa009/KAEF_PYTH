@@ -474,28 +474,19 @@ def procesar_compra(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            print('Datos recibidos en procesar_compra:', data)
             carrito = data.get('carrito', [])
             direccion = data.get('direccion', '')
             fecha_entrega = data.get('fecha_entrega')
             metodo_pago = data.get('metodo_pago', 'NEQUI')
             transaccion_id = data.get('transaccion_id', '')
 
-            user = request.user if request.user.is_authenticated else None
-            if not user:
-                print('Usuario no autenticado')
-                return JsonResponse({'success': False, 'error': 'Usuario no autenticado'})
-            try:
-                cliente = Cliente.objects.get(cod_usua=user)
-            except Exception as e:
-                print('No se encontró Cliente para el usuario:', user, e)
-                return JsonResponse({'success': False, 'error': 'No se encontró Cliente para el usuario'})
+            user = request.user
+            cliente = Cliente.objects.get(cod_usua=user)
 
             subtotal = sum(item['precio'] * item['quantity'] for item in carrito)
             iva = subtotal * 0.19
             total = subtotal + iva
 
-            # 1. Crear la venta (sin fecha_entrega)
             venta = Venta.objects.create(
                 cod_cliente=cliente,
                 subtotal=subtotal,
@@ -504,28 +495,20 @@ def procesar_compra(request):
                 direccion_entrega=direccion,
                 fecha_hora=timezone.now()
             )
-            print('Venta creada:', venta)
 
-            # 2. Crear los detalles de venta y combinaciones
-            COBERTURA_MAP = {
-                normalizar("Choco Blanco"): "Choc. Blanco",
-                normalizar("Choc Blanco"): "Choc. Blanco",
-                normalizar("Choc. Blanco"): "Choc. Blanco",
-                normalizar("choc-blanco"): "Choc. Blanco",
-                normalizar("Chocolate Blanco"): "Choc. Blanco",  # <-- Agregado
-                normalizar("chocolate blanco"): "Choc. Blanco",  # <-- Agregado
-                normalizar("Chocolate Oscuro"): "Choc. Oscuro",
-                normalizar("Choc Oscuro"): "Choc. Oscuro",
-                normalizar("Choc. Oscuro"): "Choc. Oscuro",
-                normalizar("choc-oscuro"): "Choc. Oscuro",
-                normalizar("Arequipe"): "Arequipe",
-                # Agrega aquí todos los nombres posibles y sus variantes normalizadas
-            }
+            # Mapeo para buscar ingredientes correctamente
+            def normalizar(texto):
+                return texto.lower().strip().replace(" ", "").replace(".", "").replace("-", "")
+
             MASA_MAP = {
                 normalizar("Vainilla"): "Vainilla",
                 normalizar("Chocolate"): "Chocolate",
                 normalizar("Red Velvet"): "Red Velvet",
-                # Agrega aquí todos los nombres posibles y sus variantes normalizadas
+            }
+            COBERTURA_MAP = {
+                normalizar("Chocolate Blanco"): "Choc. Blanco",
+                normalizar("Chocolate Oscuro"): "Choc. Oscuro",
+                normalizar("Arequipe"): "Arequipe",
             }
             TOPPING_MAP = {
                 normalizar("Chispas"): "Chispas",
@@ -534,72 +517,44 @@ def procesar_compra(request):
                 normalizar("mm"): "M&M",
                 normalizar("Chips"): "Chips",
                 normalizar("Ninguno"): None,
-                # Agrega aquí todos los nombres posibles y sus variantes normalizadas
             }
+
             for item in carrito:
-                producto = Producto.objects.filter(cod_producto=item['cod_producto']).first()
-                if not producto:
-                    print('Producto no encontrado para cod_producto:', item['cod_producto'])
-                    continue
-                DetalleVenta.objects.create(
+                cod_prod = item['cod_producto']
+                producto = Producto.objects.get(cod_producto=cod_prod)
+
+                # Crear el detalle de venta
+                detalle = DetalleVenta.objects.create(
                     cod_venta=venta,
                     cod_producto=producto,
                     cantidad=item['quantity'],
                     precio_unitario=item['precio'],
                     fecha_entrega=fecha_entrega
                 )
-                print('DetalleVenta creado para producto:', producto)
-                # Guardar la combinación personalizada
-                masa_nombre = cobertura_nombre = topping_nombre = None
-                try:
-                    # --- MASA ---
-                    masa_nombre = item['masa']['nombre']
-                    masa_nombre_norm = normalizar(masa_nombre)
-                    masa_nombre_db = MASA_MAP.get(masa_nombre_norm, masa_nombre)
-                    masa = SaborMasa.objects.filter(nombre__iexact=masa_nombre_db).first()
-                    if not masa:
-                        masa = SaborMasa.objects.filter(nombre__icontains=masa_nombre_db).first()
-                    if not masa:
-                        print('No se encontró SaborMasa para:', masa_nombre, '| Normalizado:', masa_nombre_norm)
-                        print('Nombres válidos en BD:', list(SaborMasa.objects.values_list('nombre', flat=True)))
-                        raise Exception(f'SaborMasa no encontrado para "{masa_nombre}"')
-                    # --- COBERTURA ---
-                    cobertura_nombre = item['cobertura']['nombre']
-                    cobertura_nombre_norm = normalizar(cobertura_nombre)
-                    cobertura_nombre_db = COBERTURA_MAP.get(cobertura_nombre_norm, cobertura_nombre)
-                    print(f'Buscando Glaseado en BD: "{cobertura_nombre_db}" (original: "{cobertura_nombre}", normalizado: "{cobertura_nombre_norm}")')
-                    cobertura = Glaseado.objects.filter(nombre__iexact=cobertura_nombre_db).first()
-                    if not cobertura:
-                        cobertura = Glaseado.objects.filter(nombre__icontains=cobertura_nombre_db).first()
-                    if not cobertura:
-                        print('No se encontró Glaseado para:', cobertura_nombre, '| Normalizado:', cobertura_nombre_norm)
-                        print('Nombres válidos en BD:', list(Glaseado.objects.values_list('nombre', flat=True)))
-                        raise Exception(f'Glaseado no encontrado para "{cobertura_nombre}"')
-                    # --- TOPPING ---
-                    topping = None
-                    topping_nombre = item['topping']['nombre']
-                    topping_nombre_norm = normalizar(topping_nombre)
-                    topping_nombre_db = TOPPING_MAP.get(topping_nombre_norm, topping_nombre)
-                    if topping_nombre_db and topping_nombre_db.lower() != 'ninguno':
-                        topping = Topping.objects.filter(nombre__iexact=topping_nombre_db).first()
-                        if not topping:
-                            topping = Topping.objects.filter(nombre__icontains=topping_nombre_db).first()
-                        if not topping:
-                            print('No se encontró Topping para:', topping_nombre, '| Normalizado:', topping_nombre_norm)
-                            print('Nombres válidos en BD:', list(Topping.objects.values_list('nombre', flat=True)))
-                            raise Exception(f'Topping no encontrado para "{topping_nombre}"')
+
+                # Obtener ingredientes
+                masa_nombre = item['masa']['nombre']
+                masa = SaborMasa.objects.filter(nombre__iexact=MASA_MAP.get(normalizar(masa_nombre), masa_nombre)).first()
+
+                cobertura_nombre = item['cobertura']['nombre']
+                cobertura = Glaseado.objects.filter(nombre__iexact=COBERTURA_MAP.get(normalizar(cobertura_nombre), cobertura_nombre)).first()
+
+                topping = None
+                topping_nombre = item['topping']['nombre']
+                if topping_nombre.lower() != 'ninguno':
+                    topping = Topping.objects.filter(nombre__iexact=TOPPING_MAP.get(normalizar(topping_nombre), topping_nombre)).first()
+
+                # Crear una combinación personalizada por cada unidad
+                for _ in range(item['quantity']):
                     CombinacionProducto.objects.create(
-                        cod_venta=venta,
+                        cod_detalle=detalle,
                         cod_producto=producto,
                         cod_sabor_masa_1=masa,
                         cod_glaseado_1=cobertura,
                         cod_topping_1=topping
                     )
-                    print('CombinacionProducto creada')
-                except Exception as e:
-                    print(f'Error creando CombinacionProducto para producto {producto} (masa: {masa_nombre}, cobertura: {cobertura_nombre}, topping: {topping_nombre}):', e)
 
-            # 3. Crear el pago
+
             Pago.objects.create(
                 cod_venta=venta,
                 metodo_pago=metodo_pago,
@@ -608,23 +563,10 @@ def procesar_compra(request):
                 estado_pago='PENDIENTE',
                 transaccion_id=transaccion_id
             )
-            print('Pago creado')
 
-            # 4. Preparar detalles para la respuesta
-            detalles = DetalleVenta.objects.filter(cod_venta=venta)
-            detalle_list = []
-            for d in detalles:
-                detalle_list.append({
-                    'producto': d.cod_producto.nomb_pro,
-                    'cantidad': d.cantidad,
-                    'precio_unitario': float(d.precio_unitario),
-                    'subtotal': float(d.precio_unitario) * d.cantidad
-                })
-
-            # Cuando la compra se realiza exitosamente:
-            # Busca todos los administradores
+            # Notificación para los administradores
             admins = Usuario.objects.filter(rol='ADMIN')
-            mensaje = f"Nuevo pedido realizado por {request.user.nom_usua} {request.user.apell_usua}."
+            mensaje = f"Nuevo pedido realizado por {user.nom_usua} {user.apell_usua}."
             for admin in admins:
                 Notificacion.objects.create(usuario=admin, mensaje=mensaje)
 
@@ -636,91 +578,15 @@ def procesar_compra(request):
                     'subtotal': float(venta.subtotal),
                     'iva': float(venta.iva),
                     'total': float(venta.total),
-                    'detalles': detalle_list
                 }
             })
         except Exception as e:
-            print('Error en procesar_compra:', e)
+            import traceback
             traceback.print_exc()
-            return JsonResponse({'success': False, 'error': str(e)})       
-            return JsonResponse({'success': False, 'error': 'Método no permitido'})
-            carrito = data.get('carrito', [])
-            direccion = data.get('direccion', '')  # Puedes pedirla en el modal
-            observaciones = data.get('observaciones', '')
-        except Exception:
-            return JsonResponse({'success': False, 'error': 'Datos inválidos'}, status=400)
-
-        if not carrito:
-            return JsonResponse({'success': False, 'error': 'Carrito vacío'}, status=400)
-
-        try:
-            cliente = request.user.cliente
-        except Exception:
-            return JsonResponse({'success': False, 'error': 'No es cliente'}, status=400)
-
-        subtotal = Decimal('0.00')
-        detalles = []
-
-        for item in carrito:
-            # Busca el producto por nombre y tamaño
-            talla = item.get('talla')
-            nombre = item.get('titulo')
-            cantidad = int(item.get('quantity', 1))
-            precio_unitario = Decimal(str(item.get('precio', 0)))
-            try:
-                producto = Producto.objects.get(nomb_pro=nombre, tamano=talla)
-            except Producto.DoesNotExist:
-                continue
-
-            detalles.append({
-                'producto': producto,
-                'cantidad': cantidad,
-                'precio_unitario': precio_unitario,
-            })
-            subtotal += precio_unitario * cantidad
-
-        iva = subtotal * Decimal('0.19')
-        total = subtotal + iva
-
-        venta = Venta.objects.create(
-            cod_cliente=cliente,
-            subtotal=subtotal,
-            iva=iva,
-            total=total,
-            direccion_entrega=direccion,
-            observaciones=observaciones
-        )
-
-        for det in detalles:
-            DetalleVenta.objects.create(
-                cod_venta=venta,
-                cod_producto=det['producto'],
-                cantidad=det['cantidad'],
-                precio_unitario=det['precio_unitario']
-            )
-
-        return JsonResponse({
-            'success': True,
-            'venta': {
-                'id': venta.cod_venta,
-                'fecha': venta.fecha_hora.strftime('%Y-%m-%d %H:%M'),
-                'subtotal': str(subtotal),
-                'iva': str(iva),
-                'total': str(total),
-                'direccion': venta.direccion_entrega,
-                'detalles': [
-                    {
-                        'producto': str(det['producto']),
-                        'cantidad': det['cantidad'],
-                        'precio_unitario': str(det['precio_unitario']),
-                        'subtotal': str(det['precio_unitario'] * det['cantidad'])
-                    }
-                    for det in detalles
-                ]
-            }
-        })
+            return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
+
 
 @login_required
 def mis_domicilios(request):
@@ -1111,36 +977,45 @@ def agregar_venta_completa(request):
         pago_form = PagoForm(request.POST)
 
         if venta_form.is_valid() and detalle_formset.is_valid() and combinacion_formset.is_valid() and pago_form.is_valid():
-            cantidad_total = sum(
-                form.cleaned_data.get('cantidad', 0)
+            # 1. Calcular cantidad total de donas
+            total_donas = sum(
+                form.cleaned_data['cantidad']
                 for form in detalle_formset
                 if form.cleaned_data and not form.cleaned_data.get('DELETE', False)
             )
-            cantidad_combinaciones = sum(
+            total_combinaciones = sum(
                 1 for form in combinacion_formset
                 if form.cleaned_data and not form.cleaned_data.get('DELETE', False)
             )
 
-            if cantidad_combinaciones != cantidad_total:
-                messages.error(
-                    request,
-                    f"Debes agregar exactamente {cantidad_total} combinaciones. Has agregado {cantidad_combinaciones}."
-                )
+            if total_donas != total_combinaciones:
+                messages.error(request, f'Debes agregar exactamente {total_donas} combinaciones. Has agregado {total_combinaciones}.')
             else:
                 try:
                     with transaction.atomic():
                         venta = venta_form.save(commit=False)
-
                         subtotal = Decimal('0.00')
-                        detalle_instances = []
+                        detalles_guardados = []
 
+                        # Primero guardar la venta para tener la PK
+                        venta.subtotal = 0
+                        venta.iva = 0
+                        venta.total = 0
+                        venta.save()
+
+                        # Guardar detalles con subtotal calculado manualmente
                         for form in detalle_formset:
                             if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
                                 detalle = form.save(commit=False)
                                 detalle.cod_venta = venta
-                                detalle_instances.extend([detalle] * detalle.cantidad)
-                                subtotal += detalle.cantidad * detalle.precio_unitario
+                                detalle.save()
+                                detalles_guardados.append({
+                                    'detalle': detalle,
+                                    'cantidad': detalle.cantidad
+                                })
+                                subtotal += detalle.cantidad * detalle.precio_unitario  # 👈 usa fórmula
 
+                        # Calcular totales
                         iva = subtotal * Decimal('0.19')
                         total = subtotal + iva
 
@@ -1149,30 +1024,31 @@ def agregar_venta_completa(request):
                         venta.total = total
                         venta.save()
 
-                        for form in detalle_formset:
-                            if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
-                                detalle = form.save(commit=False)
-                                detalle.cod_venta = venta
-                                detalle.save()
+                        # Guardar combinaciones en orden
+                        # Guardar combinaciones en orden
+                        combinacion_index = 0
+                        for d in detalles_guardados:
+                            for _ in range(d['cantidad']):
+                                form = combinacion_formset.forms[combinacion_index]
+                                if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                                    combinacion = form.save(commit=False)
+                                    combinacion.cod_detalle = d['detalle']
+                                    combinacion.cod_producto = d['detalle'].cod_producto  # ← AGREGAR ESTO
+                                    combinacion.save()
+                                combinacion_index += 1
 
-                        for i, form in enumerate(combinacion_formset):
-                            if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
-                                combinacion = form.save(commit=False)
-                                combinacion.cod_venta = venta
-                                if i < len(detalle_instances):
-                                    combinacion.cod_detalle = detalle_instances[i]
-                                combinacion.save()
 
+                        # Guardar pago
                         pago = pago_form.save(commit=False)
                         pago.cod_venta = venta
                         pago.save()
 
-                        messages.success(request, "Venta creada correctamente.")
+                        messages.success(request, "Venta registrada correctamente.")
                         return redirect('ventas_admin')
                 except Exception as e:
                     messages.error(request, f"Ocurrió un error al guardar la venta: {e}")
         else:
-            messages.error(request, "Revisa todos los campos. Hay errores en el formulario.")
+            messages.error(request, "Por favor corrige los errores en el formulario.")
     else:
         venta_form = VentaForm()
         detalle_formset = DetalleVentaFormSet(prefix='detalle', queryset=DetalleVenta.objects.none(), initial=[{}])
@@ -1190,7 +1066,6 @@ def agregar_venta_completa(request):
         'productos': productos,
         'precios_productos': precios,
     })
-
 
 @login_required
 def detalle_ventas(request, venta_id):

@@ -190,7 +190,11 @@
             <tbody>
                 {% for detalle in detalles %}
                 <tr>
-                    <td>{{ detalle.cod_producto.nombre }}</td>
+                    <td>
+                        <strong>{{ detalle.cod_producto.nombre }}</strong><br>
+                        <small class="text-muted">Código: {{ detalle.cod_producto.cod_producto }}</small>
+                    </td>
+
                     <td>
                         {% if detalle.combinaciones.all %}
                             <ul class="list-unstyled mb-0">

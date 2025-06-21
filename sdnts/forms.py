@@ -168,6 +168,7 @@ class DetalleVentaForm(forms.ModelForm):
         fields = ['cod_producto', 'cantidad', 'precio_unitario', 'fecha_entrega']
         widgets = {
             'fecha_entrega': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'precio_unitario': forms.NumberInput(attrs={'readonly': 'readonly'})  # 👈 Desactiva edición
         }
 
     def __init__(self, *args, **kwargs):
@@ -181,19 +182,17 @@ class DetalleVentaForm(forms.ModelForm):
         if fecha_entrega and fecha_entrega.date() < fecha_minima:
             raise forms.ValidationError("La fecha de entrega debe ser al menos 3 días después de hoy.")
         return fecha_entrega
-    
+  
 
 class CombinacionProductoForm(forms.ModelForm):
     class Meta:
         model = CombinacionProducto
         fields = [
-            'cod_producto', 
             'cod_sabor_masa_1', 
             'cod_glaseado_1', 
             'cod_topping_1'
         ]
         widgets = {
-            'cod_producto': forms.Select(attrs={'class': 'form-control'}),
             'cod_sabor_masa_1': forms.Select(attrs={'class': 'form-control'}),
             'cod_glaseado_1': forms.Select(attrs={'class': 'form-control'}),
             'cod_topping_1': forms.Select(attrs={'class': 'form-control'}),

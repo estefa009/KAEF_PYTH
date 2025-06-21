@@ -67,24 +67,31 @@ class ProductoAdmin(admin.ModelAdmin):
     list_editable = ('activo',)
 
 # 4. Configuración para ventas y producción
-class DetalleVentaInline(admin.TabularInline):
-    model = DetalleVenta
-    extra = 1
-    readonly_fields = ('subtotal',)
 
 class CombinacionProductoInline(admin.TabularInline):
     model = CombinacionProducto
     extra = 1
-    fields = ('cod_producto', 'cod_sabor_masa_1', 'cod_glaseado_1', 'cod_topping_1')
+    fields = ('cod_sabor_masa_1', 'cod_glaseado_1', 'cod_topping_1')
+
+class DetalleVentaInline(admin.TabularInline):
+    model = DetalleVenta
+    extra = 1
+    readonly_fields = ('subtotal',)
+    inlines = [CombinacionProductoInline]  # ← ESTO NO FUNCIONA DIRECTO, SOLO EN GRAPPPELLI
+
+@admin.register(DetalleVenta)
+class DetalleVentaAdmin(admin.ModelAdmin):
+    list_display = ('cod_venta', 'cod_producto', 'cantidad', 'fecha_entrega', 'precio_unitario')
+    inlines = [CombinacionProductoInline]  # ← Este es el lugar correcto
 
 @admin.register(Venta)
 class VentaAdmin(admin.ModelAdmin):
     list_display = ('cod_venta', 'cliente_info', 'fecha_hora', 'total', 'estado')
     list_filter = ('estado', 'fecha_hora')
     search_fields = ('cod_cliente__cod_usua__nom_usua',)
-    inlines = [DetalleVentaInline, CombinacionProductoInline]
+    inlines = [DetalleVentaInline]  # ← SOLO este
     readonly_fields = ('subtotal', 'iva', 'total')
-    
+
     def cliente_info(self, obj):
         return f"{obj.cod_cliente.cod_usua.nom_usua} {obj.cod_cliente.cod_usua.apell_usua}"
     cliente_info.short_description = 'Cliente'

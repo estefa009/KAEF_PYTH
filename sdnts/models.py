@@ -553,23 +553,23 @@ class Topping(models.Model):
 
 class CombinacionProducto(models.Model):
     """
-    Modelo para registrar las combinaciones personalizadas de productos en ventas
+    Modelo para registrar combinaciones personalizadas de productos en una venta
     """
     cod_combinacion = models.AutoField(primary_key=True)
-    
-    cod_venta = models.ForeignKey(
-        Venta,
-        on_delete=models.CASCADE,
-        related_name='combinaciones'
-    )
-    cod_producto = models.ForeignKey(
-        Producto,
-        on_delete=models.CASCADE,
-        related_name='combinaciones'
-    )
-    cod_detalle = models.ForeignKey(DetalleVenta, on_delete=models.CASCADE, related_name='combinaciones', null=True, blank=True)  # ← NUEVO
 
-    # Primera combinación (obligatoria)
+    cod_detalle = models.ForeignKey(
+        DetalleVenta,
+        on_delete=models.CASCADE,
+        related_name='combinaciones'
+    )
+
+    cod_producto = models.ForeignKey(
+    Producto,
+    on_delete=models.CASCADE,
+    related_name='combinaciones_personalizadas'
+    )
+
+
     cod_sabor_masa_1 = models.ForeignKey(
         SaborMasa,
         on_delete=models.CASCADE,
@@ -593,7 +593,7 @@ class CombinacionProducto(models.Model):
         verbose_name_plural = 'Combinaciones de Productos'
 
     def __str__(self):
-        return f"Combinación #{self.cod_combinacion} - Venta {self.cod_venta_id}"
+        return f"Combinación #{self.cod_combinacion} - Detalle #{self.cod_detalle_id}"
 
 class Carrito(models.Model):
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
