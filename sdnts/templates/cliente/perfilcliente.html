@@ -65,49 +65,50 @@
                                     </thead>
                                     <tbody>
                                         {% for venta in ventas %}
-                                        <tr>
-                                            <td>{{ venta.fecha_hora|date:"Y-m-d H:i:s" }}</td>
-                                            <td>${{ venta.total }}</td>
-                                            <td>${{ venta.subtotal }}</td>
-                                            <td>{{ venta.estado }}</td>
-                                            <td>
-                                                <button class="btn btn-info btn-sm" 
-                                                        onclick="toggleDetalleVenta({{ venta.cod_venta }})">
-                                                    Ver Detalles
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        {% if venta.combinaciones.all %}
-                                        <tr id="detalle-venta-{{ venta.cod_venta }}" class="detalle-venta">
-                                            <td colspan="5">
-                                                <table class="table table-bordered">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Producto</th>
-                                                            <th>Masa</th>
-                                                            <th>Glaseado</th>
-                                                            <th>Topping</th>
-                                                            <th>Cantidad</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {% for combinacion in venta.combinaciones.all %}
-                                                        <tr>
-                                                            <td>{{ combinacion.cod_producto.nomb_pro }}</td>
-                                                            <td>{{ combinacion.cod_sabor_masa_1.nombre }}</td>
-                                                            <td>{{ combinacion.cod_glaseado_1.nombre }}</td>
-                                                            <td>{{ combinacion.cod_topping_1.nombre }}</td>
-                                                            {% for detalle in venta.detalles.all %}
+                                    <tr>
+                                        <td>{{ venta.fecha_hora|date:"Y-m-d H:i:s" }}</td>
+                                        <td>${{ venta.total }}</td>
+                                        <td>${{ venta.subtotal }}</td>
+                                        <td>{{ venta.estado }}</td>
+                                        <td>
+                                            <button class="btn btn-info btn-sm" onclick="toggleDetalleVenta({{ venta.cod_venta }})">
+                                                Ver Detalles
+                                            </button>
+                                        </td>
+                                    </tr>
+
+                                    <tr id="detalle-venta-{{ venta.cod_venta }}" class="detalle-venta">
+                                        <td colspan="5">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Producto</th>
+                                                        <th>Masa</th>
+                                                        <th>Glaseado</th>
+                                                        <th>Topping</th>
+                                                        <th>Cantidad</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for detalle in venta.detalles.all %}
+                                                        {% for combinacion in detalle.combinaciones.all %}
+                                                            <tr>
+                                                                <td>{{ combinacion.cod_producto.nomb_pro }}</td>
+                                                                <td>{{ combinacion.cod_sabor_masa_1.nombre }}</td>
+                                                                <td>{{ combinacion.cod_glaseado_1.nombre }}</td>
+                                                                <td>{{ combinacion.cod_topping_1.nombre|default:"-" }}</td>
                                                                 <td>{{ detalle.cantidad }}</td>
-                                                            {% endfor %}
-                                                        </tr>
+                                                            </tr>
                                                         {% endfor %}
-                                                    </tbody>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        {% endif %}
-                                        {% endfor %}
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+
+
+
                                     </tbody>
                                 </table>
                             </div>

@@ -255,30 +255,34 @@ def contactanoscliente(request):
 def nosotroscliente(request):
     return render(request, 'cliente/nosotroscliente.html')
 
+from django.contrib import messages
+from django.shortcuts import redirect, render
+from django.contrib.auth.decorators import login_required
+from .models import Cliente, Venta
+
 @login_required
 def perfilcliente(request):
     try:
         usuario = request.user
         cliente = Cliente.objects.get(cod_usua=usuario)
-        
-        # Updated to use correct related_name 'detalles' instead of 'detalle_venta'
+
         ventas = Venta.objects.filter(
             cod_cliente=cliente
         ).prefetch_related(
-            'detalles',  # Changed from 'detalle_venta' to 'detalles'
-            'combinaciones',
-            'combinaciones__cod_producto',
-            'combinaciones__cod_sabor_masa_1',
-            'combinaciones__cod_glaseado_1',
-            'combinaciones__cod_topping_1'
+            'detalles',
+            'detalles__combinaciones',
+            'detalles__combinaciones__cod_producto',
+            'detalles__combinaciones__cod_sabor_masa_1',
+            'detalles__combinaciones__cod_glaseado_1',
+            'detalles__combinaciones__cod_topping_1',
         ).order_by('-fecha_hora')
-        
+
         context = {
             'usuario': usuario,
             'cliente': cliente,
             'ventas': ventas,
         }
-        
+
         return render(request, 'cliente/perfilcliente.html', context)
     except Exception as e:
         print(f"Error en perfilcliente: {str(e)}")
