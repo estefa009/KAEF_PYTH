@@ -835,7 +835,11 @@ def dashboard_admin(request):
     produccion_reciente = Produccion.objects.select_related('cod_venta').order_by('-fecha_inicio')[:3]
 
     rol = request.GET.get('rol')
-    usuarios = Usuario.objects.filter(rol=rol) if rol else Usuario.objects.all()
+    page = request.GET.get('page', 1)
+    usuarios_qs = Usuario.objects.filter(rol=rol) if rol else Usuario.objects.all()
+    paginator = Paginator(usuarios_qs.order_by('cod_usuario'), 10)  # 10 usuarios por página
+    usuarios = paginator.get_page(page)
+    rol_actual = rol  # para mantener el filtro en la paginación
 
     # Gráfica: Ventas por mes (últimos 6 meses, por monto)
     from collections import OrderedDict
@@ -904,6 +908,7 @@ def dashboard_admin(request):
         'total_ventas': total_ventas,
         'total_ventas_monto': monto_total_ventas,
         'usuarios': usuarios,
+        'rol_actual': rol_actual,
         'ventas_mensuales': ventas_mensuales_data,
         'ventas_por_producto': ventas_por_producto_data,
         'clientes_top': clientes_top_data,
@@ -2307,7 +2312,6 @@ def reporte_ventas(request):
     response['Content-Disposition'] = 'attachment; filename="reporte_ventas.pdf"'
     return response
 
-from.models import Produccion
 @login_required
 def reporte_produccion(request):
     producciones = Produccion.objects.all()

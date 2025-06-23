@@ -374,52 +374,44 @@
                 {% endif %}
             </tbody>
         </table>
+        <!-- PAGINACIÓN -->
+        {% if usuarios.has_other_pages %}
+        <nav aria-label="Paginación de usuarios">
+            <ul class="pagination justify-content-center" style="--bs-pagination-active-bg: #ff80a4; --bs-pagination-active-border-color: #ff80a4; --bs-pagination-color: #fff; --bs-pagination-hover-bg: #ffb6c1; --bs-pagination-hover-border-color: #ffb6c1; --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(255,128,164,.25); --bs-pagination-border-radius: 16px;">
+                {% if usuarios.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" style="color:#ff80a4; border-radius: 16px;" href="?page={{ usuarios.previous_page_number }}{% if rol_actual %}&rol={{ rol_actual }}{% endif %}">Anterior</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link" style="color:#aaa; border-radius: 16px;">Anterior</span></li>
+                {% endif %}
+                {% for num in usuarios.paginator.page_range %}
+                    {% if usuarios.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link" style="background:#ff80a4; border-color:#ff80a4; color:#fff; border-radius: 16px;">{{ num }}</span>
+                        </li>
+                    {% elif num > usuarios.number|add:'-3' and num < usuarios.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" style="color:#ff80a4; border-radius: 16px;" href="?page={{ num }}{% if rol_actual %}&rol={{ rol_actual }}{% endif %}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                {% if usuarios.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" style="color:#ff80a4; border-radius: 16px;" href="?page={{ usuarios.next_page_number }}{% if rol_actual %}&rol={{ rol_actual }}{% endif %}">Siguiente</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link" style="color:#aaa; border-radius: 16px;">Siguiente</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
     </div>
 </div>
 
 <!-- Bootstrap Bundle JS (debe ir antes de cualquier script que use Bootstrap) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    // --- Menú lateral ---
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
-    const navLinks = document.querySelectorAll('.nav-link');
 
-    function toggleMenu() {
-        sidebar.classList.toggle('active');
-        menuToggle.classList.toggle('open');
-        const icon = menuToggle.querySelector('i');
-        if (icon) {
-            icon.classList.toggle('bi-list');
-            icon.classList.toggle('bi-x');
-        }
-    }
-
-    if (menuToggle && sidebar) {
-        menuToggle.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMenu();
-        });
-
-        navLinks.forEach(link => {
-            link.addEventListener('click', function (e) {
-                e.stopPropagation();
-                navLinks.forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        document.addEventListener('click', function (event) {
-            const isClickInside = sidebar.contains(event.target) || menuToggle.contains(event.target);
-            if (!isClickInside && sidebar.classList.contains('active')) {
-                toggleMenu();
-            }
-        });
-    }
-});
-</script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Gráfica de ventas mensuales
