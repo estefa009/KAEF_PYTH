@@ -25,17 +25,17 @@ class RegistroUsuarioForm(UserCreationForm):
 
     class Meta:
         model = Usuario
-        fields = ['email', 'nom_usua', 'apell_usua', 'tele_usua']
+        fields = ['nom_usua', 'apell_usua','email', 'tele_usua']
         labels = {
-            'email': 'Correo Electrónico',
             'nom_usua': 'Nombre',
             'apell_usua': 'Apellido',
+            'email': 'Correo Electrónico',
             'tele_usua': 'Teléfono',
         }
         widgets = {
-            'email': forms.EmailInput(attrs={'placeholder': 'Correo Electrónico', 'class': 'form-control shadow'}),
             'nom_usua': forms.TextInput(attrs={'placeholder': 'Nombre', 'class': 'form-control shadow'}),
             'apell_usua': forms.TextInput(attrs={'placeholder': 'Apellido', 'class': 'form-control shadow'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Correo Electrónico', 'class': 'form-control shadow'}),
             'tele_usua': forms.TextInput(attrs={'placeholder': 'Teléfono', 'class': 'form-control shadow'}),
         }
 

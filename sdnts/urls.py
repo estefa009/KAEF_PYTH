@@ -48,6 +48,7 @@ urlpatterns = [
     path('catalogocliente/', views.catalogocliente, name='catalogocliente'),
     path('nosotroscliente/', views.nosotroscliente, name='nosotroscliente'),
     path('contactanoscliente/', views.contactanoscliente, name='contactanoscliente'),
+    path('pago/', views.pago, name='pago'),
     path('perfilcliente/', views.perfilcliente, name='perfilcliente'),
     path('editar_perfil/', views.editar_perfil, name='editar_perfil'),
 
