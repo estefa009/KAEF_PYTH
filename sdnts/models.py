@@ -557,6 +557,13 @@ class CombinacionProducto(models.Model):
     """
     cod_combinacion = models.AutoField(primary_key=True)
 
+    cod_venta = models.ForeignKey(
+        'Venta',
+        on_delete=models.CASCADE,
+        related_name='combinaciones',
+        null=True, blank=True  # Opcional, ajusta si debe ser obligatorio
+    )
+
     cod_detalle = models.ForeignKey(
         DetalleVenta,
         on_delete=models.CASCADE,

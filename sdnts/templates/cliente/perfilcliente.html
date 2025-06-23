@@ -87,18 +87,33 @@
                                                         <th>Glaseado</th>
                                                         <th>Topping</th>
                                                         <th>Cantidad</th>
+                                                        <th>Precio Unitario</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {% for detalle in venta.detalles.all %}
-                                                        {% for combinacion in detalle.combinaciones.all %}
-                                                            <tr>
-                                                                <td>{{ combinacion.cod_producto.nomb_pro }}</td>
-                                                                <td>{{ combinacion.cod_sabor_masa_1.nombre }}</td>
-                                                                <td>{{ combinacion.cod_glaseado_1.nombre }}</td>
-                                                                <td>{{ combinacion.cod_topping_1.nombre|default:"-" }}</td>
-                                                                <td>{{ detalle.cantidad }}</td>
-                                                            </tr>
+                                                        {% regroup detalle.combinaciones.all by cod_sabor_masa_1.nombre as masa_list %}
+                                                        {% for masa in masa_list %}
+                                                            {% regroup masa.list by cod_glaseado_1.nombre as glaseado_list %}
+                                                            {% for glaseado in glaseado_list %}
+                                                                {% regroup glaseado.list by cod_topping_1.nombre as topping_list %}
+                                                                {% for topping in topping_list %}
+                                                                    <tr>
+                                                                        <td>{{ topping.list.0.cod_producto.nomb_pro }}</td>
+                                                                        <td>{{ masa.grouper }}</td>
+                                                                        <td>{{ glaseado.grouper }}</td>
+                                                                        <td>{{ topping.grouper|default:"-" }}</td>
+                                                                        <td>{{ topping.list|length }}</td>
+                                                                        <td>
+                                                                            {% if detalle.precio_unitario %}
+                                                                                ${{ detalle.precio_unitario }}
+                                                                            {% else %}
+                                                                                -
+                                                                            {% endif %}
+                                                                        </td>
+                                                                    </tr>
+                                                                {% endfor %}
+                                                            {% endfor %}
                                                         {% endfor %}
                                                     {% endfor %}
                                                 </tbody>

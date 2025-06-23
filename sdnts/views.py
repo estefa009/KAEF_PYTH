@@ -527,13 +527,16 @@ def procesar_compra(request):
                 cod_prod = item['cod_producto']
                 producto = Producto.objects.get(cod_producto=cod_prod)
 
+                # Normalizar la fecha_entrega si viene como string
+                fecha_entrega_obj = timezone.make_aware(datetime.strptime(fecha_entrega, "%Y-%m-%d"))
+
                 # Crear el detalle de venta
                 detalle = DetalleVenta.objects.create(
                     cod_venta=venta,
                     cod_producto=producto,
                     cantidad=item['quantity'],
                     precio_unitario=item['precio'],
-                    fecha_entrega=fecha_entrega
+                    fecha_entrega=fecha_entrega_obj
                 )
 
                 # Obtener ingredientes
@@ -550,15 +553,17 @@ def procesar_compra(request):
 
                 # Crear una combinación personalizada por cada unidad
                 for _ in range(item['quantity']):
-                    CombinacionProducto.objects.create(
-                        cod_detalle=detalle,
-                        cod_producto=producto,
-                        cod_sabor_masa_1=masa,
-                        cod_glaseado_1=cobertura,
-                        cod_topping_1=topping
-                    )
+                 CombinacionProducto.objects.create(
+                   cod_venta=venta,  # ← esto es lo que te faltaba
+                   cod_detalle=detalle,
+                   cod_producto=producto,
+                   cod_sabor_masa_1=masa,
+                   cod_glaseado_1=cobertura,
+                   cod_topping_1=topping
+                )
 
 
+            # Registrar el pago
             Pago.objects.create(
                 cod_venta=venta,
                 metodo_pago=metodo_pago,
@@ -590,6 +595,7 @@ def procesar_compra(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
+
 
 
 @login_required
@@ -657,7 +663,8 @@ def editar_envio_domiciliario(request, cod_envio):
         if form.is_valid():
             envio = form.save(commit=False)  # Guardamos pero aún no en DB
 
-            # Verificamos el estado antes de guardar
+            # Solo actualiza los campos necesarios, no borra información
+            # No hagas envio.save() varias veces, solo una vez al final
             if envio.estado == "ENTREGADO":
                 envio.cod_venta.estado = "ENTREGADO"
                 envio.cod_venta.save()
@@ -676,9 +683,12 @@ def editar_envio_domiciliario(request, cod_envio):
             envio.save()
             messages.success(request, "Información del envío actualizada.")
             return redirect('mis_domicilios')
-
-
-
+        else:
+            # Si el formulario no es válido, vuelve a mostrar el formulario con errores y datos actuales
+            return render(request, 'domiciliario/editar_envio_domiciliario.html', {
+                'form': form,
+                'envio': envio,
+            })
     else:
         form = EnvioDomiciliarioForm(instance=envio)
 
@@ -876,24 +886,25 @@ def dashboard_admin(request):
         "data": [c['compras'] for c in clientes_top_qs]
     }
 
-    noti_count = request.user.notificaciones.filter(leida=False).count()
-    context = {
+    # Agrega esto para obtener las nuevas ventas (por ejemplo, ventas pendientes)
+    nuevas_ventas = Venta.objects.filter(estado='PENDIENTE').order_by('-fecha_hora')[:5]
+
+    return render(request, 'admin/dashboard_admin.html', {
+        'nuevas_ventas': nuevas_ventas,
+        # ...otros contextos...
         'total_usuarios': total_usuarios,
         'total_clientes': total_clientes,
         'total_domis': total_domis,
         'total_ventas': total_ventas,
         'total_ventas_monto': monto_total_ventas,
-        'ventas_recientes': ventas_recientes,
-        'produccion_reciente': produccion_reciente,
         'usuarios': usuarios,
-        'rol_actual': rol,
         'ventas_mensuales': ventas_mensuales_data,
         'ventas_por_producto': ventas_por_producto_data,
         'clientes_top': clientes_top_data,
-        'noti_count': noti_count,
-    }
-    return render(request, 'admin/dashboard_admin.html', context)
-
+        # ...agrega aquí cualquier otro contexto necesario...
+    })
+    
+    
 @login_required
 def perfil_admin(request):
     usuario = request.user
@@ -1274,19 +1285,19 @@ def generar_produccion_confirmada(request, cod_venta):
             combinaciones = CombinacionProducto.objects.filter(cod_detalle=detalle)
             for combinacion in combinaciones:
                 # Masa
-                if combinacion.cod_sabor_masa_1:
+                if combinacion.cod_sabor_masa_1 and combinacion.cod_sabor_masa_1.insumo_id:
                     id_insumo = combinacion.cod_sabor_masa_1.insumo_id
                     cantidad = CANTIDAD_BASE['masa'] * multiplicador
                     insumos_necesarios[id_insumo] = insumos_necesarios.get(id_insumo, 0) + cantidad
 
                 # Glaseado
-                if combinacion.cod_glaseado_1:
+                if combinacion.cod_glaseado_1 and combinacion.cod_glaseado_1.insumo_id:
                     id_insumo = combinacion.cod_glaseado_1.insumo_id
                     cantidad = CANTIDAD_BASE['glaseado'] * multiplicador
                     insumos_necesarios[id_insumo] = insumos_necesarios.get(id_insumo, 0) + cantidad
 
                 # Topping
-                if combinacion.cod_topping_1:
+                if combinacion.cod_topping_1 and combinacion.cod_topping_1.insumo_id:
                     id_insumo = combinacion.cod_topping_1.insumo_id
                     cantidad = CANTIDAD_BASE['topping'] * multiplicador
                     insumos_necesarios[id_insumo] = insumos_necesarios.get(id_insumo, 0) + cantidad
@@ -1294,7 +1305,11 @@ def generar_produccion_confirmada(request, cod_venta):
         # Verificación de stock
         faltantes = []
         for insumo_id, requerido in insumos_necesarios.items():
-            insumo = Insumo.objects.get(pk=insumo_id)
+            try:
+                insumo = Insumo.objects.get(pk=insumo_id)
+            except Insumo.DoesNotExist:
+                messages.error(request, f"No existe el insumo con ID {insumo_id}.")
+                return redirect('ventas_admin')
             if insumo.cnt_insumo < requerido:
                 faltantes.append(f"{insumo.nomb_insumo} (faltan {requerido - insumo.cnt_insumo:.2f})")
 
@@ -1983,6 +1998,7 @@ def editar_receta_personalizada(request, cod_producto):
 
 
 def generar_receta_base(request, cod_producto):
+
     producto = get_object_or_404(Producto, cod_producto=cod_producto)
 
     # Elimina receta anterior si existe
@@ -2385,81 +2401,3 @@ def reporte_categorias(request):
     response = HttpResponse(pdf_file, content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="reporte_categorias.pdf"'
     return response
-
-@login_required
-def notificaciones_admin(request):
-    notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha')
-    return render(request, 'admin/notificaciones.html', {'notificaciones': notificaciones})
-
-import csv
-from .models import Insumo, CategoriaInsumo
-from django.views.decorators.csrf import csrf_exempt
-
-@login_required
-@csrf_exempt
-def cargar_insumos(request):
-    if request.method == 'POST':
-        archivo = request.FILES.get('archivo_insumos')
-        if not archivo or not archivo.name.endswith('.csv'):
-            messages.error(request, 'El archivo debe ser un CSV.')
-            return redirect('cargarDatos')
-        try:
-            decoded_file = archivo.read().decode('utf-8').splitlines()
-            reader = csv.DictReader(decoded_file)
-            insumos_cargados = 0
-            insumos_fallidos = []
-            for fila in reader:
-                categoria = None
-                cod_categoria = fila.get('cod_categoria')
-                if cod_categoria:
-                    try:
-                        categoria = CategoriaInsumo.objects.get(pk=cod_categoria)
-                    except CategoriaInsumo.DoesNotExist:
-                        categoria = None
-                if categoria:
-                    Insumo.objects.create(
-                        nomb_insumo=fila.get('nomb_insumo', ''),
-                        cnt_insumo=fila.get('cnt_insumo', 0),
-                        unidad_medida=fila.get('unidad_medida', ''),
-                        cod_categoria=categoria
-                    )
-                    insumos_cargados += 1
-                else:
-                    insumos_fallidos.append(fila.get('nomb_insumo', ''))
-            msg = f'Insumos cargados exitosamente: {insumos_cargados}.'
-            if insumos_fallidos:
-                msg += f' No se cargaron estos insumos por categoría inexistente: {", ".join(insumos_fallidos)}.'
-                messages.warning(request, msg)
-            else:
-                messages.success(request, msg)
-        except Exception as e:
-            messages.error(request, f'Error al cargar insumos: {e}')
-        return redirect('cargarDatos')
-    return redirect('cargarDatos')
-
-from django.shortcuts import render, get_object_or_404
-from .models import Correo
-
-@login_required
-def ver_correo(request, cod_correo):
-    correo = get_object_or_404(Correo, pk=cod_correo)
-    return render(request, 'admin/correos/ver_correo.html', {'correo': correo})
-
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-
-@login_required
-@csrf_exempt
-def actualizar_estado_envio(request, envio_id):
-    if request.method == 'POST':
-        import json
-        try:
-            data = json.loads(request.body)
-            nuevo_estado = data.get('nuevo_estado')
-            envio = get_object_or_404(Envio, pk=envio_id)
-            envio.estado = nuevo_estado
-            envio.save()
-            return JsonResponse({'success': True})
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-    return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)

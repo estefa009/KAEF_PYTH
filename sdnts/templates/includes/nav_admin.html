@@ -12,11 +12,12 @@
 <button id="menuToggle" class="menu-toggle">
     <i class="bi bi-list"></i>
 </button>
-    <main>
-      <img src="{% static 'icon/7.ico' %}" alt="Logo Stefas Donuts" class="brand-logo">
-      <div class="welcome-message">
-        <h1>Bienvenid@ {{ user.nom_usua }} {{ user.apell_usua }}</h1>
-      </div>
+  
+<main>
+  <img src="{% static 'icon/7.ico' %}" alt="Logo Stefas Donuts" class="brand-logo">
+  <div class="welcome-message">
+    <h1>Bienvenid@ {{ user.nom_usua }} {{ user.apell_usua }}</h1>
+  </div> 
 
         <!-- Menú de usuario (dropdown) -->
         <div class="icon-bar d-flex align-items-center gap-3">
@@ -39,7 +40,7 @@
     </main>
 
 <!-- Menú Lateral -->
-<nav id="sidebar" class="sidenav">
+<nav id="sidebar" class="sidenav" style="display: block;">
     <div class="sidenav-content">
         <img src="{% static 'icon/5.ico' %}" alt="Logo" class="logo">
         <a class="nav-link" href="{% url 'dashboard_admin' %}">
@@ -86,15 +87,15 @@
 document.addEventListener('DOMContentLoaded', function() {
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('main-content');
     const navLinks = document.querySelectorAll('.nav-link');
+
+    // Asegura que el sidebar esté visible por defecto (no display: none)
+    sidebar.style.display = 'block';
 
     // Función para alternar el menú
     function toggleMenu() {
         sidebar.classList.toggle('active');
-        mainContent.classList.toggle('menu-active');
         menuToggle.classList.toggle('open');
-        
         const icon = menuToggle.querySelector('i');
         if (icon) {
             icon.classList.toggle('bi-list');

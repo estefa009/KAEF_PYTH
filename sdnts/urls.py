@@ -127,7 +127,7 @@ urlpatterns = [
     path('salidas/agregar/', views.agregar_salida, name='agregar_salida'),
 
     #correo
-    path('correos_admin/', views.enviar_correos_masivos, name='correos_admin'),
+    path('correos_admin/', views.correos_admin, name='correos_admin'),
     path('correo/<int:cod_correo>/', views.ver_correo, name='ver_correo'),
     path('correos/enviar_correos_masivos/', views.enviar_correos_masivos, name='enviar_correos_masivos'),
     #productos
@@ -158,8 +158,6 @@ urlpatterns = [
     # Reporte de usuarios
     path('usuarios/', views.reporte_usuarios_pdf, name='usuarios_pdf'),
 
-    path('notificaciones/', views.notificaciones_admin, name='notificaciones_admin'),
-
     path('procesar_compra/', views.procesar_compra, name='procesar_compra'),
 
     path('cargar_insumos/', views.cargar_insumos, name='cargar_insumos'),
@@ -167,11 +165,11 @@ urlpatterns = [
     path('exportar_pdf/', views.exportar_pdf, name='exportar_pdf'),
     path('exportar_excel/', views.exportar_excel, name='exportar_excel'),
 
-    path('actualizar_estado_envio/<int:envio_id>/', views.actualizar_estado_envio, name='actualizar_estado_envio'),
-
     
     # ...
 ]
+    # ...
+
     
     # ...
 

@@ -5,7 +5,6 @@
     top: 8px;
     left: 10px;
     z-index: 1001;
-    /* Por encima de todo */
     background: #ff6699;
     color: white;
     border: none;
@@ -30,13 +29,47 @@
     position: fixed;
     top: 0;
     left: -250px;
-    /* Oculta el menú */
     width: 250px;
     height: 100vh;
     background: #ff6699;
     transition: left 0.3s ease;
     z-index: 1000;
     overflow-y: auto;
+    /* Scrollbar personalizado */
+    scrollbar-width: thin;
+    scrollbar-color: #e83e8c #ffe0ea;
+}
+
+/* Cuando se abre */
+.sidenav.active {
+    left: 0;
+    width: 300px ;
+}
+
+/* Contenido interno del menú */
+.sidenav-content {
+    padding: 80px 20px 20px;
+}
+
+/* Estilos de los enlaces */
+.sidenav .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.sidenav .nav-link i {
+    margin-right: 10px;
+}
+
+.sidenav .nav-link:hover {
+    background-color: #ffe0ea;
+    color: #e83e8c;
 }
 
 /* CLASE QUE MUESTRA EL MENÚ */
@@ -116,7 +149,8 @@
 
 .menu-toggle {
     cursor: pointer;
-    /* Otros estilos */
+    background: transparent !important;
+    color: #fc6998;;
 }
 
 /*________________________CLIENTE________________________*/
