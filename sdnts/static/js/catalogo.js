@@ -246,14 +246,23 @@ function agregarAlCarrito(producto) {
 }
 
 function showHTML() {
-    if (!rowProduct) return;
+    // Verificar que los elementos básicos existan
+    if (!rowProduct) {
+        console.log('rowProduct no encontrado, omitiendo actualización del carrito');
+        return;
+    }
 
     rowProduct.innerHTML = '';
 
     if (allProducts.length === 0) {
         rowProduct.innerHTML = emptyCartMessage;
-        if (valorTotal) valorTotal.innerText = '$0.00';
-        if (countProducts) countProducts.innerText = '0';
+        // Verificar que el elemento existe antes de intentar modificarlo
+        if (valorTotal) {
+            valorTotal.innerText = '$0.00';
+        }
+        if (countProducts) {
+            countProducts.innerText = '0';
+        }
     } else {
         let total = 0;
         let totalOfProducts = 0;
@@ -376,14 +385,13 @@ document.addEventListener('DOMContentLoaded', function () {
     initModal('modalV', 'btnInfoV', 'closeV');
     initModal('modalC', 'btnInfoC', 'closeC');
     initModal('modalR', 'btnInfoR', 'closeR');
-    initModal('modalB', 'btnInfoB', 'closeB');
-    initModal('modalOS', 'btnInfoOS', 'closeOS');
+    initModal('modalB', 'btnInfoB', 'closeB');    initModal('modalOS', 'btnInfoOS', 'closeOS');
     initModal('modalA', 'btnInfoA', 'closeA');
     initModal('modalT1', 'btnInfoT1', 'closeT1');
     initModal('modalT2', 'btnInfoT2', 'closeT2');
     initModal('modalT3', 'btnInfoT3', 'closeT3');
     initModal('modalT4', 'btnInfoT4', 'closeT4');
-    initModal('modalP', 'btnPagar', 'closeP');
+    // initModal('modalP', 'btnPagar', 'closeP'); // Ya no se usa - ahora se redirige a /pago/
 
     // Configurar eventos para los botones de agregar al carrito
     document.getElementById('btnCerrarModalS')?.addEventListener('click', function () {
@@ -690,264 +698,30 @@ window.addEventListener('click', function (event) {
 
 document.getElementById('btnPagar')?.addEventListener('click', function () {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    let subtotal = cart.reduce((acc, item) => acc + item.precio * item.quantity, 0);
-    let iva = subtotal * 0.19;
-    let total = subtotal + iva;
-
-    // Factura con estilos Bootstrap tipo lista alineada
-    let productosHTML = '';
+    
     if (cart.length === 0) {
-        productosHTML = `<div class="alert alert-warning text-center">Tu carrito está vacío</div>`;
-        document.getElementById('total-pagar-modal').textContent = '0.00';
-    } else {
-        productosHTML = `
-        <div class="list-group mb-3">
-            ${cart.map(item => `
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>${item.titulo}</strong>
-                        <div class="text-muted small">${item.descripcion || ''}</div>
-                    </div>
-                    <div class="text-right">
-                        <div><b>Cant:</b> ${item.quantity}</div>
-                        <div><b>Unitario:</b> $${item.precio.toFixed(2)}</div>
-                        <div><b>Subtotal:</b> $${(item.precio * item.quantity).toFixed(2)}</div>
-                    </div>
-                </div>
-            `).join('')}
-        </div>
-        <div class="text-left">
-            <b>Subtotal:</b> $${subtotal.toFixed(2)}<br>
-            <b>IVA (19%):</b> $${iva.toFixed(2)}<br>
-            <b>Total:</b> $${total.toFixed(2)}
-        </div>
-        `;
-        document.getElementById('total-pagar-modal').textContent = total.toFixed(2);
+        alert('Tu carrito está vacío. Agrega algunos productos antes de proceder al pago.');
+        return;
     }
 
-    // Asegúrate de que el contenedor existe antes de asignar el HTML
-    const cajita = document.querySelector('#modalP .productosPagar .cajita'); if (cajita) {
-        cajita.innerHTML = productosHTML;
-    }
-
-    // Mostrar el modal solo si hay productos
-    const modalP = document.getElementById('modalP');
-    if (modalP) {
-        if (cart.length > 0) {
-            modalP.classList.remove('hidden');
-            modalP.style.display = 'flex';
-        } else {
-            modalP.classList.add('hidden');
-            modalP.style.display = 'none';
-        }
-    }
+    // Redirigir a la nueva vista de pago
+    window.location.href = '/pago/';
 });
 
-// Cerrar el modal de pago (puedes tener un botón o la X)
-document.getElementById('equis')?.addEventListener('click', function () {
-    document.getElementById('modalP').style.display = 'none';
-});
+// Cerrar el modal de pago (ya no se usa)
+// document.getElementById('equis')?.addEventListener('click', function () {
+//     document.getElementById('modalP').style.display = 'none';
+// });
 
-// Helpers to show modals and get user input as Promise
-function getDireccionFromModal() {
-    return new Promise((resolve, reject) => {
-        const modal = document.getElementById('modalDireccion');
-        const input = document.getElementById('inputDireccion');
-        const confirm = document.getElementById('confirmDireccion');
-        const cancel = document.getElementById('cancelDireccion');
-        const close = document.getElementById('closeDireccion');
+// Funciones auxiliares del modal de pago anterior - ya no se usan
+// function getDireccionFromModal() { ... }
+// function getFechaFromModal(minDateStr) { ... }
+// Se mantiene solo el comentario porque ahora se usa la nueva vista /pago/
 
-        function cleanup() {
-            confirm.removeEventListener('click', onConfirm);
-            cancel.removeEventListener('click', onCancel);
-            close.removeEventListener('click', onCancel);
-            modal.classList.add('hidden');
-        }
-        function onConfirm(e) {
-            e.preventDefault();
-            if (input.value.trim()) {
-                cleanup();
-                resolve(input.value.trim());
-            } else {
-                input.focus();
-                input.classList.add('input-error');
-            }
-        }
-        function onCancel(e) {
-            e.preventDefault();
-            cleanup();
-            resolve(null);
-        }
-        input.classList.remove('input-error');
-        input.value = '';
-        modal.classList.remove('hidden');
-        input.focus();
-        confirm.addEventListener('click', onConfirm);
-        cancel.addEventListener('click', onCancel);
-        close.addEventListener('click', onCancel);
-    });
-}
-
-function getFechaFromModal(minDateStr) {
-    return new Promise((resolve, reject) => {
-        const modal = document.getElementById('modalFecha');
-        const input = document.getElementById('inputFecha');
-        const confirm = document.getElementById('confirmFecha');
-        const cancel = document.getElementById('cancelFecha');
-        const close = document.getElementById('closeFecha');
-
-        function cleanup() {
-            confirm.removeEventListener('click', onConfirm);
-            cancel.removeEventListener('click', onCancel);
-            close.removeEventListener('click', onCancel);
-            modal.classList.add('hidden');
-        }
-        function onConfirm(e) {
-            e.preventDefault();
-            if (input.value && input.value >= minDateStr) {
-                cleanup();
-                resolve(input.value);
-            } else {
-                input.focus();
-                input.classList.add('input-error');
-            }
-        }
-        function onCancel(e) {
-            e.preventDefault();
-            cleanup();
-            resolve(null);
-        }
-        input.classList.remove('input-error');
-        input.value = '';
-        input.setAttribute('min', minDateStr);
-        modal.classList.remove('hidden');
-        input.focus();
-        confirm.addEventListener('click', onConfirm);
-        cancel.addEventListener('click', onCancel);
-        close.addEventListener('click', onCancel);
-    });
-}
-
-document.getElementById('btnAgregarProducto')?.addEventListener('click', async function (e) {
-    e.preventDefault();
-
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    if (cart.length === 0) {
-        alert('El carrito está vacío');
-        return;
-    }
-
-    // Get address from modal
-    const direccion = await getDireccionFromModal();
-    if (!direccion) return;
-
-    // Calcular la fecha mínima (hoy + 3 días)
-    const hoy = new Date();
-    const minDate = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + 3);
-    const minDateStr = minDate.toISOString().split('T')[0];
-
-    // Get date from modal
-    let fechaEntrega = await getFechaFromModal(minDateStr);
-    if (!fechaEntrega) return;
-
-    // Obtener método de pago seleccionado
-    const metodoPagoSeleccionado = document.querySelector('input[name="metodo_pago"]:checked')?.value;
-    // Obtener número de referencia según método de pago
-    let referenciaPago = '';
-    if (metodoPagoSeleccionado === 'NEQUI') {
-        referenciaPago = document.querySelector('#contenedorNequi .nroReferencia')?.value.trim();
-    } else if (metodoPagoSeleccionado === 'DAVIPLATA') {
-        referenciaPago = document.querySelector('#contenedorDavi .nroReferencia')?.value.trim();
-    }
-
-    // Validar campos de pago
-    if (!metodoPagoSeleccionado) {
-        alert('Debes seleccionar un método de pago.');
-        return;
-    }
-    if (!referenciaPago || referenciaPago.length < 4) {
-        alert('Debes digitar un número de referencia válido (mínimo 4 dígitos).');
-        return;
-    }
-    // Ahora puedes usar direccion y fechaEntrega
-    const payload = {
-        carrito: cart,
-        direccion: direccion,
-        fecha_entrega: fechaEntrega,
-        metodo_pago: metodoPagoSeleccionado,
-        transaccion_id: referenciaPago
-    };
-    console.log('Enviando fetch a /procesar_compra/ con:', payload);
-
-    // Validar método de pago y referencia
-    if (!payload.metodo_pago || !payload.transaccion_id) {
-        alert('Falta seleccionar método de pago o referencia de pago.');
-        return;
-    }
-
-    fetch('/procesar_compra/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify(payload)
-    })
-        .then(async response => {
-            console.log('Respuesta recibida del backend:', response);
-            if (!response.ok) {
-                let text = await response.text();
-                alert('Respuesta HTTP no OK: ' + response.status + '\n' + text);
-                throw new Error('HTTP ' + response.status + ': ' + text);
-            }
-            try {
-                return await response.json();
-            } catch (e) {
-                alert('La respuesta no es JSON válido: ' + e);
-                throw e;
-            }
-        })
-        .then(data => {
-            console.log('Respuesta JSON del backend:', data);
-            if (data.success) {
-                localStorage.removeItem('cart');
-                showHTML();
-                document.getElementById('modalP').style.display = 'none';
-                // Mostrar modal de compra exitosa SOLO con texto centrado (sin imagen)
-                const modal = document.getElementById('modalCompraExitosa');
-                if (!modal) {
-                    console.error('No se encontró el modalCompraExitosa en el DOM');
-                    document.body.insertAdjacentHTML('beforeend', `<div style="color:red; background:#fff3cd; border:1px solid #f5c6cb; padding:10px; position:fixed; top:10px; right:10px; z-index:9999;">No se encontró el modalCompraExitosa en el DOM</div>`);
-                    return;
-                }
-                const info = modal.querySelector('.infoTotalCarrito');
-                if (info) {
-                    info.innerHTML = `
-                        <div style="display:flex;align-items:center;justify-content:center;min-height:120px;">
-                            <div style="font-size:2em;color:#3C2D31FF;font-family:'Dunkin',Arial,sans-serif;text-align:center;">
-                                <b>¡Compra Exitosa!</b>
-                            </div>
-                        </div>
-                    `;
-                }
-                modal.classList.remove('hidden');
-                modal.classList.add('show');
-                modal.style.display = 'flex';
-                modal.style.opacity = '1';
-                modal.style.zIndex = '9999';
-                void modal.offsetWidth;
-                modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                if (typeof showHTML === 'function') showHTML();
-            } else {
-                alert('Error al procesar la compra: ' + (data.error || ''));
-            }
-        })
-        .catch(error => {
-            alert('Ocurrió un error al procesar la compra: ' + error);
-            document.body.insertAdjacentHTML('beforeend', `<div style="color:red; background:#fff3cd; border:1px solid #f5c6cb; padding:10px, position:fixed, top:10px, right:10px, z-index:9999;">Error: ${error}</div>`);
-            console.error('Error en fetch:', error);
-        });
-});
+// Esta función del modal de pago anterior ya no se usa - ahora se redirige a /pago/
+// document.getElementById('btnAgregarProducto')?.addEventListener('click', async function (e) {
+//     ... código comentado porque ahora se usa la nueva vista de pago
+// });
 
 // Función para obtener el CSRF token de la cookie
 function getCookie(name) {
@@ -1006,14 +780,27 @@ function mostrarModalAgregadoCarrito(producto) {
     const modal = document.getElementById('modalAgregadoCarrito');
     const titulo = document.getElementById('modalAgregadoTitulo');
     const descripcion = document.getElementById('modalAgregadoDescripcion');
-    if (!modal || !titulo || !descripcion) return;
+    
+    // Verificar que todos los elementos existan antes de continuar
+    if (!modal || !titulo || !descripcion) {
+        console.log('Modal de agregado al carrito no encontrado, omitiendo...');
+        return;
+    }
+    
     titulo.textContent = producto.titulo || '';
     descripcion.textContent = producto.descripcion || '';
     modal.classList.add('show');
     modal.classList.remove('hidden');
+    
     // Cerrar con X o OK
     const closeBtn = document.getElementById('closeAgregadoCarrito');
     const okBtn = document.getElementById('okAgregadoCarrito');
+    
+    if (!closeBtn || !okBtn) {
+        console.log('Botones del modal no encontrados');
+        return;
+    }
+    
     function cerrar() {
         modal.classList.remove('show');
         modal.classList.add('hidden');

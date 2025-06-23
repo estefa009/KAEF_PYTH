@@ -252,6 +252,12 @@ def contactanoscliente(request):
         'telefono': '+57 3026982043'
     }
     return render(request, 'cliente/contactanoscliente.html', context)
+
+@login_required
+def pago(request):
+    """Vista para la página de pago/factura"""
+    return render(request, 'cliente/pago.html')
+
 def nosotroscliente(request):
     return render(request, 'cliente/nosotroscliente.html')
 

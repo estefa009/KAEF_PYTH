@@ -2,49 +2,204 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro</title>
+  <meta charset="UTF-8">
+  <title>Registrarse</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="{% static 'css/menu.css' %}">
 
-    <!-- Bootstrap y estilos -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{% static 'css/menu.css' %}">
-    <link rel="stylesheet" href="{% static 'css/registro.css' %}">
-    <link rel="icon" href="{% static 'icon/2.ico' %}" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Concert+One&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'Dunkin';
+      src: url('{% static "font/Dunkin.otf" %}') format('opentype');
+    }
+
+    body {
+      background: white;
+      font-family: 'Century Gothic', sans-serif;
+      color: #e75480;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    .register-card {
+      background-color: white;
+      border-radius: 40px;
+      padding: 40px 50px;
+      box-shadow: 0 8px 20px rgba(255, 182, 193, 0.4);
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    .register-card img.logo {
+      width: 80px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    .register-card h2 {
+      font-family: "Dunkin", sans-serif;
+      color: #ff80a4;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    form p {
+      position: relative;
+      margin-bottom: 18px;
+    }
+
+    form label {
+      display: none;
+    }
+
+    .form-control {
+      border-radius: 30px !important;
+      border: 2px solid #ffb6c1 !important;
+      padding: 10px 20px !important;
+      padding-left: 40px !important;
+      font-size: 0.9rem;
+      width: 100%;
+    }
+
+    .form-control::placeholder {
+      font-style: italic;
+    }
+
+    form p i {
+      font-size: 1rem;
+      color: #ff80a4;
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .btn1 {
+      font-size: medium;
+      border-radius: 50px;
+      background-color: #4e4032;
+      color: #ffc0cb;
+      border: 2px solid #695450;
+      font-family: "Dunkin";
+      padding: 10px 30px;
+      width: 100%;
+      margin-top: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .btn1:hover {
+      background-color: #ffc0cb;
+      border: 2px solid #ffc0cb;
+      color: #695450;
+      transform: scale(1.05);
+    }
+
+    .small-link {
+      font-size: 0.85rem;
+      color: #e75480;
+      text-decoration: none;
+    }
+
+    .small-link:hover {
+      text-decoration: underline;
+    }
+
+    .text-muted {
+      font-size: 0.85rem;
+      color: #695450;
+    }
+
+    .alert-danger {
+      font-size: 0.85rem;
+      background-color: #ffe0e6;
+      color: #b3003b;
+      border-radius: 10px;
+      padding: 10px 15px;
+      margin-bottom: 20px;
+      text-align: left;
+
+      
+    }
+  </style>
 </head>
 <body>
-    <!-- Navbar (reutilizable) -->
-  {% include 'includes/nav_index.html' %}
+  <div class="register-card">
+    <img src="{% static 'icon/2.ico' %}" alt="Logo" class="logo">
+    <h2><i class="bi bi-person-plus-fill"></i> Crear Cuenta</h2>
 
-    <!-- Imagen de inicio -->
-    <div class="donasInicio">
-        <img src="{% static 'Image/hola.jpg' %}" alt="donas Inicio">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    {% if form.errors %}
+      <div class="alert alert-danger">
+        <ul class="mb-0">
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+<form method="post">
+  {% csrf_token %}
+  
+  {% for field in form %}
+    <div class="form-group mb-3 position-relative">
+      <div class="input-group">
+        <span class="input-group-text bg-transparent position-absolute h-100" 
+              style="z-index: 10; border: none; display: flex; align-items: center;">
+          {% if field.name == 'username' %}
+            <i class="bi bi-person-fill text-pink mx-auto"></i>
+          {% elif field.name == 'email' %}
+            <i class="bi bi-envelope-fill text-pink mx-auto"></i>
+          {% elif field.name == 'password1' or field.name == 'password2' %}
+            <i class="bi bi-lock-fill text-pink mx-auto"></i>
+          {% else %}
+            <i class="bi bi-pencil-fill text-pink mx-auto"></i>
+          {% endif %}
+        </span>
+        {{ field }}
+      </div>
     </div>
+  {% endfor %}
 
-    <!-- Formulario -->
-    <div class="formulario">
-        <div class="contenedorPrincipal shadow">
-            <div class="row">
-                <img src="{% static 'Image/Profile.png' %}" alt="Profile">
+  <button type="submit" class="btn1 btn shadow">
+    <i class="bi bi-check2-circle text-pink"></i> Registrarme
+  </button>
 
-                <form method="post" class="w-100 p-3">
-                    {% csrf_token %}
-                    {{ form.as_p }}
+  <div class="mt-3 text-muted">
+    <i class="bi bi-person-check text-pink"></i> ¿Ya tienes cuenta? 
+    <a href="{% url 'login' %}" class="small-link">Inicia sesión</a>
+  </div>
+</form>
 
-                    <div class="forgot mt-3 text-center">
-                        <input type="submit" value="REGISTRARME" class="btn btn-primary shadow">
-                        <hr>
-                        <h5>
-                            <img class="google" src="{% static 'Image/google.png' %}" alt="google">
-                            Ingresar con Google
-                        </h5>
-                    </div>
-                </form>
-
-            </div>
-        </div>
-    </div>
-
+<style>
+  /* Estilos para los iconos rosas y alineación */
+  .form-group input {
+    padding-left: 2.5rem !important;
+  }
+  .text-pink {
+    color: #ff69b4 !important; /* Color rosa estándar */
+  }
+  /* Si usas Bootstrap 5+ puedes añadir esto en tu CSS */
+  .bi {
+    vertical-align: middle;
+  }
+</style>
+  </div>
 </body>
 </html>
