@@ -603,6 +603,9 @@ def procesar_compra(request):
     return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
 
 
+from django.db.models import Q  # 👈 Importar para excluir por estado
+from django.utils.timezone import now
+from datetime import timedelta
 
 @login_required
 def mis_domicilios(request):
@@ -612,15 +615,14 @@ def mis_domicilios(request):
         messages.error(request, "No tienes un perfil de domiciliario asignado.")
         return render(request, 'domiciliario/mis_domicilios.html', {'envios': [], 'nuevos_envios': []})
 
-    envios = Envio.objects.filter(cod_domi=domiciliario, estado__in=['PENDIENTE','ASIGNADO'])
+    # Mostrar todos excepto ENTREGADO
+    envios = Envio.objects.filter(cod_domi=domiciliario).exclude(estado="ENTREGADO")
 
     recientes = now() - timedelta(days=1)
     nuevos_envios = Envio.objects.filter(
         cod_domi=domiciliario,
-        fecha_asignacion__gte=recientes,
-        estado__in=['PENDIENTE', 'ASIGNADO']
-
-    )
+        fecha_asignacion__gte=recientes
+    ).exclude(estado="ENTREGADO")
 
     context = {
         'envios': envios,
@@ -628,7 +630,7 @@ def mis_domicilios(request):
     }
 
     return render(request, 'domiciliario/mis_domicilios.html', context)
- 
+
 @login_required
 def historial_envios(request):
     usuario = request.user  # Asegúrate de usar autenticación
@@ -654,7 +656,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib import messages
 from sdnts.forms import EnvioDomiciliarioForm
 
-@login_required
+
 def editar_envio_domiciliario(request, cod_envio):
     envio = get_object_or_404(Envio, cod_envio=cod_envio)
 
@@ -662,15 +664,13 @@ def editar_envio_domiciliario(request, cod_envio):
         messages.error(request, "No tienes permiso para editar este envío.")
         return redirect('mis_domicilios')
 
-    estado_anterior = envio.estado  # Capturar el estado antes de guardar
+    estado_anterior = envio.estado  # ← capturar antes de guardar
 
     if request.method == 'POST':
         form = EnvioDomiciliarioForm(request.POST, instance=envio)
         if form.is_valid():
-            envio = form.save(commit=False)  # Guardamos pero aún no en DB
+            envio = form.save(commit=False)
 
-            # Solo actualiza los campos necesarios, no borra información
-            # No hagas envio.save() varias veces, solo una vez al final
             if envio.estado == "ENTREGADO":
                 envio.cod_venta.estado = "ENTREGADO"
                 envio.cod_venta.save()
@@ -685,16 +685,15 @@ def editar_envio_domiciliario(request, cod_envio):
                 messages.success(request, "El envío fue cancelado.")
                 return redirect('mis_domicilios')
 
-            # Si es otro estado, solo guarda normalmente
+            # ⚠️ Solo guarda cambios y no archiva si NO se cambió a entregado
             envio.save()
-            messages.success(request, "Información del envío actualizada.")
+
+            if estado_anterior != envio.estado:
+                messages.success(request, "Estado actualizado correctamente.")
+            else:
+                messages.success(request, "Observaciones o fechas actualizadas.")
+
             return redirect('mis_domicilios')
-        else:
-            # Si el formulario no es válido, vuelve a mostrar el formulario con errores y datos actuales
-            return render(request, 'domiciliario/editar_envio_domiciliario.html', {
-                'form': form,
-                'envio': envio,
-            })
     else:
         form = EnvioDomiciliarioForm(instance=envio)
 
@@ -1131,15 +1130,18 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Produccion, Salida, Entrada, Insumo, Venta, Envio
 from .forms import ProduccionForm, SalidaForm, EntradaForm, EnvioForm
 from django.db import transaction
+
 @login_required
 def produccion_admin(request):
     producciones = Produccion.objects.select_related('cod_venta').all()
-    ventas = Venta.objects.all()  # ✅ con paréntesis
-    venta = ventas.first()        # ✅ ahora sí es queryset
+    envios = Envio.objects.all()
+
+    # Diccionario para saber si ya existe un envío para una venta específica
+    envios_por_venta = {envio.cod_venta_id: envio for envio in envios}
 
     context = {
         'producciones': producciones,
-        'venta': venta,           # ✅ agregar al context
+        'envios_por_venta': envios_por_venta,
     }
     return render(request, 'admin/produccion/produccion_admin.html', context)
 
@@ -1348,15 +1350,25 @@ def generar_produccion_confirmada(request, cod_venta):
 
 def editar_produccion(request, cod_produccion):
     produccion = get_object_or_404(Produccion, pk=cod_produccion)
+
+    # Si ya tiene un envío asignado, no se permite editar
+    if produccion.cod_envio:
+        messages.warning(request, "Esta producción ya tiene un envío asignado y no se puede volver a asignar.")
+        return redirect('produccion_admin')
+
     if request.method == 'POST':
         form = ProduccionForm(request.POST, instance=produccion)
         if form.is_valid():
             form.save()
+            messages.success(request, "Producción actualizada correctamente.")
             return redirect('produccion_admin')
     else:
         form = ProduccionForm(instance=produccion)
-    return render(request, 'admin/produccion/editar_produccion.html', {'form': form, 'produccion': produccion})
 
+    return render(request, 'admin/produccion/editar_produccion.html', {
+        'form': form,
+        'produccion': produccion
+    })
 def cambiar_estado_produccion(request, cod_produccion):
     produccion = get_object_or_404(Produccion, pk=cod_produccion)
 
@@ -1386,9 +1398,15 @@ def cambiar_estado_produccion(request, cod_produccion):
     })
 
 
+@login_required
 def asignar_envio_produccion(request, cod_produccion):
     produccion = get_object_or_404(Produccion, pk=cod_produccion)
     venta = produccion.cod_venta  # Relación desde Producción a Venta
+
+    # 🔐 Verificar si ya existe un envío para esta venta
+    if Envio.objects.filter(cod_venta=venta).exists():
+        messages.error(request, "Ya existe un envío asignado para esta venta.")
+        return redirect('produccion_admin')
 
     if request.method == 'POST':
         form = EnvioForm(request.POST)
@@ -1404,7 +1422,6 @@ def asignar_envio_produccion(request, cod_produccion):
             venta.save()
             
             messages.success(request, "¡Envío asignado correctamente!")
-
             return redirect('produccion_admin')
         else:
             messages.error(request, "Hay errores en el formulario. Revisa los campos.")
@@ -1416,6 +1433,7 @@ def asignar_envio_produccion(request, cod_produccion):
         'venta': venta,
         'produccion': produccion
     })
+
 def eliminar_produccion(request, cod_produccion):
     produccion = get_object_or_404(Produccion, pk=cod_produccion)
     if request.method == 'POST':
