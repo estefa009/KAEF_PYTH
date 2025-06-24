@@ -161,6 +161,18 @@
                 padding: 4px 6px;
             }
         }
+
+         .btn-outline-morado {
+        color: #6f42c1; /* morado */
+        border: 1px solid #6f42c1;
+        background-color: transparent;
+    }
+
+    .btn-outline-morado:hover {
+        background-color: #6f42c1;
+        color: white;
+    }
+    
     </style>
 </head>
 <body>
@@ -233,10 +245,19 @@
                             <i class="bi bi-arrow-repeat"></i>
                         </a>
                         {% if produccion.estado == "FINALIZADO" %}
-                        <a href="{% url 'asignar_envio_produccion' produccion.cod_produccion %}" class="btn btn-outline-warning btn-sm" title="Asignar envío">
-                            <i class="bi bi-truck"></i>
-                        </a>
+                            {% if produccion.cod_venta.cod_venta not in envios_por_venta %}
+                                <a href="{% url 'asignar_envio_produccion' produccion.cod_produccion %}" class="btn btn-outline-warning btn-sm" title="Asignar envío">
+                                    <i class="bi bi-truck"></i>
+                                </a>
+                            {% else %}
+                                <span class="btn btn-outline-morado btn-sm" title="Ya tiene envío asignado">
+                                    <i class="bi bi-truck-flatbed"></i>
+                                </span>
+
+
+                            {% endif %}
                         {% endif %}
+
                         <a href="{% url 'eliminar_produccion' produccion.cod_produccion %}" class="btn btn-outline-danger btn-sm"
                            onclick="return confirm('¿Estás seguro de que deseas eliminar esta producción?');" title="Eliminar">
                             <i class="bi bi-trash"></i>
