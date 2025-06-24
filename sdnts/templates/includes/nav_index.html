@@ -7,27 +7,201 @@
 <body>
 {% load static %}
 <!-- templates/includes/nav_index.html -->
-<nav class="navbar navbar-expand-lg bg-light border-bottom border-body shadow">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'index' %}"><img src="{% static 'icon/7.ico' %}" width="300"></a>    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavIndex">
-      <span class="navbar-toggler-icon"></span>
+<nav class="navbar-custom">
+  <div class="navbar-container">
+    <!-- Logo -->
+    <a class="navbar-brand-custom" href="{% url 'index' %}#top">
+      <img src="{% static 'icon/7.ico' %}" alt="Stefa's Donuts Logo">
+    </a>
+    <!-- Toggle para móvil -->
+    <button class="navbar-toggle" id="navbarToggle" type="button">
+      <i class="fas fa-bars"></i>
     </button>
-    <div class="collapse navbar-collapse shadow" id="navbarNavIndex">
-      <ul class="navbar-nav">
-        <li class="nav-item"><a class="nav-link active" href="{% url 'index' %}">Inicio</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}">Catálogo</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'nosotros' %}">Nosotros</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'contactanos' %}">Contáctanos</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">
-          Iniciar sesión
-           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="Profile">
-              <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm4.28 10.28a.75.75 0 0 0 0-1.06l-3-3a.75.75 0 1 0-1.06 1.06l1.72 1.72H8.25a.75.75 0 0 0 0 1.5h5.69l-1.72 1.72a.75.75 0 1 0 1.06 1.06l3-3Z" clip-rule="evenodd" />
-           </svg>  
-        </a></li>
-      </ul>
-    </div>
+    <!-- Navegación desktop -->
+    <ul class="navbar-nav-custom" id="navbarNav">
+      <li class="nav-item-custom"><a class="nav-link-custom" href="{% url 'index' %}#top"><i class="fas fa-home"></i> Inicio</a></li>
+      <li class="nav-item-custom"><a class="nav-link-custom" href="{% url 'catalogo' %}"><i class="fas fa-cookie-bite"></i> Catálogo</a></li>
+      <li class="nav-item-custom"><a class="nav-link-custom" href="{% url 'nosotros' %}"><i class="fas fa-users"></i> Nosotros</a></li>
+      <li class="nav-item-custom"><a class="nav-link-custom" href="{% url 'contactanos' %}"><i class="fas fa-envelope"></i> Contáctanos</a></li>
+      <li class="nav-item-custom"><a class="nav-link-custom" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a></li>
+    </ul>
   </div>
 </nav>
-
+<!-- Navegación móvil -->
+<nav class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav-item"><a href="{% url 'index' %}#top" class="mobile-nav-link"><i class="fas fa-home"></i> Inicio</a></div>
+  <div class="mobile-nav-item"><a href="{% url 'catalogo' %}" class="mobile-nav-link"><i class="fas fa-cookie-bite"></i> Catálogo</a></div>
+  <div class="mobile-nav-item"><a href="{% url 'nosotros' %}" class="mobile-nav-link"><i class="fas fa-users"></i> Nosotros</a></div>
+  <div class="mobile-nav-item"><a href="{% url 'contactanos' %}" class="mobile-nav-link"><i class="fas fa-envelope"></i> Contáctanos</a></div>
+  <div class="mobile-nav-item"><a href="{% url 'login' %}" class="mobile-nav-link"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a></div>
+</nav>
+<div class="mobile-overlay" id="mobileOverlay"></div>
+<style>
+/* Reset y estilos base para el navbar */
+* { box-sizing: border-box; }
+@font-face { font-family: 'Dunkin'; src: url('{% static "font/Dunkin.otf" %}') format('truetype'); }
+.navbar-custom {
+  background: linear-gradient(135deg, #ffc0cb 0%, #ffb3d1 100%);
+  box-shadow: 0 4px 15px rgba(252, 105, 152, 0.3);
+  padding: 10px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1050;
+  backdrop-filter: blur(10px);
+}
+.navbar-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.navbar-brand-custom {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+.navbar-brand-custom:hover { transform: scale(1.05); }
+.navbar-brand-custom img {
+  height: clamp(50px, 8vw, 80px);
+  width: auto;
+  max-width: 250px;
+}
+.navbar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: #4e4032;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+.navbar-toggle:hover {
+  background-color: rgba(78, 64, 50, 0.1);
+  transform: scale(1.1);
+}
+.navbar-nav-custom {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 15px;
+}
+.nav-item-custom { position: relative; }
+.nav-link-custom {
+  font-family: "Dunkin", Arial, sans-serif;
+  color: #4e4032;
+  text-decoration: none;
+  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+  font-weight: 600;
+  padding: 12px 16px;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.nav-link-custom:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #fc6998;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(252, 105, 152, 0.2);
+  text-decoration: none;
+}
+/* Navegación móvil */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 250px;
+  height: 100vh;
+  background: linear-gradient(135deg, #ffc0cb 0%, #ffb3d1 100%);
+  padding: 70px 20px 20px;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+  transition: left 0.3s ease;
+  z-index: 1100;
+  overflow-y: auto;
+}
+.mobile-nav.active {
+  left: 0;
+  display: block;
+}
+.mobile-nav-item { margin-bottom: 20px; }
+.mobile-nav-link {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #4e4032;
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 15px 20px;
+  border-radius: 15px;
+  display: block;
+  transition: all 0.3s ease;
+}
+.mobile-nav-link:hover {
+  background: rgba(255, 255, 255, 0.8);
+  color: #fc6998;
+  text-decoration: none;
+  transform: translateX(10px);
+}
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+}
+.mobile-overlay.active { display: block; }
+@media (max-width: 992px) {
+  .navbar-toggle { display: block; }
+  .navbar-nav-custom { display: none; }
+  .navbar-container { padding: 0 15px; }
+}
+@media (max-width: 480px) {
+  .navbar-container { padding: 0 10px; }
+  .navbar-brand-custom img { height: 50px; }
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const navbarToggle = document.getElementById('navbarToggle');
+  const mobileNav = document.getElementById('mobileNav');
+  const mobileOverlay = document.getElementById('mobileOverlay');
+  // Toggle mobile navigation
+  if (navbarToggle) {
+    navbarToggle.addEventListener('click', function() {
+      mobileNav.classList.toggle('active');
+      mobileOverlay.classList.toggle('active');
+    });
+  }
+  // Cerrar móvil nav al hacer click en overlay
+  if (mobileOverlay) {
+    mobileOverlay.addEventListener('click', function() {
+      mobileNav.classList.remove('active');
+      mobileOverlay.classList.remove('active');
+    });
+  }
+  // Cerrar móvil nav al hacer click en un enlace
+  const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+  mobileNavLinks.forEach(link => {
+    link.addEventListener('click', function() {
+      mobileNav.classList.remove('active');
+      mobileOverlay.classList.remove('active');
+    });
+  });
+});
+</script>
 </body>
 </html>

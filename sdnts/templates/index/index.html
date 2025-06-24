@@ -1,831 +1,241 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-<head> 
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stefa's DNUTS</title>
-
-    <!-- Bootstrap & estilos personalizados -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/menu.css' %}">
     <link rel="icon" href="{% static 'icon/2.ico' %}" sizes="128x128" type="image/x-icon">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #fc6998;
-        }
-
-        .logo {
-            font-weight: bold;
-            padding-left: 50px;
-        }
-
-        .DNUT {
-            font-size: 400px;
-        }
-
-        h1 {
-            font-weight: bold;
-        }
-        .btn1 {
-            font-size: large;
-            border-radius: 50px;
-            background-color: #4e4032;
-            color: #ffc0cb;
-            border: 2px solid#695450;
-            font-family: "Dunkin";
-            padding: 10px 40px;
-        }
-        .btn2 {
-            border-radius: 50px;
-            background-color: #4e4032;
-            color: #ffc0cb;
-            border: 2px solid #4e4032;
-            font-family: "Dunkin";
-        }
-        .btn:hover {
-            background-color: #ffc0cb;
-            border: 2px solid #ffc0cb;
-            color: #695450;
-            transform: scale(1.05);
-            font-family: "Dunkin";
-        }
-        .botones {
-            margin-left: 100px;
-            width: 50%;
-        }
-        .container img {
-            max-width: 200px;
-            height: auto;
-        }
-        .contenedor1 {
-            background-color: white;
-            margin: auto;
-            margin-top: 30px;
-            padding-top: 50px;
-            width: 80%;
-            height: 550px;
-            border-radius: 100px;
-            font-family: "Dunkin";
-            color: #4e4032;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .textoPrincipal {
-            width: 60%;
-            padding-left: 120px;
-            float: left;
-        }
-
-        .textoPrincipal h1 {
-            font-size: 70px;
-        }
-        .celular {
-            float: right;
-            width: 40%;
-            height: 100%;
-            position: relative;
-        }
-        .celular img {
-            width: 80%;
-            height: auto;
-            padding-bottom: 25px;
-            margin-left: 50px;
-            position: absolute;
-            bottom: 0;
-        }
-        .contenedor2 {
-            width: 100%;
-            height: 600px;
-            background-color: #ffe5f0;
-            margin-top: 40px;
-        }
-        .DNUT {
-            font-size: 95px;
-        }
-        .mt-3 {
-            color: #88584e;
-            font-size: 20px;
-        }
-
-        .textoCapa2 {
-            font-family: "Dunkin";
-            color: #4e4032;
-            text-align: center;
-        }
-        .textoCapa2 h1 {
-            font-size: 55px;
-            padding-top: 30px;
-        }
-        .palabra {
-            font-size: 75px;
-        }
-        .gallery {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            padding: 10px;
-            margin-top: 10px;
-        }
-
-        .gallery-item {
-            position: relative;
-            overflow: hidden;
-            border-radius: 100px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            height: 350px;
-            width: 350px;
-            background-color: #ecd6c0;
-            padding: 50px;
-            margin: 10px;
-        }
-
-        .gallery-item:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        .titulo {
-            text-align: center;
-            font-family: "Dunkin";
-            color: #695450;
-            font-size: 20px;
-
-        }
-        .contenedor3 {
-            background-color: #fc6998;
-            width: 100%;
-            height: 600px;
-            position: relative;
-        }
-        .combos {
-            width: 85%;
-            height: 600px;
-            margin: 0 auto;
-            position: relative;
-        }
-        .cuadro {
-            width: 95%;
-            margin: auto;
-            height: 500px;
-            background-color: white;
-            margin-top: 50px;
-            border-radius: 100px;
-            border: 30px solid #fff9c7;
-        }
-        .letras {
-            width: 55%;
-            height: 450px;
-            float: left;
-        }
-        .letras h1 {
-            font-family: "Dunkin";
-            color: #4e4032;
-            font-size: 60px;
-            margin-top: 50px;
-            padding-left: 130px;
-        }
-        .letras p {
-            color: #88584e;
-        }
-        .descripcion {
-            font-family: "Dunkin";
-            color: #695450;
-            font-size: 20px;
-            padding-left: 130px;
-        }
-        .ANTOJO {
-            font-size: 85px;
-        }
-        .cantidad img {
-            width: 95%;
-            height: auto;
-            margin-left: 10%;
-            margin-right: 10%;
-        }
-        .cantidad {
-            width: 45%;
-            height: 450px;
-            float: right;
-            padding-left: 20px;
-            padding-top: 21px;
-            margin-right: 5%;
-            margin-top: -2%;
-        }
-        .flecha {
-            width: 15%;
-            height: 500px;
-            float: right;
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        .flecha img {
-            width: 60px;
-            height: 60px;
-            margin-top: 200px;
-        }
-        .flecha:hover {
-            transform: translateY(-50%) scale(1.05);
-        }
-        .cuadro:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-        }
-        .InicioSesion {
-            position: relative;
-            width: 100%;
-            height: 500px;
-            background-color: rgba(255, 255, 255, 0.5);
-        }
-       
-    .InicioSesion::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url('{% static "Image/fondo.jpg" %}');
-        background-size: cover;
-        background-position: center;
-        opacity: 0.5;
-        z-index: -1;
-    }
-
-
-        .InicioSesion h1 {
-            font-family: "Dunkin";
-            color: #4e4032;
-            font-size: 60px;
-            text-align: center;
-            padding-top: 100px;
-            z-index: 1;
-        }
-        .cuenta {
-            font-size: 80px;
-        }
-        .InicioSesion h2 {
-            font-family: "Dunkin";
-            color: #695450;
-            font-size: 20px;
-            text-align: center;
-        }
-        input.form-control {
-            border-radius: 100px;
-            background-color: white;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-            border: 5px solid #695450;
-        }
-        input.form-control:hover {
-            background-color: white;
-            border-color: #695450;
-        }
-        .row {
-            margin: auto;
-            width: 70%;
-            height: 200px;
-        }
-        .btn-link {
-            width: 300px;
-            height: 50px;
-            background-color: transparent;
-            border: none;
-            font-family: "Dunkin";
-            color: #695450;
-            font-size: 13px;
-        }
-        .btn-link:hover {
-            color: #93877e;
-            transform: scale(1.05);
-        }
-        .forgot {
-            padding-bottom: 200px;
-            padding-right: 50px;
-            text-align: center;
-        }
-        .RedesSociales {
-            width: 100%;
-            height: 485px;
-            background-color: #ecd6c0;
-            margin-top: 50px;
-        }
-        .RedesSociales h1 {
-            font-family: "Dunkin";
-            color: #4e4032;
-            text-align: center;
-            padding-top: 50px;
-        }
-        .RedesSociales h2 {
-            font-family: "Dunkin";
-            color: #695450;
-            text-align: center;
-
-        }
-        .redes img {
-            width: 200px;
-            height: 200px;
-            margin: 10px;
-        }
-        .redes1:hover {
-            transform: scale(1.05);
-        }
-        .redes2:hover {
-            transform: scale(1.05);
-        }
-        .redes3:hover {
-            transform: scale(1.05);
-        }
-        .social {
-            width: 45%;
-            height: 300px;
-            margin: auto;
-        }
-        .redes {
-            display: flex;
-            justify-content: center;
-        }
-        .redes h1 {
-            font-size: 18px;
-            text-align: center;
-        }
-        .InformacionFinal {
-            width: 100%;
-            height: 300px;
-            background-color: #695450;
-
-        }
-        .navbarFinal {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: "Dunkin";
-            padding-top: 50px;
-        }
-
-        .navbarFinal li {
-            margin: 0 30px;
-            position: relative;
-        }
-
-        .navbarFinal li::after {
-            content: '|';
-            margin-left: 30px;
-            color: #93877e;
-        }
-
-        .navbarFinal li:last-child::after {
-            content: '';
-        }
-
-        .navbarFinal a {
-            text-decoration: none;
-            color: #93877e;
-            transition: transform 0.3s;
-            display: inline-block;
-        }
-        .navbarFinal a:hover {
-            transform: scale(1.05);
-            color: #ecd6c0;
-        }
-        .Direccion {
-            text-align: center;
-            color: #93877e;
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-            margin-top: 30px;
-        }
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        a:hover {
-            text-decoration: none;
-        }
-        @font-face {
-            font-family: 'Dunkin';
-            src: url('../font/Dunkin.otf') format('truetype');
-        }
-        .icon-trash {
-            font-size: 2.5rem !important;
-            color: #fc6998 !important;
-            cursor: pointer;
-            margin: 0 auto;
-            background: none !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            transition: transform 0.18s, color 0.18s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            vertical-align: middle;
-            line-height: 1;
-            text-align: center;
-            min-width: 1.5rem;
-            min-height: 1.5rem;
-            max-width: 2.5rem;
-            max-height: 2.5rem;
-        }
-        .icon-trash:hover {
-            color: #c82333 !important;
-            transform: scale(1.18) rotate(-10deg);
-        }
-
-        .detalles-producto-carrito {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 80px;
-            min-height: 80px;
-            max-width: 100px;
-            max-height: 100px;
-            padding: 0;
-            margin: 0;
-        }
-
-        .combos { 
-            cursor: pointer; 
-        }
-
-        /* Media Queries para responsividad */
-        @media (max-width: 1200px) {
-            .contenedor1 {
-                width: 90%;
-                height: auto;
-                padding-bottom: 50px;
-            }
-            .textoPrincipal h1 {
-                font-size: 50px;
-            }
-            .DNUT {
-                font-size: 50px;
-            }
-            .celular img {
-                width: 70%;
-            }
-            .letras h1 {
-                font-size: 50px;
-                padding-left: 80px;
-            }
-            .ANTOJO {
-                font-size: 70px;
-            }
-            .descripcion {
-                padding-left: 80px;
-            }
-        }
-
-        @media (max-width: 992px) {
-            .contenedor1 {
-                height: auto;
-                padding-bottom: 400px;
-                position: relative;
-            }
-            .textoPrincipal {
-                width: 100%;
-                padding-left: 50px;
-                padding-right: 50px;
-                float: none;
-            }
-            .celular {
-                width: 100%;
-                float: none;
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                text-align: center;
-            }
-            .celular img {
-                position: relative;
-                margin: 0 auto;
-                left: auto;
-                right: auto;
-            }
-            .botones {
-                margin-left: 50px;
-                margin-bottom: 30px;
-            }
-            .gallery-item {
-                width: 300px;
-                height: 300px;
-                padding: 30px;
-            }
-            .letras h1 {
-                font-size: 40px;
-                padding-left: 50px;
-            }
-            .ANTOJO {
-                font-size: 60px;
-            }
-            .descripcion {
-                padding-left: 50px;
-            }
-            .InicioSesion h1 {
-                font-size: 50px;
-            }
-            .cuenta {
-                font-size: 60px;
-            }
-        }
-
+        /* Estilos base y responsivos inspirados en vistacliente.html */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background-color: #fc6998; overflow-x: hidden; }
+        @font-face { font-family: 'Dunkin'; src: url('{% static "font/Dunkin.otf" %}') format('truetype'); }
+        .container-custom { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        /* Hero principal */
+        .hero-section { background-color: white; margin: 30px auto; width: 90%; max-width: 1200px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; min-height: 500px; }
+        .hero-content { display: flex; align-items: center; min-height: 500px; padding: 40px; }
+        .hero-text { flex: 1; padding-right: 30px; }
+        .hero-text h1 { font-family: "Dunkin", Arial, sans-serif; color: #4e4032; font-size: clamp(2.5rem, 5vw, 4rem); font-weight: bold; margin-bottom: 20px; line-height: 1.2; }
+        .hero-text .dnut-highlight { font-size: clamp(3rem, 6vw, 5.5rem); color: #fc6998; }
+        .hero-text p { font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; color: #88584e; font-size: clamp(1rem, 2vw, 1.25rem); font-weight: bold; line-height: 1.6; }
+        .hero-btns { margin-top: 30px; }
+        .btn1 { font-size: large; border-radius: 50px; background-color: #4e4032; color: #ffc0cb; border: 2px solid #695450; font-family: "Dunkin"; padding: 10px 40px; margin-right: 10px; }
+        .btn1:hover { background-color: #ffc0cb; border: 2px solid #ffc0cb; color: #695450; transform: scale(1.05); }
+        .hero-image { flex: 1; display: flex; justify-content: center; align-items: center; }
+        .hero-image img { max-width: 100%; height: auto; max-height: 400px; }
+        /* Galería de productos */
+        .build-section { background-color: #ffe5f0; padding: 60px 0; margin-top: 40px; }
+        .build-title { text-align: center; margin-bottom: 50px; }
+        .build-title h2 { font-family: "Dunkin", Arial, sans-serif; color: #4e4032; font-size: clamp(2rem, 4vw, 3.5rem); font-weight: bold; }
+        .build-title .palabra-highlight { font-size: clamp(2.5rem, 5vw, 4.5rem); color: #fc6998; }
+        .ingredients-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; padding: 0 20px; max-width: 1200px; margin: 0 auto; }
+        .ingredient-card { background-color: #ecd6c0; border-radius: 50px; padding: 40px; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; height: 320px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .ingredient-card:hover { transform: translateY(-10px); box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
+        .ingredient-card img { width: 120px; height: 120px; object-fit: contain; margin-bottom: 20px; }
+        .ingredient-card .titulo { font-family: "Dunkin", Arial, sans-serif; color: #695450; font-size: 1.5rem; font-weight: bold; }
+        /* Sección de combos */
+        .combos-section { background-color: #fc6998; padding: 60px 0; position: relative; }
+        .combos-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; gap: 20px; }
+        .combos-card { background-color: white; border-radius: 50px; border: 15px solid #fff9c7; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transition: transform 0.3s; cursor: pointer; flex: 1; overflow: hidden; }
+        .combos-card:hover { transform: scale(1.02); }
+        .combos-content { display: flex; align-items: center; padding: 40px; min-height: 400px; }
+        .combos-text { flex: 1; padding-right: 30px; }
+        .combos-text h3 { font-family: "Dunkin", Arial, sans-serif; color: #4e4032; font-size: clamp(2rem, 4vw, 3.5rem); font-weight: bold; line-height: 1.2; margin-bottom: 20px; }
+        .antojo-highlight { font-size: clamp(2.5rem, 5vw, 4.5rem); color: #fc6998; }
+        .combos-text p { font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; color: #695450; font-size: clamp(1rem, 2vw, 1.25rem); font-weight: bold; }
+        .combos-image { flex: 1; text-align: center; }
+        .combos-image img { max-width: 100%; height: auto; max-height: 300px; }
+        .arrow-indicator { background-color: rgba(255,255,255,0.9); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: transform 0.3s; }
+        .arrow-indicator:hover { transform: scale(1.1); }
+        .arrow-indicator img { width: 40px; height: 40px; }
+        /* Login */
+        .account-section { position: relative; padding: 80px 0; display: flex; align-items: center; justify-content: center; min-height: 60vh; }
+        .account-section::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('{% static "Image/fondo.jpg" %}'); background-size: cover; background-position: center; opacity: 0.5; z-index: -1; }
+        .account-card { background: linear-gradient(to bottom, #ffeef3, #ffe4ec); border-radius: 40px; padding: 50px; margin: 0 20px; max-width: 700px; width: 100%; box-shadow: 0 15px 40px rgba(255,192,203,0.3); text-align: center; }
+        .account-title { font-family: "Dunkin", Arial, sans-serif; font-size: clamp(1.5rem, 3vw, 2rem); color: #e75480; margin-bottom: 20px; font-weight: bold; }
+        .account-description { font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; font-size: clamp(0.9rem, 2vw, 1.1rem); color: #4e4032; margin-bottom: 30px; line-height: 1.6; }
+        .account-btn { background-color: #fc6998; color: white; border-radius: 50px; padding: 15px 30px; font-size: 1.1rem; border: none; text-decoration: none; display: inline-block; transition: all 0.3s; font-weight: bold; }
+        .account-btn:hover { background-color: #e75480; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(252,105,152,0.4); color: white; text-decoration: none; }
+        /* Redes sociales */
+        .social-section { background-color: #ecd6c0; padding: 80px 0; }
+        .social-header { text-align: center; margin-bottom: 50px; }
+        .social-header h2 { font-family: "Dunkin", Arial, sans-serif; color: #4e4032; font-size: clamp(1.8rem, 3vw, 2.5rem); margin-bottom: 10px; }
+        .social-header h3 { font-family: "Dunkin", Arial, sans-serif; color: #695450; font-size: clamp(1.2rem, 2vw, 1.8rem); }
+        .social-container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+        .social-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 30px; margin-bottom: 30px; }
+        .social-item { text-align: center; transition: transform 0.3s; }
+        .social-item:hover { transform: translateY(-10px); }
+        .social-item img { width: 120px; height: 120px; object-fit: contain; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); transition: box-shadow 0.3s; }
+        .social-item:hover img { box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
+        .social-handle { text-align: center; margin-top: 20px; }
+        .social-handle h4 { font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; color: #4e4032; font-size: 1.2rem; font-weight: bold; }
+        /* Footer */
+        .footer-section { background-color: #695450; padding: 60px 0 40px; }
+        .footer-nav { list-style: none; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 70px; font-family: "Dunkin", Arial, sans-serif; margin-bottom: 40px; }
+        .footer-nav li { position: relative; }
+        .footer-nav li:not(:last-child)::after { content: '|'; position: absolute; right: -15px; color: #93877e; }
+        .footer-nav a { text-decoration: none; color: #93877e; transition: all 0.3s; font-size: 1.1rem; }
+        .footer-nav a:hover { color: #ecd6c0; transform: scale(1.05); }
+        .footer-info { text-align: center; color: #93877e; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; border-top: 1px solid #93877e; padding-top: 30px; margin: 0 20px; }
+        /* Media queries responsivas */
         @media (max-width: 768px) {
-            .contenedor1 {
-                padding-bottom: 350px;
-            }
-            .textoPrincipal h1 {
-                font-size: 40px;
-            }
-            .DNUT {
-                font-size: 40px;
-            }
-            .textoCapa2 h1 {
-                font-size: 40px;
-            }
-            .palabra {
-                font-size: 50px;
-            }
-            .gallery-item {
-                width: 250px;
-                height: 250px;
-                padding: 20px;
-            }
-            .letras {
-                width: 100%;
-                float: none;
-                text-align: center;
-            }
-            .letras h1 {
-                padding-left: 0;
-                font-size: 35px;
-                margin-top: 30px;
-            }
-            .ANTOJO {
-                font-size: 50px;
-            }
-            .descripcion {
-                padding-left: 0;
-                text-align: center;
-            }
-            .cantidad {
-                width: 100%;
-                float: none;
-                text-align: center;
-            }
-            .cantidad img {
-                margin-left: 20px;
-            }
-            .flecha {
-                display: none;
-            }
-            .InicioSesion h1 {
-                font-size: 40px;
-            }
-            .cuenta {
-                font-size: 50px;
-            }
-            .row {
-                flex-direction: column;
-                height: auto;
-                width: 90%;
-            }
-            .row .col {
-                margin-bottom: 15px;
-                width: 100%;
-            }
-            .forgot {
-                padding-bottom: 50px;
-                padding-right: 0;
-            }
-            .social {
-                width: 90%;
-            }
-            .redes {
-                flex-wrap: wrap;
-            }
-            .redes img {
-                width: 150px;
-                height: 150px;
-            }
+            .hero-content, .combos-content { flex-direction: column; text-align: center; padding: 30px 20px; }
+            .hero-text, .combos-text { padding-right: 0; margin-bottom: 30px; }
+            .combos-container { flex-direction: column; gap: 30px; }
+            .arrow-indicator { width: 60px; height: 60px; }
+            .arrow-indicator img { width: 30px; height: 30px; }
+            .ingredients-grid { grid-template-columns: 1fr; gap: 20px; }
+            .social-grid { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 20px; }
+            .social-item img { width: 80px; height: 80px; }
+            .footer-nav { flex-direction: column; gap: 35px; }
+            .footer-nav li::after { display: none; }
+            .account-card { margin: 0 10px; padding: 30px 20px; }
         }
-
-        @media (max-width: 576px) {
-            .contenedor1 {
-                padding-bottom: 300px;
-            }
-            .textoPrincipal h1 {
-                font-size: 30px;
-            }
-            .DNUT {
-                font-size: 30px;
-            }
-            .textoPrincipal {
-                padding-left: 30px;
-                padding-right: 30px;
-            }
-            .botones {
-                margin-left: 30px;
-            }
-            .textoCapa2 h1 {
-                font-size: 30px;
-            }
-            .palabra {
-                font-size: 40px;
-            }
-            .gallery-item {
-                width: 220px;
-                height: 220px;
-                margin: 5px;
-            }
-            .letras h1 {
-                font-size: 30px;
-            }
-            .ANTOJO {
-                font-size: 40px;
-            }
-            .InicioSesion h1 {
-                font-size: 30px;
-                padding-top: 70px;
-            }
-            .cuenta {
-                font-size: 40px;
-            }
-            .navbarFinal {
-                flex-direction: column;
-                padding-top: 30px;
-            }
-            .navbarFinal li {
-                margin: 10px 0;
-            }
-            .navbarFinal li::after {
-                content: '';
-            }
+        @media (max-width: 480px) {
+            .hero-section { width: 95%; margin: 20px auto; border-radius: 30px; }
+            .build-section, .combos-section, .social-section { padding: 40px 0; }
+            .account-section { padding: 60px 0; }
+            .footer-section { padding: 40px 0 30px; }
         }
     </style>
 </head>
-
-<body>
-  {% include 'includes/nav_index.html' %}
-
-  <!-- Sección principal -->
-  <div class="contenedor1 shadow">
-      <div class="textoPrincipal">
-          <h1>¡La vida sabe mejor con una <span class="DNUT">DNUT!</span></h1>
-          <p class="mt-3">Haz parte de esta experiencia, ¡Regístrate y<br> ordena AHORA!</p>
-      </div>
-      <div class="celular">
-          <img src="{% static 'Image/donlog.png' %}" alt="Donut imagen" class="img-fluid">
-      </div>
-      <div class="botones">
-          <a href="{% url 'registro' %}" class="btn1 btn mx-2 shadow">REGISTRARME</a>
-      </div>
-  </div>
-
-  <!-- Galería de productos -->
-  <div class="contenedor2 shadow">
-      <div class="textoCapa2">
-          <h1>¡Arma y construye tu <span class="palabra">DNUT</span> a tu gusto!</h1>
-      </div>
-      <div class="gallery">
-          <div class="gallery-item shadow">
-              <a href="{% url 'catalogo' %}#ProductMasas">
-                  <img src="{% static 'Image/masa.png' %}" alt="masa">
-                  <p class="titulo">Masa</p>
-              </a>
-          </div>
-          <div class="gallery-item shadow">
-              <a href="{% url 'catalogo' %}#ProductCobertura">
-                  <img src="{% static 'Image/cobertura.png' %}" alt="cobertura">
-                  <p class="titulo">Cobertura</p>
-              </a>
-          </div>
-          <div class="gallery-item shadow">
-              <a href="{% url 'catalogo' %}#ProductToppings">
-                  <img src="{% static 'Image/toppings.png' %}" alt="topping">
-                  <p class="titulo">Toppings</p>
-              </a>
-          </div>
-      </div>
-  </div>
-
-  <!-- Sección de combos -->
-  <div class="contenedor3 shadow">
-      <div class="flecha">
-          <a class="flechita" href="{% url 'catalogo' %}">
-              <img src="{% static 'Image/flecha.png' %}" alt="flecha">
-          </a>
-      </div>
-      <div class="combos" id="combos">
-          <div class="cuadro shadow">
-              <div class="letras">
-                  <h1>!Elige el <br>combo a tu <span class="ANTOJO">ANTOJO!</span></h1>
-                  <p class="descripcion">Elige la cantidad de DNTS que <br>quieras llevar</p>
-              </div>
-              <div class="cantidad">
-                  <img src="{% static 'Image/yea.png' %}" alt="cantidadDonas">
-              </div>
-          </div>
-      </div>
-  </div>
-
-  <!-- Script de redirección -->
-  <script>
-      document.getElementById("combos").onclick = function () {
-          window.location.href = "{% url 'catalogo' %}";
-      };
-  </script>
-
-  <!-- Login -->
-<div class="InicioSesion shadow">
-    <h1>¿Ya tienes <span class="cuenta">CUENTA?</span></h1>
-    <h2>Inicia Sesión</h2>
-    <br>
-    <form action="{% url 'login' %}" method="post" id="loginForm">
-        {% csrf_token %}
-        {% if error %}
-        <div class="alert alert-danger">
-            <p>{{ error }}</p>
-        </div>
-        {% endif %}
-        <div class="row">
-            <div class="col-5">
-                <input type="text" name="email" class="form-control shadow" placeholder="Correo" required maxlength="50">
+<body id="top">
+    {% include 'includes/nav_index.html' %}
+    <!-- Hero principal -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>¡La vida sabe mejor con una <span class="dnut-highlight">DNUT!</span></h1>
+                <p>Haz parte de esta experiencia, ¡Regístrate y<br> ordena AHORA!</p>
+                <div class="hero-btns">
+                    <a href="{% url 'registro' %}" class="btn1 btn shadow">REGISTRARME</a>
+                </div>
             </div>
-            <div class="col-5">
-                <input type="password" name="password" class="form-control shadow" placeholder="Contraseña" required maxlength="50">
-            </div>
-            <div>
-                <button type="submit" class="btn2 btn form mx-2 shadow">INICIAR SESIÓN</button>
-            </div>
-            <div class="forgot">
-<a href="{% url 'password_reset' %}" class=" btn-link ">¿Olvidaste tu contraseña?</a>
+            <div class="hero-image">
+                <img src="{% static 'Image/donlog.png' %}" alt="Donut imagen" class="img-fluid">
             </div>
         </div>
-    </form>
-</div>
-
-  <!-- Redes sociales -->
-  <div class="RedesSociales">
-      <h1>Síguenos en nuestras redes sociales</h1>
-      <h2>¡CONÓCENOS!</h2>
-      <div class="social">
-          <div class="redes">
-              <div class="redes1">
-                  <a href="https://x.com/?lang=es" target="_blank">
-                      <img src="{% static 'Image/twitter.png' %}" alt="Twitter">
-                  </a>
-              </div>
-              <div class="redes2">
-                  <a href="https://www.facebook.com/" target="_blank">
-                      <img src="{% static 'Image/facebook.png' %}" alt="Facebook">
-                  </a>
-              </div>
-              <div class="redes3">
-                  <a href="https://www.instagram.com/09_tefy_09/" target="_blank">
-                      <img src="{% static 'Image/instagram.png' %}" alt="Instagram">
-                  </a>
-              </div>
-              <h1>@Stefa'sdonuts</h1>
-          </div>
-      </div>
-  </div>
-
-  <!-- Footer -->
-  <div class="InformacionFinal">
-      <ul class="navbarFinal">
-          <li><a href="{% url 'index' %}">Inicio</a></li>
-          <li><a href="{% url 'catalogo' %}">Catálogo</a></li>
-          <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
-          <li><a href="{% url 'contactanos' %}">Contáctanos</a></li>
-      </ul>
-      <div class="Direccion">
-          <br><hr><br>
-          <p>Cra 13 # 6510, Bogotá, Colombia <br>
-              © {% now "Y" %} Stefa´s Donuts.</p>
-      </div>
-  </div>
-
-  <!-- Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    </section>
+    <!-- Galería de productos -->
+    <section class="build-section">
+        <div class="build-title">
+            <h2>¡Arma y construye tu <span class="palabra-highlight">DNUT</span> a tu gusto!</h2>
+        </div>
+        <div class="ingredients-grid">
+            <div class="ingredient-card">
+                <a href="{% url 'catalogo' %}#ProductMasas">
+                    <img src="{% static 'Image/masa.png' %}" alt="Diferentes tipos de masa para tu donut">
+                    <p class="titulo">Masa</p>
+                </a>
+            </div>
+            <div class="ingredient-card">
+                <a href="{% url 'catalogo' %}#ProductCobertura">
+                    <img src="{% static 'Image/cobertura.png' %}" alt="Deliciosas coberturas para tu donut">
+                    <p class="titulo">Cobertura</p>
+                </a>
+            </div>
+            <div class="ingredient-card">
+                <a href="{% url 'catalogo' %}#ProductToppings">
+                    <img src="{% static 'Image/toppings.png' %}" alt="Increíbles toppings para personalizar">
+                    <p class="titulo">Toppings</p>
+                </a>
+            </div>
+        </div>
+    </section>
+    <!-- Sección de combos -->
+    <section class="combos-section">
+        <div class="combos-container">
+            <div class="combos-card" id="combos">
+                <div class="combos-content">
+                    <div class="combos-text">
+                        <h3>¡Elige el <br>combo a tu <span class="antojo-highlight">ANTOJO!</span></h3>
+                        <p>Elige la cantidad de DNUTS que <br>quieras llevar...</p>
+                    </div>
+                    <div class="combos-image">
+                        <img src="{% static 'Image/yea.png' %}" alt="Variedad de combos disponibles">
+                    </div>
+                    <div class="arrow-indicator">
+                        <img src="{% static 'icon/flecha.png' %}" alt="Ir al catálogo">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        document.getElementById("combos").onclick = function () {
+            window.location.href = "{% url 'catalogo' %}";
+        };
+    </script>
+    <!-- Login -->
+    <section class="account-section">
+        <div class="account-card">
+            <h2 class="account-title">¿Ya tienes <span class="cuenta">CUENTA?</span></h2>
+            <p class="account-description">Inicia sesión para acceder a tu cuenta y realizar pedidos fácilmente.</p>
+            <form action="{% url 'login' %}" method="post" id="loginForm">
+                {% csrf_token %}
+                {% if error %}
+                <div class="alert alert-danger"><p>{{ error }}</p></div>
+                {% endif %}
+                <div class="form-row justify-content-center">
+                    <div class="col-12 col-md-5 mb-3">
+                        <input type="email" name="email" class="form-control mb-3" placeholder="Correo" required maxlength="50">
+                        <input type="password" name="password" class="form-control mb-3" placeholder="Contraseña" required maxlength="50">
+                        <button type="submit" class="btn1 btn btn-block shadow">Iniciar sesión</button>
+                    </div>
+                </div>
+                <div class="forgot">
+                    <a href="{% url 'password_reset' %}" class="btn-link">¿Olvidaste tu contraseña?</a>
+                </div>
+            </form>
+        </div>
+    </section>
+    <!-- Redes sociales -->
+    <section class="social-section">
+        <div class="social-header">
+            <h2>Síguenos en nuestras redes sociales</h2>
+            <h3>¡CONÓCENOS!</h3>
+        </div>
+        <div class="social-container">
+            <div class="social-grid">
+                <div class="social-item">
+                    <a href="https://x.com/?lang=es" target="_blank" rel="noopener">
+                        <img src="{% static 'Image/twitter.png' %}" alt="Síguenos en Twitter">
+                    </a>
+                </div>
+                <div class="social-item">
+                    <a href="https://www.facebook.com/" target="_blank" rel="noopener">
+                        <img src="{% static 'Image/facebook.png' %}" alt="Síguenos en Facebook">
+                    </a>
+                </div>
+                <div class="social-item">
+                    <a href="https://www.instagram.com/09_tefy_09/" target="_blank" rel="noopener">
+                        <img src="{% static 'Image/instagram.png' %}" alt="Síguenos en Instagram">
+                    </a>
+                </div>
+            </div>
+            <div class="social-handle">
+                <h4>@Stefa'sdonuts</h4>
+            </div>
+        </div>
+    </section>
+    <!-- Footer -->
+    <footer class="footer-section">
+        <ul class="footer-nav">
+            <li><a href="{% url 'index' %}">Inicio</a></li>
+            <li><a href="{% url 'catalogo' %}">Catálogo</a></li>
+            <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
+            <li><a href="{% url 'contactanos' %}">Contáctanos</a></li>
+        </ul>
+        <div class="footer-info">
+            <p>Cra 13 # 6510, Bogotá, Colombia <br>© 2024 Stefa´s Donuts.</p>
+        </div>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

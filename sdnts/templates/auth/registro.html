@@ -160,14 +160,20 @@
   {% for field in form %}
     <div class="form-group mb-3 position-relative">
       <div class="input-group">
-        <span class="input-group-text bg-transparent position-absolute h-100" 
-              style="z-index: 10; border: none; display: flex; align-items: center;">
+        <span class="input-group-text bg-transparent position-absolute h-100"
+              style="z-index: 10; border: none; display: flex; align-items: center; left: 0; top: 0; height: 100%; width: 2.5rem; justify-content: center;">
           {% if field.name == 'username' %}
             <i class="bi bi-person-fill text-pink mx-auto"></i>
+          {% elif field.name == 'first_name' %}
+            <i class="bi bi-person-vcard text-pink mx-auto"></i>
+          {% elif field.name == 'last_name' %}
+            <i class="bi bi-person-badge text-pink mx-auto"></i>
           {% elif field.name == 'email' %}
-            <i class="bi bi-envelope-fill text-pink mx-auto"></i>
+            <i class="bi bi-envelope-at-fill text-pink mx-auto"></i>
+          {% elif field.name == 'telefono' %}
+            <i class="bi bi-telephone text-pink mx-auto" style="font-size:1.2rem;"></i>
           {% elif field.name == 'password1' or field.name == 'password2' %}
-            <i class="bi bi-lock-fill text-pink mx-auto"></i>
+            <i class="bi bi-shield-lock-fill text-pink mx-auto"></i>
           {% else %}
             <i class="bi bi-pencil-fill text-pink mx-auto"></i>
           {% endif %}
@@ -184,6 +190,8 @@
   <div class="mt-3 text-muted">
     <i class="bi bi-person-check text-pink"></i> ¿Ya tienes cuenta? 
     <a href="{% url 'login' %}" class="small-link">Inicia sesión</a>
+    <br>
+    <a href="{% url 'index' %}#top" class="small-link"><i class="bi bi-arrow-left-circle"></i> Volver al inicio</a>
   </div>
 </form>
 
@@ -193,7 +201,7 @@
     padding-left: 2.5rem !important;
   }
   .text-pink {
-    color: #ff69b4 !important; /* Color rosa estándar */
+    color: #ff80a4 !important; /* Color igual al de 'Crear Cuenta' */
   }
   /* Si usas Bootstrap 5+ puedes añadir esto en tu CSS */
   .bi {
