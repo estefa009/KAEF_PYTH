@@ -177,6 +177,8 @@ class Insumo(models.Model):
     nomb_insumo = models.CharField('nombre', max_length=50)
     cnt_insumo = models.IntegerField('cantidad', default=0)
     unidad_medida = models.CharField('unidad de medida', max_length=10)
+    fecha_vencimiento = models.DateField('fecha de vencimiento', default=timezone.now)
+
     
     class Meta:
         verbose_name = 'Insumo'

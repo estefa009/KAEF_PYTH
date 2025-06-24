@@ -330,14 +330,14 @@ from .models import Insumo
 class InsumoForm(forms.ModelForm):
     class Meta:
         model = Insumo
-        fields = ['cod_categoria', 'nomb_insumo', 'cnt_insumo', 'unidad_medida']
+        fields = ['cod_categoria', 'nomb_insumo', 'cnt_insumo', 'unidad_medida','fecha_vencimiento']
         widgets = {
             'cod_categoria': forms.Select(attrs={'class': 'form-control'}),
             'nomb_insumo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del insumo'}),
             'cnt_insumo': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Cantidad'}),
             'unidad_medida': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Unidad de medida'}),
+            'fecha_vencimiento': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
-        
 from django import forms
 from .models import Salida
 

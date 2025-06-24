@@ -213,6 +213,26 @@
         </a>
     </div>
 
+    <!-- Filtro por mes de vencimiento -->
+    <form method="get" class="row g-3 mb-3">
+        <div class="col-auto">
+            <label for="mes_vencimiento" class="col-form-label">Filtrar por mes de vencimiento:</label>
+        </div>
+        <div class="col-auto">
+            <select name="mes" id="mes_vencimiento" class="form-select">
+    <option value="">Todos</option>
+    {% for mes_num, mes_nombre in meses_lista %}
+        <option value="{{ mes_num }}" {% if mes_num == request.GET.mes %}selected{% endif %}>
+            {{ mes_num }} - {{ mes_nombre }}
+        </option>
+    {% endfor %}
+</select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+    </form>
+
     <!-- Tabla de insumos con scroll -->
     <div class="table-responsive tabla-scroll">
         <table class="table">
@@ -223,6 +243,7 @@
                     <th>Categoría</th>
                     <th>Cantidad</th>
                     <th>Unidad de Medida</th>
+                    <th>Fecha de Vencimiento</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -230,25 +251,27 @@
                 {% csrf_token %}
                 {% if insumos %}
                     {% for insumo in insumos %}
-                    <tr>
-                        <td>{{ insumo.cod_insumo }}</td>
-                        <td>{{ insumo.nomb_insumo }}</td>
-                        <td>{{ insumo.cod_categoria.nom_categoria }}</td>
-                        <td>{{ insumo.cnt_insumo }}</td>
-                        <td>{{ insumo.unidad_medida }}</td>
-                        <td class="actions-cell">
-                            <a href="{% url 'editar_insumo' insumo.cod_insumo %}" class="btn btn-primary" title="Editar">
-                                <i class="bi bi-pencil-fill"></i> Editar
-                            </a>
-                            <button type="button"
-                                class="btn btn-danger btn-eliminar-insumo"
-                                data-insumo-id="{{ insumo.cod_insumo }}"
-                                data-insumo-nombre="{{ insumo.nomb_insumo }}">
-                                <i class="bi bi-trash-fill"></i> Eliminar
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
+<tr>
+    <td>{{ insumo.cod_insumo }}</td>
+    <td>{{ insumo.nomb_insumo }}</td>
+    <td>{{ insumo.cod_categoria.nom_categoria }}</td>
+    <td>{{ insumo.cnt_insumo }}</td>
+    <td>{{ insumo.unidad_medida }}</td>
+    <td>{{ insumo.fecha_vencimiento }}</td>
+    <td class="actions-cell">
+        <a href="{% url 'editar_insumo' insumo.cod_insumo %}" class="btn btn-primary" title="Editar">
+            <i class="bi bi-pencil-fill"></i> Editar
+        </a>
+        <button type="button"
+            class="btn btn-danger btn-eliminar-insumo"
+            data-insumo-id="{{ insumo.cod_insumo }}"
+            data-insumo-nombre="{{ insumo.nomb_insumo }}">
+            <i class="bi bi-trash-fill"></i> Eliminar
+        </button>
+    </td>
+</tr>
+{% endfor %}
+
                 {% else %}
                     <tr>
                         <td colspan="6" class="no-data">No hay insumos registrados</td>

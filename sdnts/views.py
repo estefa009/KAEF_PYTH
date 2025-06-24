@@ -899,9 +899,29 @@ def dashboard_admin(request):
     # Agrega esto para obtener las nuevas ventas (por ejemplo, ventas pendientes)
     nuevas_ventas = Venta.objects.filter(estado='PENDIENTE').order_by('-fecha_hora')[:5]
 
+    # Alerta por insumos próximos a vencer
+    hoy_date = timezone.now().date()
+    dias_alerta = 7
+    insumos_por_vencer = Insumo.objects.filter(fecha_vencimiento__lte=hoy_date + timedelta(days=dias_alerta))
+
+    # Enviar correo si hay insumos por vencer (solo una vez por sesión)
+    if insumos_por_vencer.exists() and not request.session.get('correo_insumos_vencer_enviado'):
+        lista = "\n".join([f"- {i.nomb_insumo} (vence el {i.fecha_vencimiento})" for i in insumos_por_vencer])
+        try:
+            send_mail(
+                '⚠ Alerta de Insumos por Vencer - KAEF',
+                f'Los siguientes insumos están por vencer en los próximos {dias_alerta} días:\n\n{lista}',
+                settings.DEFAULT_FROM_EMAIL,  # Usa el correo configurado en settings.py
+                ['tucorreo@ejemplo.com'],     # Cambia esto por tu correo real
+                fail_silently=False           # Para ver errores si los hay
+            )
+            request.session['correo_insumos_vencer_enviado'] = True
+        except Exception as e:
+            messages.warning(request, f'No se pudo enviar el correo de alerta: {e}')
+
     return render(request, 'admin/dashboard_admin.html', {
         'nuevas_ventas': nuevas_ventas,
-        # ...otros contextos...
+        'insumos_por_vencer': insumos_por_vencer,
         'total_usuarios': total_usuarios,
         'total_clientes': total_clientes,
         'total_domis': total_domis,
@@ -912,7 +932,6 @@ def dashboard_admin(request):
         'ventas_mensuales': ventas_mensuales_data,
         'ventas_por_producto': ventas_por_producto_data,
         'clientes_top': clientes_top_data,
-        # ...agrega aquí cualquier otro contexto necesario...
     })
     
     
@@ -1678,26 +1697,38 @@ def cargar_insumos(request):
             insumos_cargados = 0
             insumos_fallidos = []
             for fila in reader:
+                # Ajusta los nombres de las columnas según tu CSV
+                nomb_insumo = fila.get('nomb_insumo')
+                cnt_insumo = fila.get('cnt_insumo')
+                unidad_medida = fila.get('unidad_medida')
+                cod_categoria_id = fila.get('cod_categoria') or fila.get('cod_categoria_id')
+                fecha_vencimiento = fila.get('fecha_vencimiento')
+
                 categoria = None
-                cod_categoria = fila.get('cod_categoria')
-                if cod_categoria:
+                if cod_categoria_id:
                     try:
-                        categoria = CategoriaInsumo.objects.get(pk=cod_categoria)
+                        categoria = CategoriaInsumo.objects.get(pk=cod_categoria_id)
                     except CategoriaInsumo.DoesNotExist:
                         categoria = None
-                if categoria:
-                    Insumo.objects.create(
-                        nomb_insumo=fila.get('nomb_insumo', ''),
-                        cnt_insumo=fila.get('cnt_insumo', 0),
-                        unidad_medida=fila.get('unidad_medida', ''),
-                        cod_categoria=categoria
-                    )
-                    insumos_cargados += 1
+
+                if categoria and nomb_insumo and cnt_insumo and unidad_medida and fecha_vencimiento:
+                    try:
+                        Insumo.objects.create(
+                            nomb_insumo=nomb_insumo,
+                            cnt_insumo=int(cnt_insumo),
+                            unidad_medida=unidad_medida,
+                            cod_categoria=categoria,
+                            fecha_vencimiento=fecha_vencimiento
+                        )
+                        insumos_cargados += 1
+                    except Exception as e:
+                        insumos_fallidos.append(f"{nomb_insumo} (error: {e})")
                 else:
-                    insumos_fallidos.append(fila.get('nomb_insumo', ''))
+                    insumos_fallidos.append(nomb_insumo or 'Sin nombre')
+
             msg = f'Insumos cargados exitosamente: {insumos_cargados}.'
             if insumos_fallidos:
-                msg += f' No se cargaron estos insumos por categoría inexistente: {", ".join(insumos_fallidos)}.'
+                msg += f' No se cargaron estos insumos: {", ".join(insumos_fallidos)}.'
                 messages.warning(request, msg)
             else:
                 messages.success(request, msg)
@@ -1787,12 +1818,32 @@ def cargarDatos(request):
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Insumo
 from .forms import InsumoForm  # Asegúrate de tener este formulario creado
+from django.db.models import Q
+from django.utils import timezone
+
 @login_required
 def insumos_admin(request):
     """Vista para gestionar insumos"""
     from .models import Insumo
     insumos = Insumo.objects.select_related('cod_categoria').all()
-    return render(request, 'admin/insumos/insumos_admin.html', {'insumos': insumos})
+
+    mes_filtro = request.GET.get("mes")
+    if mes_filtro:
+        insumos = insumos.filter(
+            fecha_vencimiento__month=int(mes_filtro)
+        )
+
+    meses_lista = [
+        ("01", "Enero"), ("02", "Febrero"), ("03", "Marzo"), ("04", "Abril"),
+        ("05", "Mayo"), ("06", "Junio"), ("07", "Julio"), ("08", "Agosto"),
+        ("09", "Septiembre"), ("10", "Octubre"), ("11", "Noviembre"), ("12", "Diciembre")
+    ]
+
+    return render(request, 'admin/insumos/insumos_admin.html', {
+        'insumos': insumos,
+        'meses_lista': meses_lista,
+    })
+    
 
 # Agregar insumo
 def agregar_insumo(request):
@@ -1822,7 +1873,11 @@ def eliminar_insumo(request, cod_insumo):
     insumo = get_object_or_404(Insumo, cod_insumo=cod_insumo)
     if request.method == 'POST':
         insumo.delete()
+        # Si es AJAX/fetch, responde con JSON
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.META.get('HTTP_ACCEPT') == 'application/json':
+            return JsonResponse({'success': True})
         return redirect('insumos_admin')
+    # Si GET, muestra confirmación (opcional)
     return render(request, 'admin/insumos/eliminar_insumo.html', {'insumo': insumo})
 
 
@@ -1845,6 +1900,7 @@ def domiciliarios_admin(request):
 def actualizar_usuario(request):
     if request.method == 'POST':
         cod_usuario = request.POST.get('codUsuario')
+
         nombre = request.POST.get('nomUsua')
         apellido = request.POST.get('apellUsua')
         email = request.POST.get('emailUsua')
@@ -1925,6 +1981,9 @@ def ver_receta_producto(request, cod_producto):
     producto = get_object_or_404(Producto, cod_producto=cod_producto)
     receta = RecetaProducto.objects.filter(cod_producto=producto)
     return render(request, 'admin/productos/ver_receta.html', {'producto': producto, 'receta': receta})
+
+
+
 
 
 INSUMOS_BASICOS = [
