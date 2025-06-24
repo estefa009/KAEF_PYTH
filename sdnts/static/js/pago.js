@@ -143,16 +143,29 @@ function configurarFinalizarCompra() {
         return;
     }
 
-    btnFinalizar.addEventListener('click', function() {
+    btnFinalizar.addEventListener('click', function(e) {
+        e.preventDefault(); // Previene el submit si está dentro de un form
         console.log('Botón finalizar clickeado');
+        // Si el botón está dentro de un <form>, asegúrate que type="button"
         if (validarFormulario()) {
-            $('#modalConfirmacion').modal('show');
+            const modal = document.getElementById('modalConfirmacion');
+            if (modal && typeof bootstrap !== 'undefined') {
+                const bsModal = bootstrap.Modal.getOrCreateInstance(modal);
+                bsModal.show();
+            } else {
+                console.error('No se pudo abrir el modal de confirmación');
+            }
         }
     });
 
-    btnConfirmar.addEventListener('click', function() {
+    btnConfirmar.addEventListener('click', function(e) {
+        e.preventDefault();
         console.log('Confirmar compra clickeado');
-        $('#modalConfirmacion').modal('hide');
+        const modal = document.getElementById('modalConfirmacion');
+        if (modal && typeof bootstrap !== 'undefined') {
+            const bsModal = bootstrap.Modal.getOrCreateInstance(modal);
+            bsModal.hide();
+        }
         procesarCompra();
     });
 }
@@ -285,12 +298,17 @@ function procesarCompra() {
     .then(data => {
         console.log('Datos de respuesta:', data);
         document.getElementById('loading-overlay').style.display = 'none';
-          if (data.success) {
+        if (data.success) {
             // Limpiar carrito
             localStorage.removeItem('cart');
-            
-            // Mostrar modal de éxito
-            $('#modalCompraExitosa').modal('show');
+            // Mostrar modal de éxito usando Bootstrap 5 JS (NO jQuery)
+            const modal = document.getElementById('modalCompraExitosa');
+            if (modal && typeof bootstrap !== 'undefined') {
+                const bsModal = bootstrap.Modal.getOrCreateInstance(modal);
+                bsModal.show();
+            } else {
+                alert('¡Compra exitosa!');
+            }
         } else {
             throw new Error(data.error || 'Error desconocido al procesar la compra');
         }
@@ -298,7 +316,6 @@ function procesarCompra() {
     .catch(error => {
         console.error('Error al procesar compra:', error);
         document.getElementById('loading-overlay').style.display = 'none';
-        
         alert('Error al procesar la compra: ' + error.message);
     });
 }
