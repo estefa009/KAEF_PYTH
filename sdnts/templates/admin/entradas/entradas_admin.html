@@ -246,7 +246,25 @@
             <i class="bi bi-plus-circle"></i> Nueva Entrada
         </a>
     </div>
-
+<!-- Filtro por mes de vencimiento -->
+    <form method="get" class="row g-3 mb-3">
+        <div class="col-auto">
+            <label for="mes_vencimiento" class="col-form-label">Mes de Vencimiento:</label>
+        </div>
+        <div class="col-auto">
+            <select name="mes" id="mes_vencimiento" class="form-select">
+    <option value="">Todos</option>
+    {% for mes_num, mes_nombre in meses_lista %}
+        <option value="{{ mes_num }}" {% if mes_num == request.GET.mes %}selected{% endif %}>
+            {{ mes_num }} - {{ mes_nombre }}
+        </option>
+    {% endfor %}
+</select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+    </form>
     <!-- Tabla de entradas con scroll -->
     <div class="table-responsive tabla-scroll-entradas">
         <table class="table">
@@ -259,6 +277,7 @@
                     <th>Precio</th>
                     <th>Fecha Caducidad</th>
                     <th>Fecha y Hora</th>
+                    <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -272,14 +291,15 @@
                     <td>${{ entrada.precio_entrada|floatformat:2 }}</td>
                     <td>{{ entrada.fecha_caducidad|date:"d/m/Y" }}</td>
                     <td>{{ entrada.fecha_hora_entrada|date:"d/m/Y H:i" }}</td>
+                     <td>{{ entrada.estado }}</td>
+
                     <td class="actions-cell">
                         <a href="{% url 'editar_entrada' entrada.cod_entrada %}" class="btn btn-primary" title="Editar">
                             <i class="bi bi-pencil-fill"></i>
                         </a>
                         <a href="{% url 'eliminar_entrada' entrada.cod_entrada %}" 
                            class="btn btn-danger" 
-                           title="Eliminar"
-                           onclick="return confirm('¿Estás seguro de que deseas eliminar esta entrada?')">
+                           title="Eliminar">
                             <i class="bi bi-trash-fill"></i>
                         </a>
                     </td>

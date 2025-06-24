@@ -204,6 +204,29 @@
             <i class="bi bi-clock-history"></i> Historial de Correos
         </div>
         <div class="card-body">
+            <!-- Filtros de historial -->
+            <form method="get" class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <label for="filtro_rol" class="form-label mb-1">Filtrar por rol</label>
+                    <select name="rol" id="filtro_rol" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="CLIENTE" {% if request.GET.rol == "CLIENTE" %}selected{% endif %}>Clientes</option>
+                        <option value="DOMI" {% if request.GET.rol == "DOMI" %}selected{% endif %}>Domiciliarios</option>
+                        <option value="ADMIN" {% if request.GET.rol == "ADMIN" %}selected{% endif %}>Administradores</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="fecha_desde" class="form-label mb-1">Desde</label>
+                    <input type="date" class="form-control" id="fecha_desde" name="desde" value="{{ request.GET.desde }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="fecha_hasta" class="form-label mb-1">Hasta</label>
+                    <input type="date" class="form-control" id="fecha_hasta" name="hasta" value="{{ request.GET.hasta }}">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-rosa w-100"><i class="bi bi-funnel"></i> Filtrar</button>
+                </div>
+            </form>
             <div class="table-responsive">
                 <table class="table table-hover text-center align-middle">
                     <thead>
@@ -240,6 +263,38 @@
                     </tbody>
                 </table>
             </div>
+            <!-- PAGINACIÓN -->
+            {% if historial_correos.has_other_pages %}
+            <nav aria-label="Paginación de correos">
+                <ul class="pagination justify-content-center" style="--bs-pagination-active-bg: #ff80a4; --bs-pagination-active-border-color: #ff80a4; --bs-pagination-color: #fff; --bs-pagination-hover-bg: #ffb6c1; --bs-pagination-hover-border-color: #ffb6c1; --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(255,128,164,.25); --bs-pagination-border-radius: 16px;">
+                    {% if historial_correos.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" style="color:#ff80a4; border-radius: 16px;" href="?page={{ historial_correos.previous_page_number }}{% if request.GET.rol %}&rol={{ request.GET.rol }}{% endif %}{% if request.GET.desde %}&desde={{ request.GET.desde }}{% endif %}{% if request.GET.hasta %}&hasta={{ request.GET.hasta }}{% endif %}">Anterior</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link" style="color:#aaa; border-radius: 16px;">Anterior</span></li>
+                    {% endif %}
+                    {% for num in historial_correos.paginator.page_range %}
+                        {% if historial_correos.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link" style="background:#ff80a4; border-color:#ff80a4; color:#fff; border-radius: 16px;">{{ num }}</span>
+                            </li>
+                        {% elif num > historial_correos.number|add:'-3' and num < historial_correos.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" style="color:#ff80a4; border-radius: 16px;" href="?page={{ num }}{% if request.GET.rol %}&rol={{ request.GET.rol }}{% endif %}{% if request.GET.desde %}&desde={{ request.GET.desde }}{% endif %}{% if request.GET.hasta %}&hasta={{ request.GET.hasta }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if historial_correos.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" style="color:#ff80a4; border-radius: 16px;" href="?page={{ historial_correos.next_page_number }}{% if request.GET.rol %}&rol={{ request.GET.rol }}{% endif %}{% if request.GET.desde %}&desde={{ request.GET.desde }}{% endif %}{% if request.GET.hasta %}&hasta={{ request.GET.hasta }}{% endif %}">Siguiente</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link" style="color:#aaa; border-radius: 16px;">Siguiente</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
         </div>
     </div>
 </div>

@@ -198,18 +198,20 @@
     </style>
 </head>
 <body>
-    {% if insumos_por_vencer %}
-  <div class="alert alert-warning">
-    ⚠ Atención: Hay {{ insumos_por_vencer|length }} insumo(s) próximos a vencer (a 7 diaz antes vencer). 
-    <a href="{% url 'insumos_admin' %}" class="alert-link">Revisar Insumos</a>
-  </div>
-{% endif %}
-
-
+    
 {% include "includes/nav_admin.html" %}
 
 <div class="contenedor">
-    
+{% if alertas_entradas %}
+<div class="alert alert-warning">
+    <h5><i class="bi bi-exclamation-triangle-fill"></i> Entradas por vencer:</h5>
+    <ul>
+        {% for mensaje in alertas_entradas %}
+            <li>{{ mensaje|safe }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
 
     <!-- Tarjetas de resumen -->
     <div class="dashboard-cards">

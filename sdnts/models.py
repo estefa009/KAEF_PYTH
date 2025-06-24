@@ -177,7 +177,6 @@ class Insumo(models.Model):
     nomb_insumo = models.CharField('nombre', max_length=50)
     cnt_insumo = models.IntegerField('cantidad', default=0)
     unidad_medida = models.CharField('unidad de medida', max_length=10)
-    fecha_vencimiento = models.DateField('fecha de vencimiento', default=timezone.now)
 
     
     class Meta:
@@ -205,7 +204,9 @@ class Entrada(models.Model):
     cnt_entrada = models.IntegerField('cantidad')
     precio_entrada = models.DecimalField('precio', max_digits=10, decimal_places=2)
     fecha_hora_entrada = models.DateTimeField('fecha de entrada', auto_now_add=True)
-    fecha_caducidad = models.DateField('fecha de caducidad')    
+    fecha_caducidad = models.DateField('fecha de caducidad')
+    estado = models.CharField(max_length=10, default='ACTIVO')  # ACTIVO o VENCIDO
+    
     class Meta:
         verbose_name = 'Entrada de Insumo'
         verbose_name_plural = 'Entradas de Insumos'

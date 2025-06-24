@@ -137,12 +137,13 @@ def agregar_usuario(request):
         form = UsuarioForm(request.POST)  # Este formulario SÍ tiene campo 'rol'
         if form.is_valid():
             usuario = form.save()
+            # Envía correo de bienvenida al crear usuario desde el admin
             enviar_correo_bienvenida_admin(usuario)
             messages.success(request, "Usuario agregado exitosamente.")
             return redirect('dashboard_admin')
         else:
-         messages.error(request, 'Corrige los errores en el formulario.')
-    else: 
+            messages.error(request, 'Corrige los errores en el formulario.')
+    else:
         form = UsuarioForm()
     return render(request, 'usuario/agregar_usuario.html', {'form': form})
 
@@ -324,18 +325,18 @@ def editar_perfil(request):
 @login_required
 def agregar_usuario(request):
     if request.method == 'POST':
-        form = UsuarioForm(request.POST)
+        form = UsuarioForm(request.POST)  # Este formulario SÍ tiene campo 'rol'
         if form.is_valid():
-            usuario = form.save(commit=False)
-            usuario.set_password(form.cleaned_data['password1'])
-            usuario.save()
-            messages.success(request, 'Usuario agregado exitosamente.')
+            usuario = form.save()
+            # Envía correo de bienvenida al crear usuario desde el admin
+            enviar_correo_bienvenida_admin(usuario)
+            messages.success(request, "Usuario agregado exitosamente.")
             return redirect('dashboard_admin')
         else:
             messages.error(request, 'Corrige los errores en el formulario.')
     else:
         form = UsuarioForm()
-    return render(request, 'usuarios/agregar_usuario.html', {'form': form})
+    return render(request, 'usuario/agregar_usuario.html', {'form': form})
 
 @login_required
 def agregar_al_carrito(request):
@@ -811,18 +812,54 @@ def editar_usuario(request, cod_usuario):
 @login_required
 def agregar_usuario(request):
     if request.method == 'POST':
-        form = UsuarioForm(request.POST)
+        form = UsuarioForm(request.POST)  # Este formulario SÍ tiene campo 'rol'
         if form.is_valid():
-            form.save()
+            usuario = form.save()
+            # Envía correo de bienvenida al crear usuario desde el admin
+            enviar_correo_bienvenida_admin(usuario)
             messages.success(request, "Usuario agregado exitosamente.")
-            return redirect('dashboard_admin')  # Redirige al dashboard admin
+            return redirect('dashboard_admin')
+        else:
+            messages.error(request, 'Corrige los errores en el formulario.')
     else:
         form = UsuarioForm()
-
     return render(request, 'usuario/agregar_usuario.html', {'form': form})
+
+
+
+def archivar_entradas_vencidas():
+    hoy = date.today()
+    entradas_vencidas = Entrada.objects.filter(fecha_caducidad__lte=hoy, estado='ACTIVO')
+    print(f"🔎 Entradas encontradas: {entradas_vencidas.count()}")
+
+    for entrada in entradas_vencidas:
+        print(f"➡ Archivando entrada #{entrada.cod_entrada}")
+        insumo = entrada.cod_insumo
+        insumo.cnt_insumo -= entrada.cnt_entrada
+        if insumo.cnt_insumo < 0:
+            insumo.cnt_insumo = 0
+        insumo.save()
+
+        entrada.estado = 'VENCIDO'
+        entrada.save()
+
+        
+from datetime import date, timedelta
+from django.core.mail import send_mail
+from django.contrib import messages
+from collections import OrderedDict
+import calendar
+from datetime import date, timedelta
+from django.utils import timezone
+from django.db.models import Count
+from datetime import date, timedelta
+from django.core.mail import send_mail
+from django.contrib import messages
+from django.conf import settings
 
 @login_required
 def dashboard_admin(request):
+    archivar_entradas_vencidas()  # 👈 Esto es lo que hace el cambio de estado
     # Conteos principales
     total_usuarios = Usuario.objects.count()
     total_clientes = Usuario.objects.filter(rol='CLIENTE').count()
@@ -836,15 +873,11 @@ def dashboard_admin(request):
     rol = request.GET.get('rol')
     page = request.GET.get('page', 1)
     usuarios_qs = Usuario.objects.filter(rol=rol) if rol else Usuario.objects.all()
-    paginator = Paginator(usuarios_qs.order_by('cod_usuario'), 10)  # 10 usuarios por página
+    paginator = Paginator(usuarios_qs.order_by('cod_usuario'), 10)
     usuarios = paginator.get_page(page)
-    rol_actual = rol  # para mantener el filtro en la paginación
+    rol_actual = rol
 
-    # Gráfica: Ventas por mes (últimos 6 meses, por monto)
-    from collections import OrderedDict
-    import calendar
-    from django.utils import timezone
-
+    # Gráfica: Ventas por mes (últimos 6 meses)
     hoy = timezone.now()
     meses = []
     for i in range(5, -1, -1):
@@ -854,21 +887,24 @@ def dashboard_admin(request):
             y -= 1
             m += 12
         meses.append((y, m))
+
     ventas_mensuales = OrderedDict()
     for y, m in meses:
         label = f"{calendar.month_abbr[m]} {y}"
         ventas_mensuales[label] = 0
+
     ventas_qs = Venta.objects.filter(fecha_hora__gte=hoy.replace(day=1) - timezone.timedelta(days=180))
     for v in ventas_qs:
         label = f"{calendar.month_abbr[v.fecha_hora.month]} {v.fecha_hora.year}"
         if label in ventas_mensuales:
             ventas_mensuales[label] += float(v.total)
+
     ventas_mensuales_data = {
         "labels": list(ventas_mensuales.keys()),
         "data": list(ventas_mensuales.values())
     }
 
-    # Gráfica: Ventas por producto (cantidad vendida)
+    # Gráfica: Ventas por producto
     ventas_por_producto = (
         DetalleVenta.objects.values('cod_producto__nomb_pro')
         .annotate(total=Sum('cantidad'))
@@ -879,8 +915,7 @@ def dashboard_admin(request):
         "data": [v['total'] for v in ventas_por_producto]
     }
 
-    # Gráfica: Clientes con más compras (top 7)
-    from django.db.models import Count
+    # Gráfica: Clientes top
     clientes_top_qs = (
         Venta.objects.values('cod_cliente__cod_usua__nom_usua', 'cod_cliente__cod_usua__apell_usua')
         .annotate(compras=Count('cod_venta'))
@@ -895,32 +930,51 @@ def dashboard_admin(request):
         "data": [c['compras'] for c in clientes_top_qs]
     }
 
-    # Agrega esto para obtener las nuevas ventas (por ejemplo, ventas pendientes)
+    # Ventas pendientes
     nuevas_ventas = Venta.objects.filter(estado='PENDIENTE').order_by('-fecha_hora')[:5]
 
-    # Alerta por insumos próximos a vencer
-    hoy_date = timezone.now().date()
+    # ALERTAS de entradas por caducar
     dias_alerta = 7
-    insumos_por_vencer = Insumo.objects.filter(fecha_vencimiento__lte=hoy_date + timedelta(days=dias_alerta))
+    hoy_fecha = date.today()
+    entradas_por_vencer = Entrada.objects.filter(
+    fecha_caducidad__lte=hoy_fecha + timedelta(days=dias_alerta),
+    estado='ACTIVO'  # 🔍 Solo entradas activas
+).select_related('cod_insumo')
 
-    # Enviar correo si hay insumos por vencer (solo una vez por sesión)
-    if insumos_por_vencer.exists() and not request.session.get('correo_insumos_vencer_enviado'):
-        lista = "\n".join([f"- {i.nomb_insumo} (vence el {i.fecha_vencimiento})" for i in insumos_por_vencer])
+
+    alertas_entradas = []
+    for entrada in entradas_por_vencer:
+        alerta = f"⚠ Entrada de <strong>{entrada.cod_insumo.nomb_insumo}</strong> ({entrada.cnt_entrada} {entrada.cod_insumo.unidad_medida}) vence el {entrada.fecha_caducidad}"
+        alertas_entradas.append(alerta)
+
+    # Enviar correo si hay entradas por vencer y no se ha enviado en esta sesión
+    if entradas_por_vencer.exists() and not request.session.get('correo_entradas_vencer_enviado'):
+        lista = "\n".join([
+            f"- {e.cod_insumo.nomb_insumo} ({e.cnt_entrada} {e.cod_insumo.unidad_medida}) vence el {e.fecha_caducidad}"
+            for e in entradas_por_vencer
+        ])
+
+        user_email = getattr(request.user, 'email', None)
+        correos_destino = ['stefasdonuts@gmail.com']
+        if user_email:
+            correos_destino.append(user_email)
+
         try:
             send_mail(
-                '⚠ Alerta de Insumos por Vencer - KAEF',
-                f'Los siguientes insumos están por vencer en los próximos {dias_alerta} días:\n\n{lista}',
-                settings.DEFAULT_FROM_EMAIL,  # Usa el correo configurado en settings.py
-                ['tucorreo@ejemplo.com'],     # Cambia esto por tu correo real
-                fail_silently=False           # Para ver errores si los hay
+                '⚠ Alerta: Entradas próximas a vencer - KAEF',
+                f'Las siguientes entradas vencerán en los próximos {dias_alerta} días:\n\n{lista}',
+                settings.DEFAULT_FROM_EMAIL,
+                correos_destino,
+                fail_silently=False
             )
-            request.session['correo_insumos_vencer_enviado'] = True
+            request.session['correo_entradas_vencer_enviado'] = True
+            print("✅ Correo de alerta enviado a:", correos_destino)
         except Exception as e:
-            messages.warning(request, f'No se pudo enviar el correo de alerta: {e}')
+            messages.warning(request, f'⚠ No se pudo enviar el correo de alerta: {e}')
 
     return render(request, 'admin/dashboard_admin.html', {
         'nuevas_ventas': nuevas_ventas,
-        'insumos_por_vencer': insumos_por_vencer,
+        'alertas_entradas': alertas_entradas,
         'total_usuarios': total_usuarios,
         'total_clientes': total_clientes,
         'total_domis': total_domis,
@@ -932,7 +986,7 @@ def dashboard_admin(request):
         'ventas_por_producto': ventas_por_producto_data,
         'clientes_top': clientes_top_data,
     })
-    
+
     
 @login_required
 def perfil_admin(request):
@@ -1553,8 +1607,17 @@ from .forms import EntradaForm
 
 @login_required
 def entradas_admin(request):
+    archivar_entradas_vencidas()  # 👈 se asegura de que actualice al cargar esta vista
+
     entradas = Entrada.objects.all().order_by('-fecha_hora_entrada')
-    return render(request, 'admin/entradas/entradas_admin.html', {'entradas': entradas})
+    meses_lista = [
+        ("01", "Enero"), ("02", "Febrero"), ("03", "Marzo"), ("04", "Abril"),
+        ("05", "Mayo"), ("06", "Junio"), ("07", "Julio"), ("08", "Agosto"),
+        ("09", "Septiembre"), ("10", "Octubre"), ("11", "Noviembre"), ("12", "Diciembre")
+    ]
+    return render(request, 'admin/entradas/entradas_admin.html',{
+        'entradas': entradas,
+        'meses_lista': meses_lista,})
 
 
 # Agregar entrada
@@ -1698,7 +1761,26 @@ from .models import Correo
 
 @login_required
 def correos_admin(request):
-    historial_correos = Correo.objects.all().order_by('-fecha_envio')
+    historial = Correo.objects.all().order_by('-fecha_envio')
+    rol = request.GET.get('rol')
+    desde = request.GET.get('desde')
+    hasta = request.GET.get('hasta')
+
+    if rol:
+        if rol == "CLIENTE":
+            historial = historial.filter(destinatario__in=Cliente.objects.values_list('cod_usua__email', flat=True))
+        elif rol == "DOMI":
+            historial = historial.filter(destinatario__in=Domiciliario.objects.values_list('cod_usua__email', flat=True))
+        elif rol == "ADMIN":
+            historial = historial.filter(destinatario__in=Administrador.objects.values_list('cod_usua__email', flat=True))
+    if desde:
+        historial = historial.filter(fecha_envio__date__gte=desde)
+    if hasta:
+        historial = historial.filter(fecha_envio__date__lte=hasta)
+
+    paginator = Paginator(historial, 10)  # 10 correos por página
+    page = request.GET.get('page')
+    historial_correos = paginator.get_page(page)
     return render(request, 'admin/correos/correos_admin.html', {
         'historial_correos': historial_correos
     })
@@ -1845,21 +1927,15 @@ def insumos_admin(request):
     from .models import Insumo
     insumos = Insumo.objects.select_related('cod_categoria').all()
 
-    mes_filtro = request.GET.get("mes")
-    if mes_filtro:
-        insumos = insumos.filter(
-            fecha_vencimiento__month=int(mes_filtro)
-        )
-
-    meses_lista = [
-        ("01", "Enero"), ("02", "Febrero"), ("03", "Marzo"), ("04", "Abril"),
-        ("05", "Mayo"), ("06", "Junio"), ("07", "Julio"), ("08", "Agosto"),
-        ("09", "Septiembre"), ("10", "Octubre"), ("11", "Noviembre"), ("12", "Diciembre")
-    ]
+    # Elimina el filtro por mes de vencimiento, ya que no existe ese campo
+    # mes_filtro = request.GET.get("mes")
+    # if mes_filtro:
+    #     insumos = insumos.filter(
+    #         fecha_vencimiento__month=int(mes_filtro)
+    #     )
 
     return render(request, 'admin/insumos/insumos_admin.html', {
         'insumos': insumos,
-        'meses_lista': meses_lista,
     })
     
 
@@ -2407,7 +2483,7 @@ def reporte_produccion(request):
     grafico_base64 = base64.b64encode(buf.read()).decode('utf-8')
     buf.close()
     plt.close()
-    context = {'producciones': producciones, 'grafico_base64': grafico_base64}
+    context = {'producciones': produccion, 'grafico_base64': grafico_base64}
     html_string = render_to_string('reportes/reporte_produccion.html', context)
     pdf_file = HTML(string=html_string).write_pdf()
     response = HttpResponse(pdf_file, content_type='application/pdf')
