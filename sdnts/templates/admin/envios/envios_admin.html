@@ -183,6 +183,7 @@
             z-index: 2;
             background: #ff80a4;
         }
+        
 
         @media (max-width: 768px) {
             .contenedor {
@@ -206,6 +207,29 @@
                 align-items: center;
                 gap: 5px;
             }
+
+
+            .status-pending { 
+                background-color: #ffe0e9;  /* rosado claro */
+                color: #d63384;             /* rosado oscuro */
+            }
+            .status-assigned {
+                background-color: #fff3cd;  /* amarillo pastel */
+                color: #856404;             /* marrón */
+            }
+            .status-in-progress { 
+                background-color: #cce5ff;  /* azul claro */
+                color: #004085;             /* azul oscuro */
+            }
+            .status-completed { 
+                background-color: #d4edda;  /* verde claro */
+                color: #155724;             /* verde oscuro */
+            }
+            .status-cancelled { 
+                background-color: #f8d7da;  /* rojo claro */
+                color: #721c24;             /* rojo oscuro */
+            }
+
         }
     </style>
 </head>
@@ -249,9 +273,8 @@
                                 <span class="status-badge 
                                     {% if envio.estado == 'PENDIENTE' %}status-pending
                                     {% elif envio.estado == 'ASIGNADO' %}status-assigned
-
-                                    {% elif envio.estado == 'EN_PROCESO' %}status-in-progress
-                                    {% elif envio.estado == 'COMPLETADO' %}status-completed
+                                    {% elif envio.estado == 'EN_CAMINO' %}status-in-progress
+                                    {% elif envio.estado == 'ENTREGADO' %}status-completed
                                     {% elif envio.estado == 'CANCELADO' %}status-cancelled
                                     {% else %}bg-secondary{% endif %}">
                                     {{ envio.estado }}
