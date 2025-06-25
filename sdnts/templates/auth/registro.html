@@ -32,7 +32,7 @@
       padding: 40px 50px;
       box-shadow: 0 8px 20px rgba(255, 182, 193, 0.4);
       width: 100%;
-      max-width: 500px;
+      max-width: 900px; /* Aumentado para permitir diseño horizontal */
       text-align: center;
     }
 
@@ -47,6 +47,19 @@
       color: #ff80a4;
       margin-bottom: 20px;
       font-size: 24px;
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -10px;
+      justify-content: space-between;
+    }
+
+    .form-col {
+      flex: 0 0 calc(50% - 20px);
+      padding: 0 10px;
+      box-sizing: border-box;
     }
 
     form p {
@@ -88,7 +101,7 @@
       border: 2px solid #695450;
       font-family: "Dunkin";
       padding: 10px 30px;
-      width: 100%;
+      width: 50%; /* Ajustado para el diseño horizontal */
       margin-top: 15px;
       transition: all 0.3s ease;
     }
@@ -123,8 +136,22 @@
       padding: 10px 15px;
       margin-bottom: 20px;
       text-align: left;
+    }
 
+    /* Media queries para responsividad */
+    @media (max-width: 768px) {
+      .form-col {
+        flex: 0 0 100%;
+      }
       
+      .register-card {
+        max-width: 500px;
+        padding: 30px 25px;
+      }
+      
+      .btn1 {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -157,33 +184,37 @@
 <form method="post">
   {% csrf_token %}
   
-  {% for field in form %}
-    <div class="form-group mb-3 position-relative">
-      <div class="input-group">
-        <span class="input-group-text bg-transparent position-absolute h-100"
-              style="z-index: 10; border: none; display: flex; align-items: center; left: 0; top: 0; height: 100%; width: 2.5rem; justify-content: center;">
-          {% if field.name == 'username' %}
-            <i class="bi bi-person-fill text-pink mx-auto"></i>
-          {% elif field.name == 'first_name' %}
-            <i class="bi bi-person-vcard text-pink mx-auto"></i>
-          {% elif field.name == 'last_name' %}
-            <i class="bi bi-person-badge text-pink mx-auto"></i>
-          {% elif field.name == 'email' %}
-            <i class="bi bi-envelope-at-fill text-pink mx-auto"></i>
-          {% elif field.name == 'telefono' %}
-            <i class="bi bi-telephone text-pink mx-auto" style="font-size:1.2rem;"></i>
-          {% elif field.name == 'password1' or field.name == 'password2' %}
-            <i class="bi bi-shield-lock-fill text-pink mx-auto"></i>
-          {% else %}
-            <i class="bi bi-pencil-fill text-pink mx-auto"></i>
-          {% endif %}
-        </span>
-        {{ field }}
+  <div class="form-row">
+    {% for field in form %}
+      <div class="form-col">
+        <div class="form-group mb-3 position-relative">
+          <div class="input-group">
+            <span class="input-group-text bg-transparent position-absolute h-100"
+                  style="z-index: 10; border: none; display: flex; align-items: center; left: 0; top: 0; height: 100%; width: 2.5rem; justify-content: center;">
+              {% if field.name == 'username' %}
+                <i class="bi bi-person-fill text-pink mx-auto"></i>
+              {% elif field.name == 'first_name' %}
+                <i class="bi bi-person-vcard text-pink mx-auto"></i>
+              {% elif field.name == 'last_name' %}
+                <i class="bi bi-person-badge text-pink mx-auto"></i>
+              {% elif field.name == 'email' %}
+                <i class="bi bi-envelope-at-fill text-pink mx-auto"></i>
+              {% elif field.name == 'telefono' %}
+                <i class="bi bi-telephone text-pink mx-auto" style="font-size:1.2rem;"></i>
+              {% elif field.name == 'password1' or field.name == 'password2' %}
+                <i class="bi bi-shield-lock-fill text-pink mx-auto"></i>
+              {% else %}
+                <i class="bi bi-pencil-fill text-pink mx-auto"></i>
+              {% endif %}
+            </span>
+            {{ field }}
+          </div>
+        </div>
       </div>
-    </div>
-  {% endfor %}
+    {% endfor %}
+  </div>
 
-  <button type="submit" class="btn1 btn shadow">
+  <button type="submit" class="btn1 btn shadow mx-auto d-block">
     <i class="bi bi-check2-circle text-pink"></i> Registrarme
   </button>
 

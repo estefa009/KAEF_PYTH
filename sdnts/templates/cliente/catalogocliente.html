@@ -1,17 +1,115 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo</title>
-    <!-- ...existing code... -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-<!-- ...existing code... -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{% static 'css/C_catalogo.css' %}">
     <link rel="stylesheet" href="{% static 'css/menu.css' %}">
     <link rel="icon" href="{% static 'icon/2.ico' %}" sizes="128x128" type="image/x-icon">
+    <style>
+        .modal-content {
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: linear-gradient(145deg, #ffffff 0%, #fff5ee 100%);
+            border-radius: 25px;
+            box-shadow: 
+                0 10px 30px rgba(78, 64, 50, 0.15),
+                0 1px 3px rgba(0,0,0,0.05),
+                inset 0 1px 1px rgba(255,255,255,0.7);
+        }
+
+        .sabor-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .sabor-option {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #fff;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(236, 214, 192, 0.5);
+            box-shadow: 
+                0 4px 6px rgba(0,0,0,0.05),
+                inset 0 1px 1px rgba(255,255,255,0.7);
+        }
+
+        .sabor-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 12px rgba(0,0,0,0.1),
+                inset 0 1px 1px rgba(255,255,255,0.7);
+        }
+
+        .sabor-option.active {
+            border-color: #4e4032;
+            background: linear-gradient(145deg, #fff5ee 0%, #ffffff 100%);
+        }
+
+        .color-box, .img-box {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            margin-right: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .img-box {
+            background-size: cover;
+            background-position: center;
+        }
+
+        .addToCartBtn {
+            background: linear-gradient(45deg, #4e4032, #695450);
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 15px;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(78, 64, 50, 0.2);
+        }
+
+        .addToCartBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 64, 50, 0.3);
+            filter: brightness(1.1);
+        }
+
+        h4 {
+            color: #4e4032;
+            margin: 20px 0 10px;
+            font-family: "Dunkin", sans-serif;
+        }
+
+        #selectInfo {
+            color: #8b7355;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .linea {
+            border-color: rgba(78, 64, 50, 0.1);
+            margin: 20px 0;
+        }
+
+        .opcion-seleccion {
+            padding: 0 20px;
+        }
+    </style>
 </head>
 <body>
     {% include 'includes/nav_cliente.html' %}
@@ -19,111 +117,104 @@
     <div class="LaVida">
         <h1>¡La vida sabe mejor con una <span class="DNUT">DNUT!</span></h1>
     </div>
+
     <div class="ProductoCombos shadow">
         <div class="title">
             <div class="Combos shadow"><h1>Combos</h1></div>
         </div>
         <div class="seleccion">
+            <!-- Combo Talla S -->
             <div class="Cajas1 shadow">
                 <div class="descripcionCombo">
                     <h1>Talla S</h1>
-                    <h2>Bolsa de 6 dnts.<br>
-                    ¡Elige tus sabores favoritos!</h2>
+                    <h2>Bolsa de 6 dnts.<br>¡Elige tus sabores favoritos!</h2>
                     <br>
                     <span class="precio">${{ producto_s.prec_pro }}</span>
-                    <button class="boton shadow" id="btnAgregar">Agregar</button>
+                    <button id="btnAgregarS" class="boton shadow">Agregar</button>
                 </div>
-                <div class="imagenCombo"><img src="{% static 'Image/imagenCaja1.jpg' %}"></div>
+                <div class="imagenCombo">
+                    <img src="{% static 'Image/imagenCaja1.jpg' %}" alt="Bolsa de Talla S">
+                </div>
             </div>
+
+            <!-- Modal Talla S -->
             <div id="modalS" class="modal hidden">
-                <div class="modal-content">    
+                <div class="modal-content">
                     <div class="imagenModal">
-                        <img id="modal-imageS" src="{% static 'Image/imagenModal1.jpg' %}" alt="Imagen Modal Talla S">
-                    </div>               
+                        <img src="{% static 'Image/imagenModal1.jpg' %}" alt="Modal Talla S">
+                    </div>
                     <div class="info">
                         <span class="closeS close">&times;</span>
-                        <div class="infoCaja1">
-                            <h1 id="modal-title">Combos<br><span class="tallas">Talla S</span></h1>
-                            <p id="modal-descriptionS">Bolsa de 6 donas, en donde puedes escoger un solo sabor de masa, una sola cobertura y un solo topping para todas las donas. ¡Elige tus sabores favoritos!</p>
-                            <hr class="linea">
-                            <p>¡Personaliza tus donas!</p>
-                            <div id="contenidoSelect">
-                                <div class="seleccion-sabores">
-                                    
-                                    <!-- Vista previa de la dona -->
-                                    <div class="dona-preview">
-                                        <div class="dona-base" id="dona-masa-S"></div>
-                                        <div class="dona-cobertura" id="dona-cobertura-S"></div>
-                                        <!-- Capa de toppings con imagen de patrón -->
-                                        <div class="dona-topping" id="dona-topping-S"></div>
+                        <div class="infoCaja">
+                            <h2>Combo<br><span class="tallas">Talla S.</span></h2>
+                            
+                            <div class="opcion-seleccion">
+                                <h4>Masa</h4>
+                                <p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
+                                <div class="sabor-options">
+                                    {% for masa in masas %}
+                                    <div class="sabor-option{% if forloop.first %} active{% endif %}"
+                                         data-id="{{ masa.cod_sabor_masa }}"
+                                         data-nombre="{{ masa.nombre|title }}"
+                                         data-value="{{ masa.nombre|slugify }}"
+                                         data-color="{% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}">
+                                        <div class="color-box" style="background-color: {% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}"></div>
+                                        <span>{{ masa.nombre|title }}</span>
                                     </div>
-                                    
-                                    <!-- Selector de sabores con miniaturas -->
-                                   <div class="opcion-seleccion">
-    <h4>Masa</h4>
-    <p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
-    <div class="sabor-options">
-        {% for masa in masas %}
-        <div class="sabor-option{% if forloop.first %} active{% endif %}"
-             data-id="{{ masa.cod_sabor_masa }}"
-             data-nombre="{{ masa.nombre|title }}"
-             data-value="{{ masa.nombre|slugify }}"
-             data-color="{% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}">
-            <div class="color-box" style="background-color: {% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}"></div>
-            <span>{{ masa.nombre|title }}</span>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-                                    <hr class="linea">
-                                   <div class="opcion-seleccion">
-    <h4>Cobertura</h4>
-    <p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
-    <div class="sabor-options">
-        {% for cobertura in coberturas %}
-        <div class="sabor-option{% if forloop.first %} active{% endif %}"
-             data-id="{{ cobertura.cod_glaseado }}"
-             data-nombre="{{ cobertura.nombre|title }}"
-             data-value="{{ cobertura.nombre|slugify }}"
-             data-color="{% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}">
-            <div class="color-box" style="background-color: {% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}"></div>
-            <span>{{ cobertura.nombre|title }}</span>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-                                    <hr class="linea">
-                                    <div class="opcion-seleccion">
-    <h4>Toppings</h4>
-    <p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
-    <div class="sabor-options">
-        {% for topping in toppings %}
-        <div class="sabor-option{% if forloop.first %} active{% endif %}"
-             data-id="{{ topping.cod_topping }}"
-             data-nombre="{{ topping.nombre|title }}"
-             data-value="{{ topping.nombre|slugify }}">
-            <div class="img-box"
-                 style="background-image: url('{% static 'image/' %}{{ topping.nombre|slugify }}Patron.png')"></div>
-            <span>{{ topping.nombre|title }}</span>
-        </div>
-        {% endfor %}
-    </div>
-</div>
+                                    {% endfor %}
                                 </div>
                             </div>
+
+                            <hr class="linea">
+
+                            <div class="opcion-seleccion">
+                                <h4>Cobertura</h4>
+                                <p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
+                                <div class="sabor-options">
+                                    {% for cobertura in coberturas %}
+                                    <div class="sabor-option{% if forloop.first %} active{% endif %}"
+                                         data-id="{{ cobertura.cod_glaseado }}"
+                                         data-nombre="{{ cobertura.nombre|title }}"
+                                         data-value="{{ cobertura.nombre|slugify }}"
+                                         data-color="{% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}">
+                                        <div class="color-box" style="background-color: {% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}"></div>
+                                        <span>{{ cobertura.nombre|title }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <hr class="linea">
+
+                            <div class="opcion-seleccion">
+                                <h4>Toppings</h4>
+                                <p id="selectInfo">(Selecciona el sabor del topping de tus donas)</p>
+                                <div class="sabor-options">
+                                    {% for topping in toppings %}
+                                    <div class="sabor-option{% if forloop.first %} active{% endif %}"
+                                         data-id="{{ topping.cod_topping }}"
+                                         data-nombre="{{ topping.nombre|title }}"
+                                         data-value="{{ topping.nombre|slugify }}">
+                                        <div class="img-box"
+                                             style="background-image: url('{% static 'image/' %}{{ topping.nombre|slugify }}Patron.png')"></div>
+                                        <span>{{ topping.nombre|title }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <button id="btnCerrarModalS"
+                                    class="addToCartBtn cart shadow"
+                                    data-cod-producto="{{ producto_s.cod_producto }}"
+                                    data-precio="{{ producto_s.prec_pro }}">
+                                Agregar al carrito
+                            </button>
                         </div>
-<button
-    id="btnCerrarModalS"
-    class="addToCartBtn cart shadow"
-    data-cod-producto="{{ producto_s.cod_producto }}"
-    data-precio="{{ producto_s.prec_pro }}"
->
-    Agregar al carrito
-</button>                    </div>
+                    </div>
                 </div>
             </div>
             
-     
+            <!-- Combo Talla M -->
             <div class="Cajas2 shadow">
                 <div class="descripcionCombo">
                     <h1>Talla M</h1>
@@ -136,191 +227,174 @@
                     <img src="{% static 'Image/caja.png' %}" alt="Caja de Talla M">
                 </div>
             </div>
-            
+
+            <!-- Modal Talla M -->
             <div id="modalM" class="modal hidden">
-                <div class="modal-content">    
+                <div class="modal-content">
                     <div class="imagenModal">
-                        <img id="modal-imageM" src="{% static 'Image/imagenModal1.jpg' %}" alt="Imagen Modal Talla M">
-                    </div>               
+                        <img src="{% static 'Image/imagenModal1.jpg' %}" alt="Modal Talla M">
+                    </div>
                     <div class="info">
                         <span class="closeM close">&times;</span>
-                        <div class="infoCaja2">
-                            <h1 id="modal-title">Combos<br><span class="tallas">Talla M</span></h1>
-                            <p id="modal-descriptionM">Bolsa de 12 donas, en donde puedes escoger un solo sabor de masa, una sola cobertura y un solo topping para todas las donas. ¡Elige tus sabores favoritos!</p>
-                            <hr class="linea">
-                            <p>¡Personaliza tus donas!</p>
-                            <div id="contenidoSelect">
-                                <div class="seleccion-sabores">
-                                    
-                                    <!-- Vista previa de la dona -->
-                                    <div class="dona-preview">
-                                        <div class="dona-base" id="dona-masa-M"></div>
-                                        <div class="dona-cobertura" id="dona-cobertura-M"></div>
-                                        <!-- Capa de toppings con imagen de patrón -->
-                                        <div class="dona-topping" id="dona-topping-M"></div>
+                        <div class="infoCaja">
+                            <h2>Combo<br><span class="tallas">Talla M.</span></h2>
+                            
+                            <div class="opcion-seleccion">
+                                <h4>Masa</h4>
+                                <p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
+                                <div class="sabor-options">
+                                    {% for masa in masas %}
+                                    <div class="sabor-option{% if forloop.first %} active{% endif %}"
+                                         data-id="{{ masa.cod_sabor_masa }}"
+                                         data-nombre="{{ masa.nombre|title }}"
+                                         data-value="{{ masa.nombre|slugify }}"
+                                         data-color="{% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}">
+                                        <div class="color-box" style="background-color: {% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}"></div>
+                                        <span>{{ masa.nombre|title }}</span>
                                     </div>
-                                    <!-- Selector de sabores con miniaturas -->
-                                    <div class="opcion-seleccion">
-                                       <h4>Masa</h4>
-    <p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
-    <div class="sabor-options">
-        {% for masa in masas %}
-        <div class="sabor-option{% if forloop.first %} active{% endif %}"
-             data-id="{{ masa.cod_sabor_masa }}"
-             data-nombre="{{ masa.nombre|title }}"
-             data-value="{{ masa.nombre|slugify }}"
-             data-color="{% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}">
-            <div class="color-box" style="background-color: {% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}"></div>
-            <span>{{ masa.nombre|title }}</span>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-                                    <hr class="linea">
-                                   <div class="opcion-seleccion">
-    <h4>Cobertura</h4>
-    <p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
-    <div class="sabor-options">
-        {% for cobertura in coberturas %}
-        <div class="sabor-option{% if forloop.first %} active{% endif %}"
-             data-id="{{ cobertura.cod_glaseado }}"
-             data-nombre="{{ cobertura.nombre|title }}"
-             data-value="{{ cobertura.nombre|slugify }}"
-             data-color="{% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}">
-            <div class="color-box" style="background-color: {% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}"></div>
-            <span>{{ cobertura.nombre|title }}</span>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-                                    <hr class="linea">
-                                    <div class="opcion-seleccion">
-    <h4>Toppings</h4>
-    <p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
-    <div class="sabor-options">
-        {% for topping in toppings %}
-        <div class="sabor-option{% if forloop.first %} active{% endif %}"
-             data-id="{{ topping.cod_topping }}"
-             data-nombre="{{ topping.nombre|title }}"
-             data-value="{{ topping.nombre|slugify }}">
-            <div class="img-box"
-                 style="background-image: url('{% static 'image/' %}{{ topping.nombre|slugify }}Patron.png')"></div>
-            <span>{{ topping.nombre|title }}</span>
-        </div>
-        {% endfor %}
-    </div>
-</div>
+                                    {% endfor %}
                                 </div>
                             </div>
+
+                            <hr class="linea">
+
+                            <div class="opcion-seleccion">
+                                <h4>Cobertura</h4>
+                                <p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
+                                <div class="sabor-options">
+                                    {% for cobertura in coberturas %}
+                                    <div class="sabor-option{% if forloop.first %} active{% endif %}"
+                                         data-id="{{ cobertura.cod_glaseado }}"
+                                         data-nombre="{{ cobertura.nombre|title }}"
+                                         data-value="{{ cobertura.nombre|slugify }}"
+                                         data-color="{% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}">
+                                        <div class="color-box" style="background-color: {% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}"></div>
+                                        <span>{{ cobertura.nombre|title }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <hr class="linea">
+
+                            <div class="opcion-seleccion">
+                                <h4>Toppings</h4>
+                                <p id="selectInfo">(Selecciona el sabor del topping de tus donas)</p>
+                                <div class="sabor-options">
+                                    {% for topping in toppings %}
+                                    <div class="sabor-option{% if forloop.first %} active{% endif %}"
+                                         data-id="{{ topping.cod_topping }}"
+                                         data-nombre="{{ topping.nombre|title }}"
+                                         data-value="{{ topping.nombre|slugify }}">
+                                        <div class="img-box"
+                                             style="background-image: url('{% static 'image/' %}{{ topping.nombre|slugify }}Patron.png')"></div>
+                                        <span>{{ topping.nombre|title }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <button id="btnCerrarModalM"
+                                    class="addToCartBtn cart shadow"
+                                    data-cod-producto="{{ producto_m.cod_producto }}"
+                                    data-precio="{{ producto_m.prec_pro }}">
+                                Agregar al carrito
+                            </button>
                         </div>
-                    <button
-    id="btnCerrarModalM"
-    class="addToCartBtn cart shadow"
-    data-cod-producto="{{ producto_m.cod_producto }}"
-    data-precio="{{ producto_m.prec_pro }}"
->
-    Agregar al carrito
-</button>                    </div>
+                    </div>
                 </div>
             </div>
             
+            <!-- Combo Talla L -->
             <div class="Cajas3 shadow">
                 <div class="descripcionCombo">
                     <h1>Talla L</h1>
-                    <h2>Caja de 18 dnts.<br>
-                    ¡Elige tus sabores favoritos!</h2>
+                    <h2>Caja de 18 dnts.<br>¡Elige tus sabores favoritos!</h2>
                     <br>
                     <span class="precio">${{ producto_l.prec_pro }}</span>
                     <button id="btnAgregarL" class="boton shadow">Agregar</button>
                 </div>
-                <div class="imagenCombo"><img src="{% static 'Image/imagenCaja3.jpg' %}"></div>
-            </div>
-            <div id="modalL" class="modal hidden">
-                <div class="modal-content">    
-                    <div class="imagenModal">
-                        <img id="modal-imageL" src="{% static 'Image/imagenModal1.jpg' %}" alt="Imagen Modal Talla L">
-                    </div>               
-                    <div class="info">
-                        <span class="closeL close">&times;</span>
-                        <div class="infoCaja3">
-                            <h1 id="modal-title">Combos<br><span class="tallas">Talla L</span></h1>
-                            <p id="modal-descriptionL">Bolsa de 18 donas, en donde puedes escoger un solo sabor de masa, una sola cobertura y un solo topping para todas las donas. ¡Elige tus sabores favoritos!</p>
-                            <hr class="linea">
-                            <div id="contenidoSelect">
-                                <p>¡Personaliza tus donas!</p>
-                                <div class="seleccion-sabores">
-                                    
-                                    <!-- Vista previa de la dona -->
-                                    <div class="dona-preview">
-                                        <div class="dona-base" id="dona-masa-L"></div>
-                                        <div class="dona-cobertura" id="dona-cobertura-L"></div>
-                                        <!-- Capa de toppings con imagen de patrón -->
-                                        <div class="dona-topping" id="dona-topping-L"></div>
-                                    </div>
-                                    <!-- Selector de sabores con miniaturas -->
-                                    <div class="opcion-seleccion">
-                                         <h4>Masa</h4>
-    <p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
-    <div class="sabor-options">
-        {% for masa in masas %}
-        <div class="sabor-option{% if forloop.first %} active{% endif %}"
-             data-id="{{ masa.cod_sabor_masa }}"
-             data-nombre="{{ masa.nombre|title }}"
-             data-value="{{ masa.nombre|slugify }}"
-             data-color="{% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}">
-            <div class="color-box" style="background-color: {% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}"></div>
-            <span>{{ masa.nombre|title }}</span>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-                                    <hr class="linea">
-                                   <div class="opcion-seleccion">
-    <h4>Cobertura</h4>
-    <p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
-    <div class="sabor-options">
-        {% for cobertura in coberturas %}
-        <div class="sabor-option{% if forloop.first %} active{% endif %}"
-             data-id="{{ cobertura.cod_glaseado }}"
-             data-nombre="{{ cobertura.nombre|title }}"
-             data-value="{{ cobertura.nombre|slugify }}"
-             data-color="{% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}">
-            <div class="color-box" style="background-color: {% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}"></div>
-            <span>{{ cobertura.nombre|title }}</span>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-                                    <hr class="linea">
-                                    <div class="opcion-seleccion">
-    <h4>Toppings</h4>
-    <p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
-    <div class="sabor-options">
-        {% for topping in toppings %}
-        <div class="sabor-option{% if forloop.first %} active{% endif %}"
-             data-id="{{ topping.cod_topping }}"
-             data-nombre="{{ topping.nombre|title }}"
-             data-value="{{ topping.nombre|slugify }}">
-            <div class="img-box"
-                 style="background-image: url('{% static 'image/' %}{{ topping.nombre|slugify }}Patron.png')"></div>
-            <span>{{ topping.nombre|title }}</span>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-                                </div>
-                            </div>
-                        </div>
-                 <button
-    id="btnCerrarModalL"
-    class="addToCartBtn cart shadow"
-    data-cod-producto="{{ producto_l.cod_producto }}"
-    data-precio="{{ producto_l.prec_pro }}"
->
-    Agregar al carrito
-</button>                    </div>
+                <div class="imagenCombo">
+                    <img src="{% static 'Image/imagenCaja3.jpg' %}" alt="Caja de Talla L">
                 </div>
             </div>
+            <div id="modalL" class="modal hidden">
+                <div class="modal-content">
+                    <div class="imagenModal">
+                        <img src="{% static 'Image/imagenModal1.jpg' %}" alt="Modal Talla L">
+                    </div>
+                    <div class="info">
+                        <span class="closeL close">&times;</span>
+                        <div class="infoCaja">
+                            <h2>Combo<br><span class="tallas">Talla L.</span></h2>
+                            
+                            <!-- Contenido similar al Modal S pero con sus propios IDs -->
+                            <div class="opcion-seleccion">
+                                <h4>Masa</h4>
+                                <p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
+                                <div class="sabor-options">
+                                    {% for masa in masas %}
+                                    <div class="sabor-option{% if forloop.first %} active{% endif %}"
+                                         data-id="{{ masa.cod_sabor_masa }}"
+                                         data-nombre="{{ masa.nombre|title }}"
+                                         data-value="{{ masa.nombre|slugify }}"
+                                         data-color="{% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}">
+                                        <div class="color-box" style="background-color: {% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}"></div>
+                                        <span>{{ masa.nombre|title }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <hr class="linea">
+
+                            <div class="opcion-seleccion">
+                                <h4>Cobertura</h4>
+                                <p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
+                                <div class="sabor-options">
+                                    {% for cobertura in coberturas %}
+                                    <div class="sabor-option{% if forloop.first %} active{% endif %}"
+                                         data-id="{{ cobertura.cod_glaseado }}"
+                                         data-nombre="{{ cobertura.nombre|title }}"
+                                         data-value="{{ cobertura.nombre|slugify }}"
+                                         data-color="{% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}">
+                                        <div class="color-box" style="background-color: {% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}"></div>
+                                        <span>{{ cobertura.nombre|title }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <hr class="linea">
+
+                            <div class="opcion-seleccion">
+                                <h4>Toppings</h4>
+                                <p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
+                                <div class="sabor-options">
+                                    {% for topping in toppings %}
+                                    <div class="sabor-option{% if forloop.first %} active{% endif %}"
+                                         data-id="{{ topping.cod_topping }}"
+                                         data-nombre="{{ topping.nombre|title }}"
+                                         data-value="{{ topping.nombre|slugify }}">
+                                        <div class="img-box"
+                                             style="background-image: url('{% static 'image/' %}{{ topping.nombre|slugify }}Patron.png')"></div>
+                                        <span>{{ topping.nombre|title }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <button id="btnCerrarModalL"
+                                    class="addToCartBtn cart shadow"
+                                    data-cod-producto="{{ producto_l.cod_producto }}"
+                                    data-precio="{{ producto_l.prec_pro }}">
+                                Agregar al carrito
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Combo Talla XL -->
             <div class="Cajas4 shadow">
                 <div class="descripcionCombo">
                     <h1>Talla XL</h1>
@@ -333,89 +407,78 @@
                 <div class="imagenCombo"><img src="{% static 'Image/imagenCaja4.jpg' %}"></div>
             </div>
             <div id="modalXL" class="modal hidden">
-                <div class="modal-content">    
+                <div class="modal-content">
                     <div class="imagenModal">
-                        <img id="modal-imagexl" src="{% static 'Image/imagenModal1.jpg' %}" alt="Imagen Modal Talla XL">
-                    </div>               
+                        <img src="{% static 'Image/imagenModal1.jpg' %}" alt="Modal Talla XL">
+                    </div>
                     <div class="info">
                         <span class="closeXL close">&times;</span>
-                        <div class="infoCaja1">
-                            <h1 id="modal-title">Combos<br><span class="tallas">Talla XL</span></h1>
-                            <p id="modal-descriptionXL">Bolsa de 24 donas, en donde puedes escoger un solo sabor de masa, una sola cobertura y un solo topping para todas las donas. ¡Elige tus sabores favoritos!</p>
-                            <hr class="linea">
-                            <p>¡Personaliza tus donas!</p>
-                            <div id="contenidoSelect">
-                                <div class="seleccion-sabores">
-                                    
-                                    <!-- Vista previa de la dona -->
-                                    <div class="dona-preview">
-                                        <div class="dona-base" id="dona-masa-XL"></div>
-                                        <div class="dona-cobertura" id="dona-cobertura-XL"></div>
-                                        <!-- Capa de toppings con imagen de patrón -->
-                                        <div class="dona-topping" id="dona-topping-XL"></div>
+                        <div class="infoCaja">
+                            <h2>Combo<br><span class="tallas">Talla XL.</span></h2>
+                            
+                            <!-- Contenido similar al Modal S pero con sus propios IDs -->
+                            <div class="opcion-seleccion">
+                                <h4>Masa</h4>
+                                <p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
+                                <div class="sabor-options">
+                                    {% for masa in masas %}
+                                    <div class="sabor-option{% if forloop.first %} active{% endif %}"
+                                         data-id="{{ masa.cod_sabor_masa }}"
+                                         data-nombre="{{ masa.nombre|title }}"
+                                         data-value="{{ masa.nombre|slugify }}"
+                                         data-color="{% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}">
+                                        <div class="color-box" style="background-color: {% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}"></div>
+                                        <span>{{ masa.nombre|title }}</span>
                                     </div>
-                                    <!-- Selector de sabores con miniaturas -->
-                                    <div class="opcion-seleccion">
-                                         <h4>Masa</h4>
-    <p id="selectInfo">(Selecciona el sabor de la masa de tus donas)</p>
-    <div class="sabor-options">
-        {% for masa in masas %}
-        <div class="sabor-option{% if forloop.first %} active{% endif %}"
-             data-id="{{ masa.cod_sabor_masa }}"
-             data-nombre="{{ masa.nombre|title }}"
-             data-value="{{ masa.nombre|slugify }}"
-             data-color="{% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}">
-            <div class="color-box" style="background-color: {% if masa.nombre|lower == 'vainilla' %}#efd091{% elif masa.nombre|lower == 'chocolate' %}#8B4513{% elif masa.nombre|lower == 'red velvet' %}#952d30{% endif %}"></div>
-            <span>{{ masa.nombre|title }}</span>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-                                    <hr class="linea">
-                                   <div class="opcion-seleccion">
-    <h4>Cobertura</h4>
-    <p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
-    <div class="sabor-options">
-        {% for cobertura in coberturas %}
-        <div class="sabor-option{% if forloop.first %} active{% endif %}"
-             data-id="{{ cobertura.cod_glaseado }}"
-             data-nombre="{{ cobertura.nombre|title }}"
-             data-value="{{ cobertura.nombre|slugify }}"
-             data-color="{% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}">
-            <div class="color-box" style="background-color: {% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}"></div>
-            <span>{{ cobertura.nombre|title }}</span>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-                                    <hr class="linea">
-                                    <div class="opcion-seleccion">
-    <h4>Toppings</h4>
-    <p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
-    <div class="sabor-options">
-        {% for topping in toppings %}
-        <div class="sabor-option{% if forloop.first %} active{% endif %}"
-             data-id="{{ topping.cod_topping }}"
-             data-nombre="{{ topping.nombre|title }}"
-             data-value="{{ topping.nombre|slugify }}">
-            <div class="img-box"
-                 style="background-image: url('{% static 'image/' %}{{ topping.nombre|slugify }}Patron.png')"></div>
-            <span>{{ topping.nombre|title }}</span>
-        </div>
-        {% endfor %}
-    </div>
-</div>
+                                    {% endfor %}
                                 </div>
                             </div>
+
+                            <hr class="linea">
+
+                            <div class="opcion-seleccion">
+                                <h4>Cobertura</h4>
+                                <p id="selectInfo">(Selecciona el sabor de la cobertura de tus donas)</p>
+                                <div class="sabor-options">
+                                    {% for cobertura in coberturas %}
+                                    <div class="sabor-option{% if forloop.first %} active{% endif %}"
+                                         data-id="{{ cobertura.cod_glaseado }}"
+                                         data-nombre="{{ cobertura.nombre|title }}"
+                                         data-value="{{ cobertura.nombre|slugify }}"
+                                         data-color="{% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}">
+                                        <div class="color-box" style="background-color: {% if cobertura.nombre|lower == 'choc. blanco' %}#f0e0c0{% elif cobertura.nombre|lower == 'choc. oscuro' %}#5C4033{% elif cobertura.nombre|lower == 'arequipe' %}#D4A76A{% endif %}"></div>
+                                        <span>{{ cobertura.nombre|title }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <hr class="linea">
+                            <div class="opcion-seleccion">
+                                <h4>Toppings</h4>
+                                <p id="selectInfo">(Selecciona el sabor de el topping de tus donas)</p>
+                                <div class="sabor-options">
+                                    {% for topping in toppings %}
+                                    <div class="sabor-option{% if forloop.first %} active{% endif %}"
+                                         data-id="{{ topping.cod_topping }}"
+                                         data-nombre="{{ topping.nombre|title }}"
+                                         data-value="{{ topping.nombre|slugify }}">
+                                        <div class="img-box"
+                                             style="background-image: url('{% static 'image/' %}{{ topping.nombre|slugify }}Patron.png')"></div>
+                                        <span>{{ topping.nombre|title }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <button id="btnCerrarModalXL"
+                                    class="addToCartBtn cart shadow"
+                                    data-cod-producto="{{ producto_xl.cod_producto }}"
+                                    data-precio="{{ producto_xl.prec_pro }}">
+                                Agregar al carrito
+                            </button>
                         </div>
-                 <button
-    id="btnCerrarModalXL"
-    class="addToCartBtn cart shadow"
-    data-cod-producto="{{ producto_xl.cod_producto }}"
-    data-precio="{{ producto_xl.prec_pro }}"
->
-    Agregar al carrito
-</button>                    </div>
+                    </div>
                 </div>
             </div>
             <a class="Cajas5 shadow" href="#"><img src="{% static 'Image/mas.png' %}" alt="Imagen de mas"></a>
