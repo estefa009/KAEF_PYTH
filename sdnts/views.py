@@ -830,18 +830,22 @@ def agregar_usuario(request):
 def archivar_entradas_vencidas():
     hoy = date.today()
     entradas_vencidas = Entrada.objects.filter(fecha_caducidad__lte=hoy, estado='ACTIVO')
-    print(f"🔎 Entradas encontradas: {entradas_vencidas.count()}")
+    print(f"Entradas vencidas encontradas: {entradas_vencidas.count()}")  # 👈 para ver en consola
 
     for entrada in entradas_vencidas:
-        print(f"➡ Archivando entrada #{entrada.cod_entrada}")
         insumo = entrada.cod_insumo
-        insumo.cnt_insumo -= entrada.cnt_entrada
+        # Refresca el insumo para evitar problemas de concurrencia
+        insumo.refresh_from_db()
+        # Resta la cantidad de la entrada vencida al insumo
+        insumo.cnt_insumo = insumo.cnt_insumo - entrada.cnt_entrada
         if insumo.cnt_insumo < 0:
             insumo.cnt_insumo = 0
-        insumo.save()
+        insumo.save(update_fields=['cnt_insumo'])
 
         entrada.estado = 'VENCIDO'
-        entrada.save()
+        entrada.save(update_fields=['estado'])
+
+        print(f"✅ Se archivó entrada #{entrada.cod_entrada} y se descontó {entrada.cnt_entrada} de {insumo.nomb_insumo} (nuevo stock: {insumo.cnt_insumo})")
 
         
 from datetime import date, timedelta
@@ -1695,6 +1699,7 @@ def eliminar_salida(request, cod_salida):
     return redirect('salidas_admin')  # Redirige a la lista de salidas
 
 
+       
 def agregar_salida(request):
     if request.method == 'POST':
         form = SalidaForm(request.POST)
@@ -1950,7 +1955,6 @@ def agregar_insumo(request):
         form = InsumoForm()
     return render(request, 'admin/insumos/agregar_insumo.html', {'form': form})
 
-# Editar insumo
 def editar_insumo(request, cod_insumo):
     insumo = get_object_or_404(Insumo, cod_insumo=cod_insumo)
     if request.method == 'POST':
