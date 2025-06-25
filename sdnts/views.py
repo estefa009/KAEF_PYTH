@@ -217,7 +217,7 @@ def enviar_correo_bienvenida_admin(usuario):
 @login_required   
 def logout_view(request):
     logout(request)
-    return redirect('login') 
+    return redirect('index')
 @login_required    
 def vistacliente(request):
     return render(request, 'cliente/vistacliente.html') 
