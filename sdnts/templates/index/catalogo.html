@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
     <link rel="stylesheet" href="{% static 'css/menu.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modal-fix.css' %}">
     <link rel="icon" href="{% static 'icon/2.ico' %}" sizes="128x128" type="image/x-icon">
 </head>
 <body>
@@ -509,24 +510,6 @@
 </div>
 
 <script src="{% static 'js/LPCatalogo.js' %}" defer></script>
-
-<script>
-    function mostrarModal(modalId) {
-        document.getElementById(modalId).classList.remove('hidden');
-    }
-
-    function cerrarModal(modalId) {
-        document.getElementById(modalId).classList.add('hidden');
-    }
-
-    // Cerrar modal al hacer clic fuera del contenido
-    window.onclick = function(event) {
-        document.querySelectorAll('.modal').forEach(modal => {
-            if (event.target == modal) {
-                modal.classList.add('hidden');
-            }
-        });
-    };
-</script>
+<script src="{% static 'js/catalogo-modals.js' %}" defer></script>
 </body>
 </html>

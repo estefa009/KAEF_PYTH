@@ -1,0 +1,88 @@
+/* Estilos adicionales para corregir los modales */
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(78, 64, 50, 0.7);
+    z-index: 100000;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.modal.hidden {
+    display: none !important;
+}
+
+.modal.show {
+    display: flex !important;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #fff 0%, #fff5f8 100%);
+    width: 95% !important;
+    max-width: 1200px !important;
+    max-height: 80vh !important;
+    min-height: 350px !important;
+    border-radius: 30px;
+    margin: auto;
+    transform: scale(1) translateY(0) !important;
+    padding: 0 !important;
+    border: 12px solid #fff9c7;
+    box-shadow: 0 25px 50px -12px rgba(252, 105, 152, 0.3);
+}
+
+.imagenModal {
+    flex: 1 !important;
+    max-width: 45% !important;
+}
+
+.info {
+    flex: 1.2 !important;
+    padding: 2.5rem 3.5rem !important;
+    overflow-y: auto;
+}
+
+.infoCaja h2 {
+    font-size: clamp(36px, 4.5vw, 50px) !important;
+    margin-bottom: 2rem !important;
+}
+
+.infoCaja p {
+    font-size: clamp(16px, 2vw, 20px) !important;
+    margin-bottom: 2.5rem !important;
+    line-height: 1.8 !important;
+}
+
+.tallas {
+    font-size: clamp(52px, 6.5vw, 70px) !important;
+    margin: 1.8rem 0 !important;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .modal-content {
+        flex-direction: column !important;
+        max-height: 85vh !important;
+        overflow-y: auto !important;
+    }
+
+    .imagenModal {
+        max-width: 100% !important;
+        height: 300px !important;
+    }
+
+    .info {
+        padding: 2rem 2.5rem !important;
+    }
+}
+
+[id^="btnCerrarModal"] {
+    padding: 1.2rem 2.8rem !important;
+    font-size: 1.4rem !important;
+    margin-top: 1.5rem !important;
+}

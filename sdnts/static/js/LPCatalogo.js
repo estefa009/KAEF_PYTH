@@ -364,7 +364,7 @@ const modalT4 = document.getElementById('modalT4');
 const closeT4 = document.querySelector('.closeT4');
 const btnCerrarModalT4 = document.getElementById('btnCerrarModalT4');
 
-// Funciones para manejar el modal de Talla S
+// Función para abrir el modal de Talla T4
 
 if (btnInfoT4) {
     btnInfoT4.addEventListener('click', () => {
@@ -379,7 +379,6 @@ const cerrarModalT4 = () => {
 };
 
 // Añadir eventos para cerrar el modal de Talla T4
-
 if (closeT4) {
     closeT4.addEventListener('click', cerrarModalT4);
 }
@@ -400,9 +399,6 @@ window.addEventListener('click', (event) => {
     }
     if (event.target === modalXL) {
         cerrarModalXL();
-    }
-    if (event.target === modalV) {
-        cerrarModalV();
     }
     if (event.target === modalV) {
         cerrarModalV();
@@ -433,6 +429,15 @@ window.addEventListener('click', (event) => {
     }
     if (event.target === modalT4) {
         cerrarModalT4();
+    }
+});
+
+// También, cerramos todos los modales si se presiona la tecla ESC
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.classList.add('hidden');
+        });
     }
 });
 
