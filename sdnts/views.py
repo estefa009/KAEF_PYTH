@@ -117,20 +117,24 @@ def login(request):
     return render(request, 'auth/login.html')
 
 
+
 def registro(request):
     if request.method == 'POST':
-        form = RegistroUsuarioForm(request.POST)  # Este formulario NO tiene campo 'rol'
+        form = RegistroUsuarioForm(request.POST)   # el form NO incluye el campo 'rol'
         if form.is_valid():
             usuario = form.save(commit=False)
-            usuario.rol = 'CLIENTE'  # Asigna el rol por defecto
+
+            usuario.rol = 'CLIENTE'                         # o Usuario.Rol.CLIENTE si usas choices
+
             usuario.save()
+
             enviar_correo_bienvenida(usuario)
+
             return redirect('login')
     else:
         form = RegistroUsuarioForm()
+
     return render(request, 'auth/registro.html', {'form': form})
-
-
 @login_required
 def agregar_usuario(request):
     if request.method == 'POST':
@@ -2471,8 +2475,8 @@ def reporte_ventas(request):
 
 @login_required
 def reporte_produccion(request):
-    producciones = Produccion.objects.all()
-    estados = [p.get_estado_display() for p in producciones]
+    produccion = Produccion.objects.all()
+    estados = [p.get_estado_display() for p in produccion]
     from collections import Counter
     conteo = Counter(estados)
     plt.figure(figsize=(6, 4))

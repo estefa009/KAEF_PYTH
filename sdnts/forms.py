@@ -1,8 +1,16 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import Usuario, Cliente,  Venta
+from django.core.validators import RegexValidator
+
+# Validador: solo letras (con tildes, ñ, ü) y espacios
+solo_letras = RegexValidator(
+    r'^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$',
+    'Solo se permiten letras y espacios en los campos nombre/apellido.'
+)
 
 class RegistroUsuarioForm(UserCreationForm):
+    # Campos de autenticación -----------------------------
     password1 = forms.CharField(
         label='Contraseña',
         widget=forms.PasswordInput(attrs={
@@ -18,32 +26,53 @@ class RegistroUsuarioForm(UserCreationForm):
         })
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.label = ''
+    # Campos de tu modelo ---------------------------------
+    nom_usua = forms.CharField(
+        label='Nombre',
+        validators=[solo_letras],
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Nombre',
+            'class': 'form-control shadow'
+        })
+    )
+    apell_usua = forms.CharField(
+        label='Apellido',
+        validators=[solo_letras],
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Apellido',
+            'class': 'form-control shadow'
+        })
+    )
+    email = forms.EmailField(
+        label='Correo Electrónico',
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'Correo Electrónico',
+            'class': 'form-control shadow'
+        })
+    )
+    tele_usua = forms.CharField(
+        label='Teléfono',
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Teléfono',
+            'class': 'form-control shadow'
+        })
+    )
 
+    # Meta y ajustes --------------------------------------
     class Meta:
         model = Usuario
-        fields = ['nom_usua', 'apell_usua','email', 'tele_usua']
-        labels = {
-            'nom_usua': 'Nombre',
-            'apell_usua': 'Apellido',
-            'email': 'Correo Electrónico',
-            'tele_usua': 'Teléfono',
-        }
-        widgets = {
-            'nom_usua': forms.TextInput(attrs={'placeholder': 'Nombre', 'class': 'form-control shadow'}),
-            'apell_usua': forms.TextInput(attrs={'placeholder': 'Apellido', 'class': 'form-control shadow'}),
-            'email': forms.EmailInput(attrs={'placeholder': 'Correo Electrónico', 'class': 'form-control shadow'}),
-            'tele_usua': forms.TextInput(attrs={'placeholder': 'Teléfono', 'class': 'form-control shadow'}),
-        }
+        fields = ['nom_usua', 'apell_usua', 'email', 'tele_usua']
 
-    def clean(self):
-        cleaned_data = super().clean()
-        return cleaned_data
-    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Ocultamos labels en el HTML (ya están en los placeholders)
+        for field in self.fields.values():
+            field.label = ''
+            
+            
+
 class UsuarioForm(UserCreationForm):
+    # Campos de autenticación (los de UserCreationForm + estilos) ───────────────
     password1 = forms.CharField(
         label='Contraseña',
         widget=forms.PasswordInput(attrs={
@@ -51,7 +80,6 @@ class UsuarioForm(UserCreationForm):
             'class': 'form-control shadow'
         })
     )
-    
     password2 = forms.CharField(
         label='Confirmar Contraseña',
         widget=forms.PasswordInput(attrs={
@@ -59,35 +87,53 @@ class UsuarioForm(UserCreationForm):
             'class': 'form-control shadow'
         })
     )
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.label = ''  # Esto elimina todas las etiquetas
 
+    # Campos con validación extra ───────────────────────────────────────────────
+    nom_usua = forms.CharField(
+        label='Nombre',
+        validators=[solo_letras],
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Nombre',
+            'class': 'form-control shadow'
+        })
+    )
+    apell_usua = forms.CharField(
+        label='Apellido',
+        validators=[solo_letras],
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Apellido',
+            'class': 'form-control shadow'
+        })
+    )
+
+    # Meta y resto de widgets ───────────────────────────────────────────────────
     class Meta:
         model = Usuario
         fields = ['email', 'nom_usua', 'apell_usua', 'tele_usua', 'rol']
         labels = {
             'email': 'Correo Electrónico',
-            'nom_usua': 'Nombre',
-            'apell_usua': 'Apellido',
             'tele_usua': 'Teléfono',
             'rol': 'Rol',
         }
         widgets = {
-            'email': forms.EmailInput(attrs={'placeholder': 'Correo Electrónico', 'class': 'form-control shadow'}),
-            'nom_usua': forms.TextInput(attrs={'placeholder': 'Nombre', 'class': 'form-control shadow'}),
-            'apell_usua': forms.TextInput(attrs={'placeholder': 'Apellido', 'class': 'form-control shadow'}),
-            'tele_usua': forms.TextInput(attrs={'placeholder': 'Teléfono', 'class': 'form-control shadow'}),
-            'rol': forms.Select(attrs={'class': 'form-control shadow'}, choices=Usuario.ROLES),
+            'email': forms.EmailInput(attrs={
+                'placeholder': 'Correo Electrónico',
+                'class': 'form-control shadow'
+            }),
+            'tele_usua': forms.TextInput(attrs={
+                'placeholder': 'Teléfono',
+                'class': 'form-control shadow'
+            }),
+            'rol': forms.Select(attrs={
+                'class': 'form-control shadow'
+            }, choices=Usuario.ROLES),
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
-        # La validación de contraseñas ya la hace UserCreationForm automáticamente
-        return cleaned_data
-    
+    # Oculta las etiquetas en el HTML (ya están en los placeholders)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.label = ''
     
 class CargarDatosForm(forms.Form):
     TIPOS_ARCHIVO = (
@@ -235,9 +281,25 @@ class SalidaForm(forms.ModelForm):
 class EntradaForm(forms.ModelForm):
     class Meta:
         model = Entrada
-        fields = ['cod_insumo', 'cnt_entrada', 'precio_entrada', 'fecha_caducidad']
+        fields = ['cod_insumo', 'cod_proveedor', 'cnt_entrada', 'precio_entrada', 'fecha_caducidad']
+        widgets = {
+            'fecha_caducidad': forms.DateInput(attrs={'type': 'date'}),
+        }
 
+    def clean_cnt_entrada(self):
+        cnt = self.cleaned_data.get('cnt_entrada')
+        if cnt is not None and cnt < 0:
+            raise forms.ValidationError("La cantidad no puede ser negativa.")
+        return cnt
 
+    def clean_precio_entrada(self):
+        precio = self.cleaned_data.get('precio_entrada')
+        if precio is not None and precio < 0:
+            raise forms.ValidationError("El precio no puede ser negativo.")
+        return precio
+    
+    
+    
 class EnvioForm(forms.ModelForm):
     class Meta:
         model = Envio
@@ -337,6 +399,20 @@ class InsumoForm(forms.ModelForm):
             'cnt_insumo': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Cantidad'}),
             'unidad_medida': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Unidad de medida'}),
         }
+
+    def clean_nomb_insumo(self):
+     nombre = self.cleaned_data['nomb_insumo'].strip()
+     if nombre.isdigit():
+        raise forms.ValidationError("El nombre del insumo no puede ser solo números.")
+        qs = Insumo.objects.filter(nomb_insumo__iexact=nombre)
+     if self.instance.pk:
+        qs = qs.exclude(pk=self.instance.pk)
+     if qs.exists():
+        raise forms.ValidationError("Ya existe un insumo con ese nombre.")
+     return nombre
+    
+    
+    
 from django import forms
 from .models import Salida
 
