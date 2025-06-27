@@ -168,7 +168,7 @@ class DetalleVentaForm(forms.ModelForm):
         fields = ['cod_producto', 'cantidad', 'precio_unitario', 'fecha_entrega']
         widgets = {
             'fecha_entrega': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'precio_unitario': forms.NumberInput(attrs={'readonly': 'readonly'})  # 👈 Desactiva edición
+            'precio_unitario': forms.NumberInput(attrs={'readonly': 'readonly'})  # Desactiva edición manual
         }
 
     def __init__(self, *args, **kwargs):
@@ -182,7 +182,19 @@ class DetalleVentaForm(forms.ModelForm):
         if fecha_entrega and fecha_entrega.date() < fecha_minima:
             raise forms.ValidationError("La fecha de entrega debe ser al menos 3 días después de hoy.")
         return fecha_entrega
-  
+
+    def clean_cantidad(self):
+        cantidad = self.cleaned_data.get('cantidad')
+        if cantidad is not None and cantidad <= 0:
+            raise forms.ValidationError("❌ La cantidad no puede ser cero ni negativa.")
+        return cantidad
+
+    def clean_precio_unitario(self):
+        precio = self.cleaned_data.get('precio_unitario')
+        if precio is not None and precio < 0:
+            raise forms.ValidationError("❌ El precio unitario no puede ser negativo.")
+        return precio
+
 
 class CombinacionProductoForm(forms.ModelForm):
     class Meta:
@@ -219,6 +231,11 @@ class PagoForm(forms.ModelForm):
         model = Pago
         exclude = ['cod_venta', 'estado_pago', 'transaccion_id']
 
+    def clean_valor_pagado(self):
+        valor = self.cleaned_data.get('valor_pagado')
+        if valor is not None and valor < 0:
+            raise forms.ValidationError("El valor pagado no puede ser negativo.")
+        return valor
 #produccion
 from .models import Produccion, Salida, Entrada, Envio
 
@@ -392,7 +409,7 @@ class RecetaPersonalizacionForm(forms.ModelForm):
 RecetaPersonalizacionFormSet = forms.modelformset_factory(
     RecetaPersonalizacion,
     form=RecetaPersonalizacionForm,
-    extra=3,  # Puedes aumentar esto si quieres más combinaciones
+    extra=3,  #  más combinaciones
     can_delete=True
 )
 

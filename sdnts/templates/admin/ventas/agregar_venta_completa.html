@@ -66,9 +66,14 @@
                             {% endif %}
                         </div>
                     {% endfor %}
+                    <div class="mb-1">
+                        <label><strong>Producto asociado:</strong></label>
+                        <input type="text" class="form-control producto-combinacion" readonly>
+                    </div>
                 </div>
             {% endfor %}
         </div>
+
 
         <h4>Totales</h4>
         <p>Subtotal: $<span id="subtotal">0.00</span></p>
@@ -201,9 +206,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function actualizarCombinaciones() {
         let totalCantidad = 0;
+        let productosSeleccionados = [];
+
         document.querySelectorAll('.detalle-form').forEach(form => {
             const cantidadInput = form.querySelector('input[name$="cantidad"]');
-            totalCantidad += parseInt(cantidadInput.value) || 0;
+            const productoSelect = form.querySelector('select[name$="cod_producto"]');
+            const cantidad = parseInt(cantidadInput.value) || 0;
+            const productoId = productoSelect.value;
+
+            for (let i = 0; i < cantidad; i++) {
+                productosSeleccionados.push(productoId);
+            }
+
+            totalCantidad += cantidad;
         });
 
         combinacionContainer.querySelectorAll('.combinacion-form').forEach(form => form.remove());
@@ -215,11 +230,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 input.id = input.id.replace(/-\d+-/, `-${i}-`);
                 if (input.type !== 'hidden') input.value = '';
             });
+
+            // Asignar código del producto asociado visualmente
+            const productoInput = newForm.querySelector('.producto-combinacion');
+            if (productoInput) {
+                productoInput.value = productosSeleccionados[i] || 'N/A';
+            }
+
             combinacionContainer.appendChild(newForm);
         }
 
         document.getElementById('id_combinacion-TOTAL_FORMS').value = totalCantidad;
     }
+
 
     bindDetalleEvents();
     bindEliminarEventos();
