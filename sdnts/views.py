@@ -1119,7 +1119,7 @@ def agregar_venta_completa(request):
                                     'detalle': detalle,
                                     'cantidad': detalle.cantidad
                                 })
-                                subtotal += detalle.cantidad * detalle.precio_unitario  # 👈 usa fórmula
+                                subtotal += detalle.cantidad * detalle.precio_unitario
 
                         # Calcular totales
                         iva = subtotal * Decimal('0.19')
@@ -1130,7 +1130,6 @@ def agregar_venta_completa(request):
                         venta.total = total
                         venta.save()
 
-                        # Guardar combinaciones en orden
                         # Guardar combinaciones en orden
                         combinacion_index = 0
                         for d in detalles_guardados:
@@ -2491,7 +2490,7 @@ def reporte_produccion(request):
     grafico_base64 = base64.b64encode(buf.read()).decode('utf-8')
     buf.close()
     plt.close()
-    context = {'producciones': produccion, 'grafico_base64': grafico_base64}
+    context = {'producciones': producciones, 'grafico_base64': grafico_base64}
     html_string = render_to_string('reportes/reporte_produccion.html', context)
     pdf_file = HTML(string=html_string).write_pdf()
     response = HttpResponse(pdf_file, content_type='application/pdf')

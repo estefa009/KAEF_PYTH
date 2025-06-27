@@ -1,0 +1,1 @@
+web: gunicorn kaef_final.wsgi:application
